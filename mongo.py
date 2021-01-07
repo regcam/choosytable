@@ -13,6 +13,9 @@ app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
 mongo = PyMongo(app)
 star = mongo.db.stars
 
+db = mongo.db
+print ("MongoDB Database:", mongo.db)
+
 @app.route('/company', methods=['GET'])
 def get_all_companies():
   return json_util.dumps(star.find({'reviews':{"$exists":True}}))
@@ -88,6 +91,23 @@ def add_person():
   except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
+
+@app.route("/")
+def connect_mongo():
+  html_str = '''
+  <!DOCTYPE html>
+  <html lang="en">
+  '''
+  # Have Flask return some MongoDB information
+  html_str = html_str + "\n<h1>Choosy Table</h1>\n"
+  #html_str = html_str + "\n## mongo.cx client instance:" + str(mongo.cx) + "\n"
+  html_str = html_str + "\n### " + str(db) + "\n"
+  html_str = html_str + "\n### " + str(star) + "\n"
+
+  # Get a MongoDB document using PyMongo's find_one() method
+  html_str = html_str + "\n<h2>Latest Info:</h2><h3>" + str(star.find_one()) + "</h3>\n</html>"
+
+  return html_str
 
 if __name__ == '__main__':
     app.run(debug=True)
