@@ -101,9 +101,9 @@ def authorized(resp):
     session['access_token'] = access_token, ''
     return redirect(url_for('welcome'))
 
-@google.tokengetter
-def get_access_token():
-    return session.get('access_token')
+#@google.tokengetter
+#def get_access_token():
+#    return session.get('access_token')
 
 @app.route('/company', methods=['GET'])
 def get_all_companies():
