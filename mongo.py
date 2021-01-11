@@ -13,15 +13,15 @@ REDIRECT_URI = '/oauth2callback'
 
 # Add your SECRET_KEY here
 # Set your secret key as an evironment variable and use it as below
-SECRET_KEY = "AIzaSyC-gxgB1__GVbvQaZtvI-4T1w9xZ6O6uQY"
+SECRET_KEY = ""
 DEBUG = True
 
 app = Flask(__name__)
 
 # Your GOOGLE_CLIENT_ID and GOOGLE_CLIENT SECRET are needed here
 # You can get them at https://code.google.com/apis/console
-GOOGLE_CLIENT_ID = "655625041349-qe8et4rsnf2a8ljfjsi9tfauha67fe63.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "_WdCPAGoABiDZoOQuZHzwO48"
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
 
 app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
