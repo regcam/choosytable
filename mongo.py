@@ -1,20 +1,96 @@
-from flask import Flask
+from flask import Flask, redirect, url_for, session
+from flask_oauth import OAuth
 from flask import jsonify
 from flask import request
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
+import urllib.request,urllib.parse,urllib.error
+
+
+# This is one of the Redirect URIs from Google APIs console
+REDIRECT_URI = '/oauth2callback'
+
+# Add your SECRET_KEY here
+# Set your secret key as an evironment variable and use it as below
+SECRET_KEY = "AIzaSyC-gxgB1__GVbvQaZtvI-4T1w9xZ6O6uQY"
+DEBUG = True
 
 app = Flask(__name__)
 
+# Your GOOGLE_CLIENT_ID and GOOGLE_CLIENT SECRET are needed here
+# You can get them at https://code.google.com/apis/console
+GOOGLE_CLIENT_ID = "655625041349-qe8et4rsnf2a8ljfjsi9tfauha67fe63.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "_WdCPAGoABiDZoOQuZHzwO48"
+
 app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
+app.secret_key = SECRET_KEY
+oauth = OAuth()
 
 mongo = PyMongo(app)
 star = mongo.db.stars
-
 db = mongo.db
-print ("MongoDB Database:", mongo.db)
+
+google = oauth.remote_app('google',
+base_url='https://www.google.com/accounts/',
+authorize_url='https://accounts.google.com/o/oauth2/auth',
+request_token_url=None,
+request_token_params={'scope': 'https://www.googleapis.com/auth/userinfo.email',
+'response_type': 'code'},
+access_token_url='https://accounts.google.com/o/oauth2/token',
+access_token_method='POST',
+access_token_params={'grant_type': 'authorization_code'},
+consumer_key=GOOGLE_CLIENT_ID,
+consumer_secret=GOOGLE_CLIENT_SECRET)
+
+@app.route("/")
+def home():
+  access_token = session.get('access_token')
+  if access_token is None:
+      return redirect(url_for('login'))
+  
+  access_token = access_token[0]
+
+  headers = {'Authorization': 'OAuth '+access_token}
+  req = urllib.request.Request('https://www.googleapis.com/oauth2/v1/userinfo',
+                None, headers)
+  try:
+    res = urllib.request.urlopen(req)
+  except urllib.error.HTTPError as e:
+    if e.code == 401:
+        # Unauthorized - bad token
+        session.pop('access_token', None)
+        return redirect(url_for('login'))
+    return res.read()
+
+@app.route('/welcome')
+def welcome():
+  html_str = '''
+  <!DOCTYPE html>
+  <html lang="en">
+  '''
+  html_str = html_str + "\n<h1>Choosy Table</h1>\n"
+  html_str = html_str + "\n### " + str(db) + "\n"
+  html_str = html_str + "\n### " + str(star) + "\n"
+  html_str = html_str + "\n<h2>Latest Info:</h2><h3>" + str(star.find_one()) + "</h3>\n</html>"
+  return html_str
+
+@app.route('/login')
+def login():
+    callback=url_for('authorized', _external=True)
+    return google.authorize(callback=callback)
+
+@app.route(REDIRECT_URI)
+@google.authorized_handler
+def authorized(resp):
+    access_token = resp['access_token']
+    session['access_token'] = access_token, ''
+    return redirect(url_for('welcome'))
+
+@google.tokengetter
+def get_access_token():
+    return session.get('access_token')
 
 @app.route('/company', methods=['GET'])
 def get_all_companies():
@@ -91,23 +167,6 @@ def add_person():
   except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
-
-@app.route("/")
-def connect_mongo():
-  html_str = '''
-  <!DOCTYPE html>
-  <html lang="en">
-  '''
-  # Have Flask return some MongoDB information
-  html_str = html_str + "\n<h1>Choosy Table</h1>\n"
-  #html_str = html_str + "\n## mongo.cx client instance:" + str(mongo.cx) + "\n"
-  html_str = html_str + "\n### " + str(db) + "\n"
-  html_str = html_str + "\n### " + str(star) + "\n"
-
-  # Get a MongoDB document using PyMongo's find_one() method
-  html_str = html_str + "\n<h2>Latest Info:</h2><h3>" + str(star.find_one()) + "</h3>\n</html>"
-
-  return html_str
 
 if __name__ == '__main__':
     app.run(debug=True)
