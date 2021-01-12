@@ -1,11 +1,9 @@
 from flask import Flask, redirect, url_for, session, render_template
-from flask_oauth import OAuth
 from flask import jsonify
 from flask import request
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
-import urllib.request,urllib.parse,urllib.error
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
 
