@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
 
-DEBUG = True
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'restdb'
