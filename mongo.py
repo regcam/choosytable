@@ -26,6 +26,9 @@ def before_request():
     return render_template("index.html")
 
 @app.route("/")
+@app.route("/home")
+@app.route("/index")
+@app.route("/")
 def home():
   resp = google.get("/oauth2/v1/userinfo")
   return render_template(
@@ -35,81 +38,81 @@ def home():
     collection=str(star), 
     latestInfo=str(star.find_one()))
 
-@app.route('/company', methods=['GET'])
-def get_all_companies():
-  return json_util.dumps(star.find({'reviews':{"$exists":True}}))
-
-@app.route('/company', methods=['POST'])
-def add_company():
-  company = request.json['company']
-  creator = request.json['creator']
-  reviews = request.json['reviews']
-  output={}
-  try:
-      return json_util.dumps(star.insert({'created' : datetime.now(), 'company': company, 'creator': creator, 'reviews': reviews}))
-  except Exception as e:
-      output = {'error' : str(e)}
-      return jsonify(output)
-
-@app.route('/company/<company_id>', methods=['GET'])
-def get_company(company_id):
-  return json_util.dumps(star.find_one({'_id': ObjectId(company_id)}))
-
-@app.route('/company/<company_id>', methods=['POST'])
-def update_company(company_id):
-  r = star.find_one({'_id' : ObjectId(company_id)})
-  if r:
-    for key in request.json.keys():
-        r[key] = request.json[key]
+@app.route('/company', methods=['GET','POST','PUT'])
+def company():
+  if request.method == 'GET':
+    return json_util.dumps(star.find({'reviews':{"$exists":True}}))
+  elif request.method in ('POST', 'PUT'):
+    company = request.json['company']
+    creator = request.json['creator']
+    reviews = request.json['reviews']
+    output={}
     try:
-        output= star.replace_one({'_id' : ObjectId(company_id)}, r)
-        output= star.update_one({'_id' : ObjectId(company_id)}, { "$set": {'last_modified':datetime.now() } } )
-        output = {'message' : 'company updated'}
-        return jsonify({'result' : output})
+        return json_util.dumps(star.insert({'created' : datetime.now(), 'company': company, 'creator': creator, 'reviews': reviews}))
     except Exception as e:
         output = {'error' : str(e)}
         return jsonify(output)
-  else:
-    output = {'error' : 'company not found'}
-    return jsonify(output)
 
-@app.route('/person/<person_id>', methods=['GET'])
-def get_person(person_id):
-  return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
+@app.route('/company/<company_id>', methods=['GET','POST','PUT'])
+def single_company(company_id):
+  if request.method=='GET':
+    return json_util.dumps(star.find_one({'_id': ObjectId(company_id)}))
+  elif request.method in ('POST','PUT'):
+    r = star.find_one({'_id' : ObjectId(company_id)})
+    if r:
+      for key in request.json.keys():
+          r[key] = request.json[key]
+      try:
+          output= star.replace_one({'_id' : ObjectId(company_id)}, r)
+          output= star.update_one({'_id' : ObjectId(company_id)}, { "$set": {'last_modified':datetime.now() } } )
+          output = {'message' : 'company updated'}
+          return jsonify({'result' : output})
+      except Exception as e:
+          output = {'error' : str(e)}
+          return jsonify(output)
+    else:
+      output = {'error' : 'company not found'}
+      return jsonify(output)
 
-@app.route('/person/<person_id>', methods=['POST'])
-def update_person(person_id):
-  r = star.find_one({'_id' : ObjectId(person_id)})
-  if r:
-    for key in request.json.keys():
-        r[key] = request.json[key]
+@app.route('/person/<person_id>', methods=['GET','PUT','POST'])
+def single_person(person_id):
+  if request.method=='GET':
+    return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
+  elif request.method in ('POST','PUT'):
+    r = star.find_one({'_id' : ObjectId(person_id)})
+    if r:
+      for key in request.json.keys():
+          r[key] = request.json[key]
+      try:
+          output= star.replace_one({'_id' : ObjectId(person_id)}, r)
+          output= star.update_one({'_id' : ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
+          output = {'message' : 'person updated'}
+          return jsonify({'result' : output})
+      except Exception as e:
+          output = {'error' : str(e)}
+          return jsonify(output)
+    else:
+      output = {'error' : 'person not found'}
+      return jsonify(output)
+
+@app.route('/person', methods=['GET','POST','PUT'])
+def persons():
+  if request.method=='GET':
+    if request.args:
+      name=request.args.get("name","")
+      return json_util.dumps(star.find({"$and":[{'name':name},{'email':{"$exists":True}}]}))
+    else:
+      return json_util.dumps(star.find({'email':{"$exists":True}}))
+  elif request.method in ('POST','PUT'):
+    name = request.json['name']
+    email = request.json['email']
+    ethnicity = request.json['ethnicity']
+    output={}
     try:
-        output= star.replace_one({'_id' : ObjectId(person_id)}, r)
-        output= star.update_one({'_id' : ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
-        output = {'message' : 'person updated'}
-        return jsonify({'result' : output})
+        return json_util.dumps(star.insert({'created' : datetime.now(), 'name': name, 'email': email, 'ethnicity': ethnicity}))
     except Exception as e:
         output = {'error' : str(e)}
         return jsonify(output)
-  else:
-    output = {'error' : 'person not found'}
-    return jsonify(output)
-
-@app.route('/person', methods=['GET'])
-def get_all_persons():
-  return json_util.dumps(star.find({'email':{"$exists":True}}))
-
-@app.route('/person', methods=['POST'])
-def add_person():
-  name = request.json['name']
-  email = request.json['email']
-  ethnicity = request.json['ethnicity']
-  output={}
-  try:
-      return json_util.dumps(star.insert({'created' : datetime.now(), 'name': name, 'email': email, 'ethnicity': ethnicity}))
-  except Exception as e:
-      output = {'error' : str(e)}
-      return jsonify(output)
 
 if __name__ == '__main__':
     app.run(debug=True)
