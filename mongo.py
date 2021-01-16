@@ -4,13 +4,14 @@ from bson import json_util
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
+from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-app.secret_key = os.environ.get("SECRET_KEY")
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 app.config['GOOGLE_OAUTH_CLIENT_ID']=os.environ.get("GOOGLE_CLIENT_ID")
 app.config['GOOGLE_OAUTH_CLIENT_SECRET']=os.environ.get("GOOGLE_CLIENT_SECRET")
 blueprint = make_google_blueprint(scope=["profile", "email"])
@@ -24,19 +25,20 @@ db = mongo.db
 def before_request():
   if not google.authorized and "google" not in request.path:
     return render_template("index.html")
+  else:
+    session['resp']=google.get("/oauth2/v1/userinfo").json()
 
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
-@app.route("/")
 def home():
-  resp = google.get("/oauth2/v1/userinfo")
+  e = ['Black', 'Latinx', 'Native American', 'Asian']
   return render_template(
     'welcome.html', 
-    email=resp.json()["email"], 
-    database=str(db), 
-    collection=str(star), 
-    latestInfo=str(star.find_one()))
+    email=session['resp']['email'],
+    name=session['resp']['name'],
+    latestInfo=str(star.find_one()),
+    e=e)
 
 @app.route('/company', methods=['GET','POST','PUT'])
 def company():
@@ -44,14 +46,14 @@ def company():
     return json_util.dumps(star.find({'reviews':{"$exists":True}}))
   elif request.method in ('POST', 'PUT'):
     company = request.json['company']
-    creator = request.json['creator']
+    creator = session['resp']['name']
     reviews = request.json['reviews']
     output={}
     try:
-        return json_util.dumps(star.insert({'created' : datetime.now(), 'company': company, 'creator': creator, 'reviews': reviews}))
+      return json_util.dumps(star.insert({'created' : datetime.now(), 'company': company, 'creator': creator, 'reviews': reviews}))
     except Exception as e:
-        output = {'error' : str(e)}
-        return jsonify(output)
+      output = {'error' : str(e)}
+      return jsonify(output)
 
 @app.route('/company/<company_id>', methods=['GET','POST','PUT'])
 def single_company(company_id):
@@ -61,15 +63,15 @@ def single_company(company_id):
     r = star.find_one({'_id' : ObjectId(company_id)})
     if r:
       for key in request.json.keys():
-          r[key] = request.json[key]
+        r[key] = request.json[key]
       try:
-          output= star.replace_one({'_id' : ObjectId(company_id)}, r)
-          output= star.update_one({'_id' : ObjectId(company_id)}, { "$set": {'last_modified':datetime.now() } } )
-          output = {'message' : 'company updated'}
-          return jsonify({'result' : output})
+        output= star.replace_one({'_id' : ObjectId(company_id)}, r)
+        output= star.update_one({'_id' : ObjectId(company_id)}, { "$set": {'last_modified':datetime.now() } } )
+        output = {'message' : 'company updated'}
+        return jsonify({'result' : output})
       except Exception as e:
-          output = {'error' : str(e)}
-          return jsonify(output)
+        output = {'error' : str(e)}
+        return jsonify(output)
     else:
       output = {'error' : 'company not found'}
       return jsonify(output)
@@ -82,21 +84,21 @@ def single_person(person_id):
     r = star.find_one({'_id' : ObjectId(person_id)})
     if r:
       for key in request.json.keys():
-          r[key] = request.json[key]
+        r[key] = request.json[key]
       try:
-          output= star.replace_one({'_id' : ObjectId(person_id)}, r)
-          output= star.update_one({'_id' : ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
-          output = {'message' : 'person updated'}
-          return jsonify({'result' : output})
+        output= star.replace_one({'_id' : ObjectId(person_id)}, r)
+        output= star.update_one({'_id' : ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
+        output = {'message' : 'person updated'}
+        return jsonify({'result' : output})
       except Exception as e:
-          output = {'error' : str(e)}
-          return jsonify(output)
+        output = {'error' : str(e)}
+        return jsonify(output)
     else:
       output = {'error' : 'person not found'}
       return jsonify(output)
 
 @app.route('/person', methods=['GET','POST','PUT'])
-def persons():
+def person():
   if request.method=='GET':
     if request.args:
       name=request.args.get("name","")
@@ -104,15 +106,29 @@ def persons():
     else:
       return json_util.dumps(star.find({'email':{"$exists":True}}))
   elif request.method in ('POST','PUT'):
-    name = request.json['name']
-    email = request.json['email']
-    ethnicity = request.json['ethnicity']
+    name = session['resp']['name']
+    email = session['resp']['email']
+    ethnicity = request.form['ethnicity']
+    print("Your ethnicity is '"+ ethnicity + "'")
     output={}
     try:
-        return json_util.dumps(star.insert({'created' : datetime.now(), 'name': name, 'email': email, 'ethnicity': ethnicity}))
+      return json_util.dumps(star.insert({'created' : datetime.now(), 'name': name, 'email': email, 'ethnicity': ethnicity}))
     except Exception as e:
-        output = {'error' : str(e)}
-        return jsonify(output)
+      output = {'error' : str(e)}
+      return jsonify(output)
+
+@app.route("/logout")
+def logout():
+    token = blueprint.token["access_token"]
+    resp = google.post(
+        "https://accounts.google.com/o/oauth2/revoke",
+        params={"token": token},
+        headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )
+    assert resp.ok, resp.text
+    #logout_user()        # Delete Flask-Login's session cookie
+    del blueprint.token  # Delete OAuth token from storage
+    return render_template('bye.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

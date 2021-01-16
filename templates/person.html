@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <h1>Choosy Table</h1>
+    <p>Create a profile</p>
+    <form action="{{ url_for('addperson') }}" method="post">
+        Ethnicity: <input type="text" name="addethnicity"><br>
+        <input type="submit" value="Submit">
+    </form>    
+</body>
+</html>

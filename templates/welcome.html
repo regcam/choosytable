@@ -3,8 +3,19 @@
 <body>
     <h1>Choosy Table</h1>
     <p>You are {{email}} on Google</p>
-    <p>The database is: {{database}}</p>
-    <p>The collection is: {{collection}}</p>
     <h2>Latest Info:</h2><h3>{{latestInfo}}</h3>
+
+    <p>Create a profile</p>
+    <form action="/person" method="post">
+        <p>Name <input placeholder="Enter your name" type="text" name="name" value="{{name}}"></input></p>
+        <p>Email <input disabled=True label="Email" type="email" name="email" value="{{email}}"></input></p>
+        <p>Ethnicity <select name="ethnicity">
+            {% for n in e %}
+            <option value="{{n}}">{{n}}</option>
+            {% endfor %}
+        </select>
+        </p>
+        <p><input type="submit" value="Submit"></input></p>
+    </form>
 </body>
 </html>
