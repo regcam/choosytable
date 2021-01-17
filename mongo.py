@@ -37,15 +37,15 @@ def home():
   x=star.find_one({'email':session['resp']['email']})
   if x is not None:
     return render_template(
-      'welcome.html',
-      id=x['_id'],
+      'person.html',
+      personid=x['_id'],
       email=x['email'],
       name=x['name'],
       ethnicity=x['ethnicity'],
       e=e)
   else:
     return render_template(
-      'welcome.html',
+      'person.html',
       email=session['resp']['email'],
       name=session['resp']['name'],
       e=e)

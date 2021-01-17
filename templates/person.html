@@ -2,17 +2,28 @@
 <html lang="en">
 <body>
     <h1>Choosy Table</h1>
-    <p>Your profile:</p>
-    <form action="/person" method="post">
+
+    <p>Hey {{name}}, is your info correct?</p>
+    {% if personid %}
+        <form action="/person/{{personid}}" method="post">
+    {% else %}
+        <form action="/person" method="post">
+    {% endif %}
         <p>Name <input placeholder="Enter your name" type="text" name="name" value="{{name}}"></input></p>
         <p>Email <input disabled=True label="Email" type="email" name="email" value="{{email}}"></input></p>
         <p>Ethnicity <select name="ethnicity">
             {% for n in e %}
-            <option value="{{n}}">{{n}}</option>
+                {% if n==ethnicity %}
+                    <option value="{{n}}" selected>{{n}}</option>
+                {% else %}
+                    <option value="{{n}}">{{n}}</option>
+                {% endif %}
             {% endfor %}
         </select></p>
-        <p>Sex <input placeholder="How do you identify?" type="text" name="sex" value="{{sex}}"></input></p>
         <p><input type="submit" value="Submit"></input></p>
     </form>
+
+    <p><a href={{url_for('company')}}>Post a Company review?</a></p>
+
 </body>
 </html>
