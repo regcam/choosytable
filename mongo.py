@@ -31,14 +31,24 @@ def before_request():
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
+@app.route("/welcome")
 def home():
   e = ['Black', 'Latinx', 'Native American', 'Asian']
-  return render_template(
-    'welcome.html', 
-    email=session['resp']['email'],
-    name=session['resp']['name'],
-    latestInfo=str(star.find_one()),
-    e=e)
+  x=star.find_one({'email':session['resp']['email']})
+  if x is not None:
+    return render_template(
+      'welcome.html',
+      id=x['_id'],
+      email=x['email'],
+      name=x['name'],
+      ethnicity=x['ethnicity'],
+      e=e)
+  else:
+    return render_template(
+      'welcome.html',
+      email=session['resp']['email'],
+      name=session['resp']['name'],
+      e=e)
 
 @app.route('/company', methods=['GET','POST','PUT'])
 def company():
@@ -79,22 +89,20 @@ def single_company(company_id):
 @app.route('/person/<person_id>', methods=['GET','PUT','POST'])
 def single_person(person_id):
   if request.method=='GET':
-    return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
-  elif request.method in ('POST','PUT'):
-    r = star.find_one({'_id' : ObjectId(person_id)})
-    if r:
-      for key in request.json.keys():
-        r[key] = request.json[key]
-      try:
-        output= star.replace_one({'_id' : ObjectId(person_id)}, r)
-        output= star.update_one({'_id' : ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
-        output = {'message' : 'person updated'}
-        return jsonify({'result' : output})
-      except Exception as e:
-        output = {'error' : str(e)}
-        return jsonify(output)
-    else:
+    try:
+      return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
+    except:
       output = {'error' : 'person not found'}
+      return jsonify(output)
+  elif request.method in ('POST','PUT'):
+    try:
+      r = star.find_one({'_id' : ObjectId(person_id)})
+      star.replace_one({'_id' : ObjectId(person_id)}, {'created':r['created'],'name':request.form['name'],'email':r['email'],'ethnicity':request.form['ethnicity']})
+      star.update_one({'_id':ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
+      output = {'message' : 'Your profile has been updated'}
+      return jsonify({'result' : output})
+    except Exception as e:
+      output = {'error' : str(e)}
       return jsonify(output)
 
 @app.route('/person', methods=['GET','POST','PUT'])
@@ -109,10 +117,9 @@ def person():
     name = session['resp']['name']
     email = session['resp']['email']
     ethnicity = request.form['ethnicity']
-    print("Your ethnicity is '"+ ethnicity + "'")
     output={}
     try:
-      return json_util.dumps(star.insert({'created' : datetime.now(), 'name': name, 'email': email, 'ethnicity': ethnicity}))
+      return json_util.dumps(star.insert({'created':datetime.now(), 'name':name, 'email':email, 'ethnicity':ethnicity}))
     except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
