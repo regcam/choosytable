@@ -96,9 +96,15 @@ def single_person(person_id):
       return jsonify(output)
   elif request.method in ('POST','PUT'):
     try:
-      r = star.find_one({'_id' : ObjectId(person_id)})
-      star.replace_one({'_id' : ObjectId(person_id)}, {'created':r['created'],'name':request.form['name'],'email':r['email'],'ethnicity':request.form['ethnicity']})
-      star.update_one({'_id':ObjectId(person_id)}, { "$set": {'last_modified':datetime.now() } } )
+      star.update(
+        {'_id':ObjectId(person_id)},
+        {
+          '$set':{
+          'name':request.form['name'],
+          'ethnicity':request.form['ethnicity'],
+          "last_modified":datetime.now()} 
+        } 
+      )
       output = {'message' : 'Your profile has been updated'}
       return jsonify({'result' : output})
     except Exception as e:
