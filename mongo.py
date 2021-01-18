@@ -53,7 +53,8 @@ def home():
 @app.route('/company', methods=['GET','POST','PUT'])
 def company():
   if request.method == 'GET':
-    return json_util.dumps(star.find({'reviews':{"$exists":True}}))
+    companies=star.find({'reviews':{"$exists":True}})
+    return render_template('company.html',companies=companies)
   elif request.method in ('POST', 'PUT'):
     company = request.json['company']
     creator = session['resp']['name']
