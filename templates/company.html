@@ -1,47 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}"></head>
 <body>
     <h1>Choosy Table</h1>
-    <div class="table-responsive">
-        <table class="table table-sm table-borderless mb-0">
-            <thead class="thead-dark" style="text-align:left">
-                <tr>
-                    <th>#</th>
-                    <th>Company</th>
-                    <th>Review</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for company in companies %}
-                <tr>
-                    <th scope="row">{{ loop.index }}</th>
-                    <td>{{ company.company }}</td>
-                    <td>{% for review in company.reviews %}
-                            <p>{{ review.review }}</p>
-                        {% endfor %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    {{ pagination.info }}
+    {{ pagination.links }}
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Company</th>
+                <th>Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td>{{ loop.index + pagination.skip }}</td>
+                <td>{{ company.company }}</td>
+                <td>{{ company.reviews }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{ pagination.links }}
+
 
     <p>Create or Review a Company</p>
     {% if companyid %}
-        <form action="/company/{{companyid}}" method="post">
-    {% else %}
+    <form action="/company/{{companyid}}" method="post">
+        {% else %}
         <form action="/company" method="post">
-    {% endif %}
+            {% endif %}
             <p>Company Name <input placeholder="Enter your name" type="text" name="name" value="{{name}}"></input></p>
             <p>Ethnicity <select name="ethnicity">
-                {% for n in e %}
+                    {% for n in e %}
                     {% if n==ethnicity %}
-                        <option value="{{n}}" selected>{{n}}</option>
+                    <option value="{{n}}" selected>{{n}}</option>
                     {% else %}
-                        <option value="{{n}}">{{n}}</option>
+                    <option value="{{n}}">{{n}}</option>
                     {% endif %}
-                {% endfor %}
-            </select></p>
+                    {% endfor %}
+                </select></p>
             <p><input type="submit" value="Submit"></input></p>
-    </form>
+        </form>
 </body>
+
 </html>

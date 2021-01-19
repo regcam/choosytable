@@ -4,7 +4,7 @@ from bson import json_util
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
-from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
+from flask_paginate import Pagination, get_page_parameter
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -52,9 +52,15 @@ def home():
 
 @app.route('/company', methods=['GET','POST','PUT'])
 def company():
-  if request.method == 'GET':
+  if request.method == 'GET': 
+    search=False
+    q=request.args.get('q')
+    if q:
+      search=True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
     companies=star.find({'reviews':{"$exists":True}})
-    return render_template('company.html',companies=companies)
+    pagination = Pagination(page=page, total=companies.count(), search=search, record_name='companies')
+    return render_template('company.html',companies=companies,pagination=pagination)
   elif request.method in ('POST', 'PUT'):
     company = request.json['company']
     creator = session['resp']['name']
@@ -131,7 +137,6 @@ def person():
       output = {'error' : str(e)}
       return jsonify(output)
 
-@app.route("/pagination")
 def skiplimit(type="all", page_size=5, page_num=1):
     skips = page_size * (page_num - 1)
     if type=="person":
@@ -144,15 +149,7 @@ def skiplimit(type="all", page_size=5, page_num=1):
 
 @app.route("/logout")
 def logout():
-    token = blueprint.token["access_token"]
-    resp = google.post(
-        "https://accounts.google.com/o/oauth2/revoke",
-        params={"token": token},
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
-    )
-    assert resp.ok, resp.text
-    #logout_user()        # Delete Flask-Login's session cookie
-    del blueprint.token  # Delete OAuth token from storage
+    session.clear()
     return render_template('bye.html')
 
 if __name__ == '__main__':
