@@ -59,7 +59,7 @@ def company():
       search=True
     page = request.args.get(get_page_parameter(), type=int, default=1)
     companies=star.find({'reviews':{"$exists":True}})
-    pagination = Pagination(page=page, total=companies.count(), search=search, record_name='companies')
+    pagination=Pagination(page=page, total=companies.count(), search=search, record_name='companies')
     return render_template('company.html',companies=companies,pagination=pagination)
   elif request.method in ('POST', 'PUT'):
     company = request.json['company']
@@ -136,16 +136,6 @@ def person():
     except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
-
-def skiplimit(type="all", page_size=5, page_num=1):
-    skips = page_size * (page_num - 1)
-    if type=="person":
-      cursor = star.find({'email':{"$exists":True}}).skip(skips).limit(page_size)
-    elif type=="company":
-      cursor = star.find({'reviews':{"$exists":True}}).skip(skips).limit(page_size)
-    else:
-      cursor = star.find().skip(skips).limit(page_size)
-    return str([x for x in cursor])
 
 @app.route("/logout")
 def logout():
