@@ -28,20 +28,19 @@
 
     <p>Create or Review a Company</p>
     {% if companyid %}
-    <form action="/company/{{companyid}}" method="post">
+    <form action="/company/{{companyid}}" id="updatecompany" method="post">
         {% else %}
-        <form action="/company" method="post">
+        <form action="/company" id="updatecompany" method="post">
             {% endif %}
-            <p>Company Name <input placeholder="Enter your name" type="text" name="name" value="{{name}}"></input></p>
-            <p>Ethnicity <select name="ethnicity">
-                    {% for n in e %}
-                    {% if n==ethnicity %}
-                    <option value="{{n}}" selected>{{n}}</option>
-                    {% else %}
-                    <option value="{{n}}">{{n}}</option>
-                    {% endif %}
-                    {% endfor %}
-                </select></p>
+            <p><input placeholder="Enter the Company's Name" type="text" name="company"></input></p>
+            <p><textarea placeholder="Enter your review" name="reviews" form="updatecompany"></textarea></p>
+            <p>Rating: 
+                <input class="radio-inline" type="radio" name="rating" value="5">5</input>
+                <input class="radio-inline" type="radio" name="rating" value="4">4</input>
+                <input class="radio-inline" type="radio" name="rating" value="3">3</input>
+                <input class="radio-inline" type="radio" name="rating" value="1">2</input>
+                <input class="radio-inline" type="radio" name="rating" value="1">1</input>
+            </p>
             <p><input type="submit" value="Submit"></input></p>
         </form>
 </body>

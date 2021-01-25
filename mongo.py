@@ -62,12 +62,22 @@ def company():
     pagination=Pagination(page=page, total=companies.count(), search=search, record_name='companies')
     return render_template('company.html',companies=companies,pagination=pagination)
   elif request.method in ('POST', 'PUT'):
-    company = request.json['company']
-    creator = session['resp']['name']
-    reviews = request.json['reviews']
-    output={}
     try:
-      return json_util.dumps(star.insert({'created' : datetime.now(), 'company': company, 'creator': creator, 'reviews': reviews}))
+      return json_util.dumps(
+        star.insert(
+          {
+            'created':datetime.now(), 
+            'company':request.form['company'], 
+            'creator':session['resp']['name'], 
+            'reviews':[
+              {
+                'review':request.form['reviews'],
+                'rating':request.form['rating']
+              }
+            ] 
+          }
+        )
+      )
     except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
@@ -122,17 +132,13 @@ def single_person(person_id):
 def person():
   if request.method=='GET':
     if request.args:
-      name=request.args.get("name","")
-      return json_util.dumps(star.find({"$and":[{'name':name},{'email':{"$exists":True}}]}))
+      return json_util.dumps(star.find({"$and":[{'name':request.args.get("name","")},{'email':{"$exists":True}}]}))
     else:
       return json_util.dumps(star.find({'email':{"$exists":True}}))
   elif request.method in ('POST','PUT'):
-    name = session['resp']['name']
-    email = session['resp']['email']
-    ethnicity = request.form['ethnicity']
     output={}
     try:
-      return json_util.dumps(star.insert({'created':datetime.now(), 'name':name, 'email':email, 'ethnicity':ethnicity}))
+      return json_util.dumps(star.insert({'created':datetime.now(), 'name':session['resp']['name'], 'email':session['resp']['email'], 'ethnicity':request.form['ethnicity']}))
     except Exception as e:
       output = {'error' : str(e)}
       return jsonify(output)
