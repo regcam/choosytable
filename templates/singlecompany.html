@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}"></head>
+<body>
+    <h1>Choosy Table</h1>
+    {{ pagination.info }}
+    {{ pagination.links }}
+    <table class="styled-table">
+        <thead>
+            <tr><th>{{singlecompany.company}}</th></tr>
+        </thead>
+        <tbody>
+            {% for r in singlecompany.reviews %}
+            <tr><td>{{ r }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{ pagination.links }}
+
+    <p>Add a new review</p>
+    <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
+        <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
+        <p><textarea placeholder="Enter your review" name="reviews" form="updatecompany"></textarea></p>
+        <p>Rating: 
+            <input class="radio-inline" type="radio" name="rating" value="5">5</input>
+            <input class="radio-inline" type="radio" name="rating" value="4">4</input>
+            <input class="radio-inline" type="radio" name="rating" value="3">3</input>
+            <input class="radio-inline" type="radio" name="rating" value="1">2</input>
+            <input class="radio-inline" type="radio" name="rating" value="1">1</input>
+        </p>
+        <p><input type="submit" value="Submit"></input></p>
+    </form>
+</body>
+
+</html>

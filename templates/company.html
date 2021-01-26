@@ -17,7 +17,7 @@
             {% for company in companies %}
             <tr>
                 <td>{{ loop.index + pagination.skip }}</td>
-                <td>{{ company.company }}</td>
+                <td><a href="company/{{company._id}}">{{ company.company }}</a></td>
                 <td>{{ company.reviews }}</td>
             </tr>
             {% endfor %}
@@ -26,7 +26,7 @@
     {{ pagination.links }}
 
 
-    <p>Create or Review a Company</p>
+    <p>Submit a new company review</p>
     {% if companyid %}
     <form action="/company/{{companyid}}" id="updatecompany" method="post">
         {% else %}
