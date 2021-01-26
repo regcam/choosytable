@@ -36,16 +36,29 @@ def before_request():
 @app.route("/index")
 @app.route("/welcome")
 def home():
-    e = ['Black', 'Latinx', 'Native American', 'Asian']
+    e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     x = star.find_one({'email': session['resp']['email']})
-    if x is not None:
+    r = star.find(
+      {
+        "$and": [
+          {'creator': x['name']}, 
+          {'reviews': {"$exists": True}}
+        ]
+      })
+    if r is not None:
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        pagination = Pagination(
+            page=page, total=r.count(), search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
-            personid=x['_id'],
-            email=x['email'],
-            name=x['name'],
-            ethnicity=x['ethnicity'],
-            e=e)
+            x=x,
+            r=r,
+            e=e,
+            pagination=pagination)
     else:
         return render_template(
             'person.html',

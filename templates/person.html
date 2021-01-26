@@ -1,19 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+<head><link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}"></head>
 <body>
     <h1>Choosy Table</h1>
 
-    <p>Hey {{name}}, is your info correct?</p>
-    {% if personid %}
+    {{ pagination.info }}
+    {{ pagination.links }}
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Company</th>
+                <th>Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in r %}
+            <tr>
+                <td>{{ loop.index + pagination.skip }}</td>
+                <td>{{ s.company }}</td>
+                <td>
+                    {% for x in s.reviews %}
+                        {{ x }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{ pagination.links }}
+
+    <p>Hey {{x['name']}}, is your info correct?</p>
+    {% if x['_id'] %}
         <form action="/person/{{personid}}" method="post">
     {% else %}
         <form action="/person" method="post">
     {% endif %}
-        <p>Name <input placeholder="Enter your name" type="text" name="name" value="{{name}}"></input></p>
-        <p>Email <input disabled=True label="Email" type="email" name="email" value="{{email}}"></input></p>
+        <p>Name <input placeholder="Enter your name" type="text" name="name" value="{{x['name']}}"></input></p>
+        <p>Email <input disabled=True label="Email" type="email" name="email" value="{{x['email']}}"></input></p>
         <p>Ethnicity <select name="ethnicity">
             {% for n in e %}
-                {% if n==ethnicity %}
+                {% if n==x['ethnicity'] %}
                     <option value="{{n}}" selected>{{n}}</option>
                 {% else %}
                     <option value="{{n}}">{{n}}</option>
