@@ -116,7 +116,7 @@ def single_company(company_id):
                 },
                 upsert=True
             )
-            return redirect(url_for('/company/company_id'))
+            return redirect(request.url)
         except Exception as e:
             output = {'error': str(e)}
             return jsonify(output)
