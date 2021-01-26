@@ -68,24 +68,22 @@ def company():
         return render_template('company.html', companies=companies, pagination=pagination)
     elif request.method in ('POST', 'PUT'):
         try:
-            return json_util.dumps(
-                star.insert(
-                    {
-                        'created': datetime.now(),
-                        'company': request.form['company'],
-                        'creator': session['resp']['name'],
-                        'reviews': [
-                            {
-                                'review': request.form['reviews'],
-                                'rating':request.form['rating']
-                            }
-                        ]
-                    }
-                )
+            star.insert(
+                {
+                    'created': datetime.now(),
+                    'company': request.form['company'],
+                    'creator': session['resp']['name'],
+                    'reviews': [
+                        {
+                            'review': request.form['reviews'],
+                            'rating':request.form['rating']
+                        }
+                    ]
+                }
             )
+            return redirect(request.url)
         except Exception as e:
-            output = {'error': str(e)}
-            return jsonify(output)
+            return jsonify({'error': str(e)})
 
 
 @app.route('/company/<company_id>', methods=['GET', 'POST', 'PUT'])
@@ -109,20 +107,18 @@ def single_company(company_id):
                     {'reviews':
                         {
                             'review': request.form['reviews'],
-                            'rating':request.form['rating']
+                            'rating': request.form['rating']
                         }
-                    },
+                     },
                     '$set': {'last_modified': datetime.now()}
                 },
                 upsert=True
             )
             return redirect(request.url)
         except Exception as e:
-            output = {'error': str(e)}
-            return jsonify(output)
+            return jsonify({'error': str(e)})
     else:
-        output = {'error': 'company not found'}
-        return jsonify(output)
+        return jsonify({'error': 'company not found'})
 
 
 @app.route('/person/<person_id>', methods=['GET', 'PUT', 'POST'])
@@ -131,8 +127,7 @@ def single_person(person_id):
         try:
             return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
         except:
-            output = {'error': 'person not found'}
-            return jsonify(output)
+            return jsonify({'error': 'person not found'})
     elif request.method in ('POST', 'PUT'):
         try:
             star.update(
@@ -144,11 +139,9 @@ def single_person(person_id):
                         "last_modified": datetime.now()}
                 }
             )
-            output = {'message': 'Your profile has been updated'}
-            return jsonify({'result': output})
+            return redirect(request.url)
         except Exception as e:
-            output = {'error': str(e)}
-            return jsonify(output)
+            return jsonify({'error': str(e)})
 
 
 @app.route('/person', methods=['GET', 'POST', 'PUT'])
@@ -159,12 +152,11 @@ def person():
         else:
             return json_util.dumps(star.find({'email': {"$exists": True}}))
     elif request.method in ('POST', 'PUT'):
-        output = {}
         try:
-            return json_util.dumps(star.insert({'created': datetime.now(), 'name': session['resp']['name'], 'email': session['resp']['email'], 'ethnicity': request.form['ethnicity']}))
+            star.insert({'created': datetime.now(), 'name': session['resp']['name'], 'email': session['resp']['email'], 'ethnicity': request.form['ethnicity']})
+            return redirect(request.url)
         except Exception as e:
-            output = {'error': str(e)}
-            return jsonify(output)
+            return jsonify({'error': str(e)})
 
 
 @app.route("/logout")
