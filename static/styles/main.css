@@ -1,3 +1,5 @@
+body {background-color: #ffffff;}
+
 .pagination-page-info {
     padding: .6em;
     padding-left: 0;
@@ -7,8 +9,8 @@
     font-size: 12px;
 }
 .pagination-page-info b {
-    color: black;
-    background: #6aa6ed;
+    color: 202020;
+    background: #FFDF6C;
     padding-left: 2px;
     padding: .1em .25em;
     font-size: 150%;
@@ -24,8 +26,8 @@
 }
 
 .styled-table thead tr {
-    background-color: #009879;
-    color: #ffffff;
+    background-color: #707070;
+    color: #202020;
     text-align: left;
 }
 
@@ -35,7 +37,7 @@
 }
 
 .styled-table tbody tr {
-    border-bottom: thin solid #dddddd;
+    border-bottom: thin solid #3F3F3F;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
@@ -43,14 +45,38 @@
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid #3F3F3F;
 }
 
 .styled-table tbody tr.active-row {
     font-weight: bold;
-    color: #009879;
+    color: #3F3F3F;
 }
 
 td:hover { /* th:hover also if you wish */
-    background: purple;
+    background: #FFDF6C;
+  }
+
+  .styled-nav ul {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .styled-nav li {
+    float: left;
+    background-color: #707070;
+    list-style-type: none;
+  }
+  
+  .styled-nav li a {
+    display: block;
+    color: #202020;
+    text-align: left;
+    padding: 16px;
+    text-decoration: none;
+  }
+  
+  .styled-nav li a:hover {
+    background-color: #FFDF6C;
   }

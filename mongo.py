@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
+from flask_navigation import Navigation
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -21,6 +22,14 @@ app.register_blueprint(blueprint, url_prefix="/login")
 mongo = PyMongo(app)
 star = mongo.db.stars
 db = mongo.db
+nav = Navigation(app)
+
+nav.Bar('top', [
+    nav.Item('Home', 'person'),
+    nav.Item('Companies', 'company'),
+    nav.Item('People', 'person'),
+    nav.Item('Logout', 'logout'),
+])
 
 
 @app.before_request

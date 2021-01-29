@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}"></head>
+<head><link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
+    <ul class="styled-nav">
+        {% for item in nav.top %}
+        <li class="{{ 'active' if item.is_active else '' }}">
+            <b><a href="{{ item.url }}">{{ item.label }}</a></b>
+        </li>
+        {% endfor %}
+    </ul>
+</head>
+<br>
 <body>
+    <br>
+    <br>
     <h1>Choosy Table</h1>
 
     {{ pagination.info }}
