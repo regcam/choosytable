@@ -31,6 +31,13 @@ nav.Bar('top', [
     nav.Item('Logout', 'logout'),
 ])
 
+colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+labels = ['0','1','2','3','4','5']
+
 
 @app.before_request
 def before_request():
@@ -117,9 +124,12 @@ def single_company(company_id):
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         singlecompany = star.find_one({'_id': ObjectId(company_id)})
+        values=[]
+        for i in range(len(singlecompany['reviews'])):
+            values.append(i)
         pagination = Pagination(page=page, total=len(list(
             singlecompany['reviews'])), search=search, record_name=singlecompany['company'])
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination)
+        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors))
     elif request.method in ('POST', 'PUT'):
         try:
             star.update_one(

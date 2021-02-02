@@ -43,7 +43,7 @@
 
     <p>Hey {{x['name']}}, is your info correct?</p>
     {% if x['_id'] %}
-        <form action="/person/{{personid}}" method="post">
+        <form action="/person/{{x['_id']}}" method="post">
     {% else %}
         <form action="/person" method="post">
     {% endif %}
