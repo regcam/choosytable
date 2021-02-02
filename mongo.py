@@ -6,6 +6,7 @@ import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
+import statistics 
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -36,7 +37,7 @@ colors = [
     "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
     "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
 
-labels = ['0','1','2','3','4','5']
+labels = ['1 Star','2 Stars','3 Stars','4 Stars','5 Stars']
 
 
 @app.before_request
@@ -124,9 +125,25 @@ def single_company(company_id):
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         singlecompany = star.find_one({'_id': ObjectId(company_id)})
-        values=[]
+        data=[]
         for i in range(len(singlecompany['reviews'])):
-            values.append(i)
+            data.append(singlecompany['reviews'][i]['rating'])
+        data.sort()
+        l=[0,0,0,0,0]
+        for j in range(len(data)):
+            if data[j]=="1":
+                l[0]+=1
+            elif data[j]=="2":
+                l[1]+=1
+            elif data[j]=="3":
+                l[2]+=1
+            elif data[j]=="4":
+                l[3]+=1
+            elif data[j]=="5":
+                l[4]+=1
+        values=[]
+        for k in range(len(l)):
+            values.append(format(l[k]/len(data), '.3f'))
         pagination = Pagination(page=page, total=len(list(
             singlecompany['reviews'])), search=search, record_name=singlecompany['company'])
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors))
