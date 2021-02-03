@@ -126,10 +126,11 @@ def single_company(company_id):
         page = request.args.get(get_page_parameter(), type=int, default=1)
         singlecompany = star.find_one({'_id': ObjectId(company_id)})
         data=[]
+        l=[0,0,0,0,0]
+        values=[]
         for i in range(len(singlecompany['reviews'])):
             data.append(singlecompany['reviews'][i]['rating'])
         data.sort()
-        l=[0,0,0,0,0]
         for j in range(len(data)):
             if data[j]=="1":
                 l[0]+=1
@@ -141,7 +142,6 @@ def single_company(company_id):
                 l[3]+=1
             elif data[j]=="5":
                 l[4]+=1
-        values=[]
         for k in range(len(l)):
             values.append(format(l[k]/len(data), '.3f'))
         pagination = Pagination(page=page, total=len(list(

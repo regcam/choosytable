@@ -26,13 +26,13 @@
     </table>
     {{ pagination.links }}
 
-    <h1>Reviews</h1>
+    <h1>Overall Reviews</h1>
     <canvas id="chart" width="600" height="400"></canvas>
     <script>
       var pieData = [
         {% for item, label, colors in set %}
           {
-            value: {{item}},
+            value: parseFloat({{item}}*100).toFixed(2),
             label: "{{label}}",
             color : "{{colors}}"
           },
