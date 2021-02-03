@@ -141,22 +141,32 @@ def single_company(company_id):
 
         for k in l.values():
             values.append(format(k/len(singlecompany['reviews']), '.3f'))
-            
+        
+        iel = ['White','Asian','Latino','Black','Afro-Latino','African','Indigenous People','Pacific Islander']
+        igl = ['Female','Male','Transgender','Agender']
         pagination = Pagination(page=page, total=len(
             singlecompany['reviews']), search=search, record_name=singlecompany['company'])
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors))
+        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors),iel=iel,igl=igl)
     elif request.method in ('POST', 'PUT'):
         try:
             star.update_one(
                 {'_id': ObjectId(company_id)},
                 {
                     '$push':
-                    {'reviews':
+                    {
+                        'reviews':
                         {
-                            'review': request.form['reviews'],
-                            'rating': request.form['rating']
+                            'review': request.form.get('reviews'),
+                            'rating': request.form.get('rating')
+                        },
+                        'interviews':
+                        {
+                            'ie':request.form.get('ie'),
+                            'gender': request.form.get('ig'),
+                            'position': request.form.get('position'),
+                            'win': request.form.get('win')
                         }
-                     },
+                    },
                     '$set': {'last_modified': datetime.now()}
                 },
                 upsert=True

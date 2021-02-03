@@ -20,8 +20,15 @@
         </thead>
         <tbody>
             {% for r in singlecompany.reviews %}
-            <tr><td>{{ r }}</td></tr>
+            <tr>
+                <td>{{ r }}</td>
             {% endfor %}
+            </tr>
+            <tr>
+            {% for s in singlecompany.interviews %}
+            <td>{{ s }}</td>
+            {% endfor %}
+            </tr>
         </tbody>
     </table>
     {{ pagination.links }}
@@ -52,7 +59,7 @@
 
     </script>
 
-    <p>Add a new review</p>
+    <h2>Add a new Company review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
         <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
         <p><textarea placeholder="Enter your review" name="reviews" form="updatecompany"></textarea></p>
@@ -62,6 +69,24 @@
             <input class="radio-inline" type="radio" name="rating" value="3">3</input>
             <input class="radio-inline" type="radio" name="rating" value="2">2</input>
             <input class="radio-inline" type="radio" name="rating" value="1">1</input>
+        </p>
+
+    <h2>Have you interviewed with {{singlecompany.company}}?</h2>
+        <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
+        <p>Interviewer's Ethnicity <select name="ie">
+            {% for x in iel %}
+                <option value="{{x}}">{{x}}</option>
+            {% endfor %}
+        </select></p>
+        <p>Gender: 
+            {% for y in igl %}
+            <input class="radio-inline" type="radio" name="ig" value="{{y}}">{{y}}</input>
+            {% endfor %}
+        </p>
+        <p>Position Title <input placeholder="Position Title?" type="text" name="position"></input></p>
+        <p>Were you offered the position? 
+            <input class="radio-inline" type="radio" name="win" value="y">Yes</input>
+            <input class="radio-inline" type="radio" name="win" value="n">No</input> 
         </p>
         <p><input type="submit" value="Submit"></input></p>
     </form>
