@@ -125,27 +125,25 @@ def single_company(company_id):
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         singlecompany = star.find_one({'_id': ObjectId(company_id)})
-        data=[]
-        l=[0,0,0,0,0]
+        l={'one':0,'two':0,'three':0,'four':0,'five':0}
         values=[]
         for i in range(len(singlecompany['reviews'])):
-            data.append(singlecompany['reviews'][i]['rating'])
-        data.sort()
-        for j in range(len(data)):
-            if data[j]=="1":
-                l[0]+=1
-            elif data[j]=="2":
-                l[1]+=1
-            elif data[j]=="3":
-                l[2]+=1
-            elif data[j]=="4":
-                l[3]+=1
-            elif data[j]=="5":
-                l[4]+=1
-        for k in range(len(l)):
-            values.append(format(l[k]/len(data), '.3f'))
-        pagination = Pagination(page=page, total=len(list(
-            singlecompany['reviews'])), search=search, record_name=singlecompany['company'])
+            if singlecompany['reviews'][i]['rating']=="1":
+                l['one']+=1
+            elif singlecompany['reviews'][i]['rating']=="2":
+                l['two']+=1
+            elif singlecompany['reviews'][i]['rating']=="3":
+                l['three']+=1
+            elif singlecompany['reviews'][i]['rating']=="4":
+                l['four']+=1
+            elif singlecompany['reviews'][i]['rating']=="5":
+                l['five']+=1
+
+        for k in l.values():
+            values.append(format(k/len(singlecompany['reviews']), '.3f'))
+            
+        pagination = Pagination(page=page, total=len(
+            singlecompany['reviews']), search=search, record_name=singlecompany['company'])
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors))
     elif request.method in ('POST', 'PUT'):
         try:

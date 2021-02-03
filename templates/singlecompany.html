@@ -25,8 +25,11 @@
         </tbody>
     </table>
     {{ pagination.links }}
-
-    <h1>Overall Reviews</h1>
+    {% if pagination.total>1 %}
+    <h1>{{pagination.total}} Reviews - </h1>
+    {% else %}
+    <h1>{{pagination.total}} Review - </h1>
+    {% endif %}
     <canvas id="chart" width="600" height="400"></canvas>
     <script>
       var pieData = [
