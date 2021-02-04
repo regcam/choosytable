@@ -144,33 +144,52 @@ def single_company(company_id):
         
         iel = ['White','Asian','Latino','Black','Afro-Latino','African','Indigenous People','Pacific Islander']
         igl = ['Female','Male','Transgender','Agender']
+        p = ['Software Engineer','Staff Engineer','Lead Engineer',
+        'Architect','Software Engineer Manager','Technical Manager','Technical Director',
+        'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
+        'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
+        'DBA','Operations Engineer']
         pagination = Pagination(page=page, total=len(
             singlecompany['reviews']), search=search, record_name=singlecompany['company'])
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, set=zip(values,labels,colors),iel=iel,igl=igl)
+        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
+        set=zip(values,labels,colors),iel=iel,igl=igl,p=p)
     elif request.method in ('POST', 'PUT'):
         try:
-            star.update_one(
-                {'_id': ObjectId(company_id)},
-                {
-                    '$push':
+            if None not in [request.form.get('reviews'),request.form.get('rating')]:
+                star.update_one(
+                    {'_id': ObjectId(company_id)},
                     {
-                        'reviews':
+                        '$push':
                         {
-                            'review': request.form.get('reviews'),
-                            'rating': request.form.get('rating')
+                            'reviews':
+                            {
+                                'review': request.form.get('reviews'),
+                                'rating': request.form.get('rating')
+                            }
                         },
-                        'interviews':
-                        {
-                            'ie':request.form.get('ie'),
-                            'gender': request.form.get('ig'),
-                            'position': request.form.get('position'),
-                            'win': request.form.get('win')
-                        }
+                        '$set': {'last_modified': datetime.now()}
                     },
-                    '$set': {'last_modified': datetime.now()}
-                },
-                upsert=True
-            )
+                    upsert=True
+                )
+            elif None not in [request.form.get('ie'),request.form.get('ig'),
+            request.form.get('position'),request.form.get('win')]:
+                star.update_one(
+                    {'_id': ObjectId(company_id)},
+                    {
+                        '$push':
+                        {
+                            'interviews':
+                            {
+                                'ie':request.form.get('ie'),
+                                'gender': request.form.get('ig'),
+                                'position': request.form.get('position'),
+                                'win': request.form.get('win')
+                            }
+                        },
+                        '$set': {'last_modified': datetime.now()}
+                    },
+                    upsert=True
+                )
             return redirect(request.url)
         except Exception as e:
             return jsonify({'error': str(e)})

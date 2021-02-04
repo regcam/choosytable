@@ -70,7 +70,10 @@
             <input class="radio-inline" type="radio" name="rating" value="2">2</input>
             <input class="radio-inline" type="radio" name="rating" value="1">1</input>
         </p>
+        <p><input type="submit" value="Submit"></input></p>
+    </form>
 
+    <form action="/company/{{singlecompany._id}}" id="interview" method="post">
     <h2>Have you interviewed with {{singlecompany.company}}?</h2>
         <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
         <p>Interviewer's Ethnicity <select name="ie">
@@ -83,7 +86,11 @@
             <input class="radio-inline" type="radio" name="ig" value="{{y}}">{{y}}</input>
             {% endfor %}
         </p>
-        <p>Position Title <input placeholder="Position Title?" type="text" name="position"></input></p>
+        <p>Position Title <select name="position">
+            {% for z in p %}
+                <option value="{{z}}">{{z}}</option>
+            {% endfor %}
+        </select></p>
         <p>Were you offered the position? 
             <input class="radio-inline" type="radio" name="win" value="y">Yes</input>
             <input class="radio-inline" type="radio" name="win" value="n">No</input> 
