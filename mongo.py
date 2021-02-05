@@ -210,7 +210,7 @@ def single_company(company_id):
                     },
                     upsert=True
                 )
-                return redirect(request.url)
+            return redirect(request.url)
         except Exception as e:
             return jsonify({'error': str(e)})
     else:
