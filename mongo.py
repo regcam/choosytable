@@ -159,11 +159,11 @@ def single_company(company_id):
                 success['y']+=1
             else:
                 success['n']+=1
-            if positionDict.get(singlecompany['interviews'][a]['position']):
+            if positionDict.get(singlecompany['interviews'][a]['position']) is None:
+                positionDict[singlecompany['interviews'][a]['position']]=1
+            else:
                 positionDict[singlecompany['interviews'][a]['position']]=\
                     positionDict.get(singlecompany['interviews'][a]['position'])+1
-            else:
-                positionDict[singlecompany['interviews'][a]['position']]=1
 
         values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
         format(success['n']/len(singlecompany['interviews']), '.3f')] 
@@ -210,7 +210,7 @@ def single_company(company_id):
                     },
                     upsert=True
                 )
-            return redirect(request.url)
+                return redirect(request.url)
         except Exception as e:
             return jsonify({'error': str(e)})
     else:
