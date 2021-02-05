@@ -38,7 +38,16 @@ colors = [
     "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
 
 labels = ['1 Star','2 Stars','3 Stars','4 Stars','5 Stars']
+labels1 = ['Offered the Job %','No Offer %']
+labels2 = ['# of Interviews']
 
+iel = ['White','Asian','Latino','Black','Afro-Latino','African','Indigenous People','Pacific Islander']
+igl = ['Female','Male','Transgender','Agender']
+p = ['Software Engineer','Staff Engineer','Lead Engineer',
+'Architect','Software Engineer Manager','Technical Manager','Technical Director',
+'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
+'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
+'DBA','Operations Engineer']
 
 @app.before_request
 def before_request():
@@ -127,6 +136,7 @@ def single_company(company_id):
         singlecompany = star.find_one({'_id': ObjectId(company_id)})
         l={'one':0,'two':0,'three':0,'four':0,'five':0}
         values=[]
+        success={'y':0,'n':0}
         for i in range(len(singlecompany['reviews'])):
             if singlecompany['reviews'][i]['rating']=="1":
                 l['one']+=1
@@ -142,17 +152,29 @@ def single_company(company_id):
         for k in l.values():
             values.append(format(k/len(singlecompany['reviews']), '.3f'))
         
-        iel = ['White','Asian','Latino','Black','Afro-Latino','African','Indigenous People','Pacific Islander']
-        igl = ['Female','Male','Transgender','Agender']
-        p = ['Software Engineer','Staff Engineer','Lead Engineer',
-        'Architect','Software Engineer Manager','Technical Manager','Technical Director',
-        'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
-        'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
-        'DBA','Operations Engineer']
+        positionDict={}
+        for c in p:
+            positionDict[c]=0
+
+        for a in range(len(singlecompany['interviews'])):
+            if singlecompany['interviews'][a]['win'] == "y":
+                success['y']+=1
+            else:
+                success['n']+=1
+            if singlecompany['interviews'][a]['position'] in positionDict.keys():
+                positionDict[singlecompany['interviews'][a]['position']]=\
+                    positionDict.get(singlecompany['interviews'][a]['position'])+1
+
+        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
+        format(success['n']/len(singlecompany['interviews']), '.3f')] 
+
+        positionDict={x:y for x,y in positionDict.items() if y!=0}
+        
         pagination = Pagination(page=page, total=len(
             singlecompany['reviews']), search=search, record_name=singlecompany['company'])
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-        set=zip(values,labels,colors),iel=iel,igl=igl,p=p)
+        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
+        set2=zip(positionDict.items(),colors))
     elif request.method in ('POST', 'PUT'):
         try:
             if None not in [request.form.get('reviews'),request.form.get('rating')]:

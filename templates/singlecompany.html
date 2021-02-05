@@ -59,6 +59,52 @@
 
     </script>
 
+    <h2>Interview Success Rate</h2>
+    <canvas id="chart1" width="600" height="400"></canvas>
+    <script>
+      var pieData1 = [
+        {% for values1, labels1, colors in set1 %}
+          {
+            value: {{values1}}*100,
+            label: "{{labels1}}",
+            color: "{{colors}}"
+          },
+        {% endfor %}
+      ];
+
+      // get bar chart canvas
+      var mychart1 = document.getElementById("chart1").getContext("2d");
+      steps = 10
+      //max = {{ max }}
+
+      // draw pie chart
+      new Chart(document.getElementById("chart1").getContext("2d")).Pie(pieData1);
+
+    </script>
+
+    <h2>Most Interviewed for Position</h2>
+    <canvas id="chart2" width="600" height="400"></canvas>
+    <script>
+    var pieData2 = [
+        {% for value2, colors in set2 %}
+        {
+            value: {{value2[1]}},
+            label: "{{value2[0]}}",
+            color : "{{colors}}"
+        },
+        {% endfor %}
+    ];
+
+    // get bar chart canvas
+    var mychart2 = document.getElementById("chart2").getContext("2d");
+    steps = 10
+    //max = {{ max }}
+
+    // draw pie chart
+    new Chart(document.getElementById("chart2").getContext("2d")).Pie(pieData2);
+
+    </script>
+
     <h2>Add a new Company review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
         <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
@@ -73,8 +119,8 @@
         <p><input type="submit" value="Submit"></input></p>
     </form>
 
-    <form action="/company/{{singlecompany._id}}" id="interview" method="post">
     <h2>Have you interviewed with {{singlecompany.company}}?</h2>
+    <form action="/company/{{singlecompany._id}}" id="interview" method="post">
         <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
         <p>Interviewer's Ethnicity <select name="ie">
             {% for x in iel %}
