@@ -153,22 +153,20 @@ def single_company(company_id):
             values.append(format(k/len(singlecompany['reviews']), '.3f'))
         
         positionDict={}
-        for c in p:
-            positionDict[c]=0
 
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
                 success['y']+=1
             else:
                 success['n']+=1
-            if singlecompany['interviews'][a]['position'] in positionDict.keys():
+            if positionDict.get(singlecompany['interviews'][a]['position']):
                 positionDict[singlecompany['interviews'][a]['position']]=\
                     positionDict.get(singlecompany['interviews'][a]['position'])+1
+            else:
+                positionDict[singlecompany['interviews'][a]['position']]=1
 
         values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
         format(success['n']/len(singlecompany['interviews']), '.3f')] 
-
-        positionDict={x:y for x,y in positionDict.items() if y!=0}
         
         pagination = Pagination(page=page, total=len(
             singlecompany['reviews']), search=search, record_name=singlecompany['company'])
