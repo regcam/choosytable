@@ -6,7 +6,6 @@ import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
-import statistics 
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
