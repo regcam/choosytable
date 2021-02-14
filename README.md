@@ -18,12 +18,12 @@ Execute `pip3 install -r requirements.txt`
 ## Getting Started:
 Export the following required variables to your environment:
 
-SECRET_KEY - Needed to keep the Flask client-side sessions secure 
+* SECRET_KEY - Needed to keep the Flask client-side sessions secure 
 
-#### The following variables are set from configuring OAuth via [Google APIs](https://support.google.com/googleapi/answer/6158857?hl=en&ref_topic=7013279):
-GOOGLE_OAUTH_CLIENT_ID - Client ID generated from your OAuth credentials
+* #### The following variables are set from configuring OAuth via [Google APIs](https://support.google.com/googleapi/answer/6158857?hl=en&ref_topic=7013279):
+* GOOGLE_OAUTH_CLIENT_ID - Client ID generated from your OAuth credentials
 
-GOOGLE_OAUTH_CLIENT_SECRET - Client Secret generated fromyoru OAuth credentials
+* GOOGLE_OAUTH_CLIENT_SECRET - Client Secret generated fromyoru OAuth credentials
 
 #### The following variables come from configuring your MongoDB instance:
 MONGO_DBNAME - Name of mongo database
