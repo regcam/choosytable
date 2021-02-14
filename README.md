@@ -5,11 +5,14 @@ Choosy Table is were People of Color can share and view their hiring and corpora
 
 ## Tech Stack:
 Backend/Frontend - Python3/Flask
+
 Persistent Storage - MongoDB 
 
 ## Requirements:
 Google APIs account
+
 MongoDB Compass
+
 Execute `pip3 install -r requirements.txt`
 
 ## Getting Started:
