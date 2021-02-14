@@ -16,7 +16,7 @@ MongoDB Compass
 Execute `pip3 install -r requirements.txt`
 
 ## Getting Started:
-Export the following required variables to your environment:
+1. Export the following required variables to your environment:
 
 * SECRET_KEY - Needed to keep the Flask client-side sessions secure 
 
@@ -26,13 +26,13 @@ Export the following required variables to your environment:
 * GOOGLE_OAUTH_CLIENT_SECRET - Client Secret generated fromyoru OAuth credentials
 
 #### The following variables come from configuring your MongoDB instance:
-MONGO_DBNAME - Name of mongo database
+* MONGO_DBNAME - Name of mongo database
 
-MONGO_URI - URI to your mongodb instance
+* MONGO_URI - URI to your mongodb instance
 
-OAUTHLIB_INSECURE_TRANSPORT - Normally, OAuthLib will raise an InsecureTransportError if you attempt to use OAuth2 over HTTP, rather than HTTPS. Setting this environment variable will prevent this error from being raised. This is mostly useful for local testing, or automated tests. ***Never set this variable in production.***
+* OAUTHLIB_INSECURE_TRANSPORT - Normally, OAuthLib will raise an InsecureTransportError if you attempt to use OAuth2 over HTTP, rather than HTTPS. Setting this environment variable will prevent this error from being raised. This is mostly useful for local testing, or automated tests. ***Never set this variable in production.***
 
-OAUTHLIB_RELAX_TOKEN_SCOPE - Accounts for Google changing the requested OAuth scopes on you
+* OAUTHLIB_RELAX_TOKEN_SCOPE - Accounts for Google changing the requested OAuth scopes on you
 
-Then start the app:
+2. Then start the app:
 `/usr/bin/python3 /PATH/TO/YOUR/mongo.py`
