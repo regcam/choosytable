@@ -14,10 +14,15 @@ MongoDB Compass
 
 Getting Started:
 Export the following required variables to your environment:
+
 MONGO_DBNAME
+
 MONGO_URI
+
 SECRET_KEY
+
 GOOGLE_OAUTH_CLIENT_ID
+
 GOOGLE_OAUTH_CLIENT_SECRET
 
 Then start the app:
