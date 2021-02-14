@@ -12,7 +12,7 @@ app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-#app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
+app.secret_key = os.urandom(24).hex()
 app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
 app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
     "GOOGLE_CLIENT_SECRET")
