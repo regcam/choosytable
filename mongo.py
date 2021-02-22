@@ -6,6 +6,7 @@ import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
+from functools import lru_cache
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -48,6 +49,7 @@ p = ['Software Engineer','Staff Engineer','Lead Engineer',
 'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
 'DBA','Operations Engineer']
 
+@lru_cache
 @app.before_request
 def before_request():
     if not google.authorized and "google" not in request.path:
@@ -55,7 +57,7 @@ def before_request():
     else:
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
-
+@lru_cache
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
@@ -91,6 +93,9 @@ def home():
             name=session['resp']['name'],
             e=e)
 
+@lru_cache
+def find_reviews():
+    return star.find({'reviews': {"$exists": True}})
 
 @app.route('/company', methods=['GET', 'POST', 'PUT'])
 def company():
@@ -100,7 +105,8 @@ def company():
         if q:
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        companies = star.find({'reviews': {"$exists": True}})
+        companies = find_reviews()
+        print(companies)
         pagination = Pagination(
             page=page, total=companies.count(), search=search, record_name='companies')
         return render_template('company.html', companies=companies, pagination=pagination)
