@@ -58,7 +58,7 @@ def before_request():
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
-@lru_cache
+#@lru_cache
 def find_creatorreviews(y):
     return star.find(
       {
@@ -69,7 +69,7 @@ def find_creatorreviews(y):
       })
 
 
-@lru_cache
+#@lru_cache
 def find_email(z):
     return star.find_one({'email': z})
 
@@ -79,7 +79,7 @@ def invalidate_cache():
     find_reviews.cache_clear()
     findone_company.cache_clear()
 
-
+@lru_cache
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
@@ -110,7 +110,7 @@ def home():
             e=e)
 
 
-@lru_cache
+#@lru_cache
 def find_reviews():
     return star.find({'reviews': {"$exists": True}})
 
@@ -152,7 +152,7 @@ def company_post():
         return jsonify({'error': str(e)})
 
 
-@lru_cache
+#@lru_cache
 def findone_company(c):
     return star.find_one({'_id': ObjectId(c)})
 
