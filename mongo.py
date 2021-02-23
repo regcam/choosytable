@@ -57,21 +57,37 @@ def before_request():
     else:
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
+
 @lru_cache
+def find_creatorreviews(y):
+    return star.find(
+      {
+        "$and": [
+          {'creator': y}, 
+          {'reviews': {"$exists": True}}
+        ]
+      })
+
+
+@lru_cache
+def find_email(z):
+    return star.find_one({'email': z})
+
+
+def invalidate_cache():
+    find_creatorreviews.cache_clear()
+    find_reviews.cache_clear()
+    findone_company.cache_clear()
+
+
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
 @app.route("/welcome")
 def home():
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
-    x = star.find_one({'email': session['resp']['email']})
-    r = star.find(
-      {
-        "$and": [
-          {'creator': x['name']}, 
-          {'reviews': {"$exists": True}}
-        ]
-      })
+    x = find_email(session['resp']['email'])
+    r = find_creatorreviews(x['name'])
     if r is not None:
         search = False
         q = request.args.get('q')
@@ -93,44 +109,56 @@ def home():
             name=session['resp']['name'],
             e=e)
 
+
 @lru_cache
 def find_reviews():
     return star.find({'reviews': {"$exists": True}})
 
-@app.route('/company', methods=['GET', 'POST', 'PUT'])
+
+@lru_cache
+@app.route('/company', methods=['GET'])
 def company():
-    if request.method == 'GET':
-        search = False
-        q = request.args.get('q')
-        if q:
-            search = True
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        companies = find_reviews()
-        print(companies)
-        pagination = Pagination(
-            page=page, total=companies.count(), search=search, record_name='companies')
-        return render_template('company.html', companies=companies, pagination=pagination)
-    elif request.method in ('POST', 'PUT'):
-        try:
-            star.insert(
-                {
-                    'created': datetime.now(),
-                    'company': request.form['company'],
-                    'creator': session['resp']['name'],
-                    'reviews': [
-                        {
-                            'review': request.form['reviews'],
-                            'rating':request.form['rating']
-                        }
-                    ]
-                }
-            )
-            return redirect(request.url)
-        except Exception as e:
-            return jsonify({'error': str(e)})
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    companies = find_reviews()
+    pagination = Pagination(
+        page=page, total=companies.count(), search=search, record_name='companies')
+    return render_template('company.html', companies=companies, pagination=pagination)
 
 
-@app.route('/company/<company_id>', methods=['GET', 'POST', 'PUT'])
+@lru_cache
+@app.route('/company', methods=['POST', 'PUT'])
+def company_post():
+    try:
+        star.insert(
+            {
+                'created': datetime.now(),
+                'company': request.form['company'],
+                'creator': session['resp']['name'],
+                'reviews': [
+                    {
+                        'review': request.form['reviews'],
+                        'rating':request.form['rating']
+                    }
+                ]
+            }
+        )
+        invalidate_cache()
+        return redirect(request.url)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+@lru_cache
+def findone_company(c):
+    return star.find_one({'_id': ObjectId(c)})
+
+
+@lru_cache
+@app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
     if request.method == 'GET':
         search = False
@@ -138,7 +166,7 @@ def single_company(company_id):
         if q:
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        singlecompany = star.find_one({'_id': ObjectId(company_id)})
+        singlecompany = findone_company(company_id)
         l={'one':0,'two':0,'three':0,'four':0,'five':0}
         values=[]
         success={'y':0,'n':0}
@@ -178,48 +206,50 @@ def single_company(company_id):
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
         set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
         set2=zip(positionDict.items(),colors))
-    elif request.method in ('POST', 'PUT'):
-        try:
-            if None not in [request.form.get('reviews'),request.form.get('rating')]:
-                star.update_one(
-                    {'_id': ObjectId(company_id)},
+
+
+@app.route('/company/<company_id>', methods=['POST', 'PUT'])
+def single_companypost(company_id):
+    try:
+        if None not in [request.form.get('reviews'),request.form.get('rating')]:
+            star.update_one(
+                {'_id': ObjectId(company_id)},
+                {
+                    '$push':
                     {
-                        '$push':
+                        'reviews':
                         {
-                            'reviews':
-                            {
-                                'review': request.form.get('reviews'),
-                                'rating': request.form.get('rating')
-                            }
-                        },
-                        '$set': {'last_modified': datetime.now()}
+                            'review': request.form.get('reviews'),
+                            'rating': request.form.get('rating')
+                        }
                     },
-                    upsert=True
-                )
-            elif None not in [request.form.get('ie'),request.form.get('ig'),
-            request.form.get('position'),request.form.get('win')]:
-                star.update_one(
-                    {'_id': ObjectId(company_id)},
+                    '$set': {'last_modified': datetime.now()}
+                },
+                upsert=True
+            )
+        elif None not in [request.form.get('ie'),request.form.get('ig'),
+        request.form.get('position'),request.form.get('win')]:
+            star.update_one(
+                {'_id': ObjectId(company_id)},
+                {
+                    '$push':
                     {
-                        '$push':
+                        'interviews':
                         {
-                            'interviews':
-                            {
-                                'ie':request.form.get('ie'),
-                                'gender': request.form.get('ig'),
-                                'position': request.form.get('position'),
-                                'win': request.form.get('win')
-                            }
-                        },
-                        '$set': {'last_modified': datetime.now()}
+                            'ie':request.form.get('ie'),
+                            'gender': request.form.get('ig'),
+                            'position': request.form.get('position'),
+                            'win': request.form.get('win')
+                        }
                     },
-                    upsert=True
-                )
-            return redirect(request.url)
-        except Exception as e:
-            return jsonify({'error': str(e)})
-    else:
-        return jsonify({'error': 'company not found'})
+                    '$set': {'last_modified': datetime.now()}
+                },
+                upsert=True
+            )
+        invalidate_cache()
+        return redirect(request.url)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 
 @app.route('/person/<person_id>', methods=['GET', 'PUT', 'POST'])
@@ -240,24 +270,26 @@ def single_person(person_id):
                         "last_modified": datetime.now()}
                 }
             )
+            invalidate_cache()
             return redirect(request.url)
         except Exception as e:
             return jsonify({'error': str(e)})
 
 
-@app.route('/person', methods=['GET', 'POST', 'PUT'])
+@lru_cache
+@app.route('/person', methods=['GET'])
 def person():
-    if request.method == 'GET':
-        if request.args:
-            return json_util.dumps(star.find({"$and": [{'name': request.args.get("name", "")}, {'email': {"$exists": True}}]}))
-        else:
-            return json_util.dumps(star.find({'email': {"$exists": True}}))
-    elif request.method in ('POST', 'PUT'):
-        try:
-            star.insert({'created': datetime.now(), 'name': session['resp']['name'], 'email': session['resp']['email'], 'ethnicity': request.form['ethnicity']})
-            return redirect(request.url)
-        except Exception as e:
-            return jsonify({'error': str(e)})
+    return redirect("/home")
+
+
+@app.route('/person', methods=['POST', 'PUT'])
+def person_post():
+    try:
+        star.insert({'created': datetime.now(), 'name': session['resp']['name'], 'email': session['resp']['email'], 'ethnicity': request.form['ethnicity']})
+        invalidate_cache()
+        return redirect(request.url)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 
 @app.route("/logout")
