@@ -110,12 +110,12 @@ def home():
             e=e)
 
 
-#@lru_cache
+@lru_cache
 def find_reviews():
     return star.find({'reviews': {"$exists": True}})
 
 
-@lru_cache
+#@lru_cache
 @app.route('/company', methods=['GET'])
 def company():
     search = False
@@ -129,7 +129,6 @@ def company():
     return render_template('company.html', companies=companies, pagination=pagination)
 
 
-@lru_cache
 @app.route('/company', methods=['POST', 'PUT'])
 def company_post():
     try:
@@ -146,13 +145,14 @@ def company_post():
                 ]
             }
         )
-        invalidate_cache()
+        find_reviews.cache_clear()
+        find_reviews()
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
 
 
-#@lru_cache
+@lru_cache
 def findone_company(c):
     return star.find_one({'_id': ObjectId(c)})
 
@@ -246,34 +246,39 @@ def single_companypost(company_id):
                 },
                 upsert=True
             )
-        invalidate_cache()
+        findone_company.cache_clear()
+        findone_company(company_id)
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
 
 
-@app.route('/person/<person_id>', methods=['GET', 'PUT', 'POST'])
+@lru_cache
+@app.route('/person/<person_id>', methods=['GET'])
 def single_person(person_id):
     if request.method == 'GET':
         try:
             return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
         except:
             return jsonify({'error': 'person not found'})
-    elif request.method in ('POST', 'PUT'):
-        try:
-            star.update(
-                {'_id': ObjectId(person_id)},
-                {
-                    '$set': {
-                        'name': request.form['name'],
-                        'ethnicity': request.form['ethnicity'],
-                        "last_modified": datetime.now()}
-                }
-            )
-            invalidate_cache()
-            return redirect(request.url)
-        except Exception as e:
-            return jsonify({'error': str(e)})
+
+
+@app.route('/person/<person_id>', methods=['PUT', 'POST'])
+def singleupdate_person(person_id):
+    try:
+        star.update(
+            {'_id': ObjectId(person_id)},
+            {
+                '$set': {
+                    'name': request.form['name'],
+                    'ethnicity': request.form['ethnicity'],
+                    "last_modified": datetime.now()}
+            }
+        )
+        #invalidate_cache()
+        return redirect(request.url)
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 
 @lru_cache
@@ -285,8 +290,13 @@ def person():
 @app.route('/person', methods=['POST', 'PUT'])
 def person_post():
     try:
-        star.insert({'created': datetime.now(), 'name': session['resp']['name'], 'email': session['resp']['email'], 'ethnicity': request.form['ethnicity']})
-        invalidate_cache()
+        x=star.insert_one(
+            {'created': datetime.now(), 
+            'name': session['resp']['name'], 
+            'email': session['resp']['email'], 
+            'ethnicity': request.form['ethnicity']})
+        find_creatorreviews.cache_clear()
+        find_creatorreviews(x.name)
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
