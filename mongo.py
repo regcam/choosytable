@@ -110,12 +110,12 @@ def home():
             e=e)
 
 
-@lru_cache
+#@lru_cache
 def find_reviews():
     return star.find({'reviews': {"$exists": True}})
 
 
-#@lru_cache
+@lru_cache
 @app.route('/company', methods=['GET'])
 def company():
     search = False
@@ -145,8 +145,8 @@ def company_post():
                 ]
             }
         )
-        find_reviews.cache_clear()
-        find_reviews()
+        #find_reviews.cache_clear()
+        #find_reviews()
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
