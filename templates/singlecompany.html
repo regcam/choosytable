@@ -65,6 +65,7 @@
 
                 </script>
             </td>
+            {% if company.interviews %}
             <td>
                 <h2>Interview Success Rate</h2>
                 <canvas id="chart1" width="600" height="400"></canvas>
@@ -89,8 +90,9 @@
 
                 </script>
             </td>
-
+            {% endif %}
         </tr>
+        {% if company.interviews %}
         <tr>
             <td>
                 <h2>Most Interviewed for Position</h2>
@@ -117,6 +119,7 @@
                 </script>
             </td>
         </tr>
+        {% endif %}
     </table>
     <h2>Add a new Company review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
