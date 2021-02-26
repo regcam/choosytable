@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, g
+from waitress import serve
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
@@ -7,6 +8,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
 from functools import lru_cache
+
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -309,4 +311,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    #app.run(debug=True)
+    serve(app, host='0.0.0.0', port=5000, url_scheme='http')
