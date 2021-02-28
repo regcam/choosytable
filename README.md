@@ -4,14 +4,18 @@
 Choosy Table is were People of Color can share and view their hiring and corporate experiences.  Before we lend our talents to any company we should know how they treat us during and after the interview process.  This app will empower POC to engage businesses whom value our collaboration and community.
 
 ## Tech Stack:
-Backend/Frontend - Python3/Flask
+Backend/Frontend - Python3
 
 Persistent Storage - MongoDB 
+
+WSGI Server - Gunicorn
 
 ## Requirements:
 Google APIs account
 
 MongoDB Compass
+
+`brew install gunicorn`
 
 Execute `pip3 install -r requirements.txt`
 
@@ -34,5 +38,5 @@ Execute `pip3 install -r requirements.txt`
 
     * OAUTHLIB_RELAX_TOKEN_SCOPE - Accounts for Google changing the requested OAuth scopes on you
 
-2. Then start the app:
-`/usr/bin/python3 /PATH/TO/YOUR/mongo.py`
+2. Then start the app locally:
+`gunicorn --bind 127.0.0.1:5000 mongo:app`
