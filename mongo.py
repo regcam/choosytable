@@ -1,5 +1,4 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, g
-from waitress import serve
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
@@ -76,11 +75,6 @@ def find_email(z):
     return star.find_one({'email': z})
 
 
-def invalidate_cache():
-    find_creatorreviews.cache_clear()
-    find_reviews.cache_clear()
-    findone_company.cache_clear()
-
 @lru_cache
 @app.route("/")
 @app.route("/home")
@@ -147,8 +141,6 @@ def company_post():
                 ]
             }
         )
-        #find_reviews.cache_clear()
-        #find_reviews()
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -162,52 +154,51 @@ def findone_company(c):
 @lru_cache
 @app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
-    if request.method == 'GET':
-        search = False
-        q = request.args.get('q')
-        if q:
-            search = True
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        singlecompany = findone_company(company_id)
-        l={'one':0,'two':0,'three':0,'four':0,'five':0}
-        values=[]
-        success={'y':0,'n':0}
-        for i in range(len(singlecompany['reviews'])):
-            if singlecompany['reviews'][i]['rating']=="1":
-                l['one']+=1
-            elif singlecompany['reviews'][i]['rating']=="2":
-                l['two']+=1
-            elif singlecompany['reviews'][i]['rating']=="3":
-                l['three']+=1
-            elif singlecompany['reviews'][i]['rating']=="4":
-                l['four']+=1
-            elif singlecompany['reviews'][i]['rating']=="5":
-                l['five']+=1
+    search = False
+    q = request.args.get('q')
+    if q:
+        search = True
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    singlecompany = findone_company(company_id)
+    l={'one':0,'two':0,'three':0,'four':0,'five':0}
+    values=[]
+    success={'y':0,'n':0}
+    for i in range(len(singlecompany['reviews'])):
+        if singlecompany['reviews'][i]['rating']=="1":
+            l['one']+=1
+        elif singlecompany['reviews'][i]['rating']=="2":
+            l['two']+=1
+        elif singlecompany['reviews'][i]['rating']=="3":
+            l['three']+=1
+        elif singlecompany['reviews'][i]['rating']=="4":
+            l['four']+=1
+        elif singlecompany['reviews'][i]['rating']=="5":
+            l['five']+=1
 
-        for k in l.values():
-            values.append(format(k/len(singlecompany['reviews']), '.3f'))
-        
-        positionDict={}
+    for k in l.values():
+        values.append(format(k/len(singlecompany['reviews']), '.3f'))
+    
+    positionDict={}
 
-        for a in range(len(singlecompany['interviews'])):
-            if singlecompany['interviews'][a]['win'] == "y":
-                success['y']+=1
-            else:
-                success['n']+=1
-            if positionDict.get(singlecompany['interviews'][a]['position']) is None:
-                positionDict[singlecompany['interviews'][a]['position']]=1
-            else:
-                positionDict[singlecompany['interviews'][a]['position']]=\
-                    positionDict.get(singlecompany['interviews'][a]['position'])+1
+    for a in range(len(singlecompany['interviews'])):
+        if singlecompany['interviews'][a]['win'] == "y":
+            success['y']+=1
+        else:
+            success['n']+=1
+        if positionDict.get(singlecompany['interviews'][a]['position']) is None:
+            positionDict[singlecompany['interviews'][a]['position']]=1
+        else:
+            positionDict[singlecompany['interviews'][a]['position']]=\
+                positionDict.get(singlecompany['interviews'][a]['position'])+1
 
-        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
-        format(success['n']/len(singlecompany['interviews']), '.3f')] 
-        
-        pagination = Pagination(page=page, total=len(
-            singlecompany['reviews']), search=search, record_name=singlecompany['company'])
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-        set2=zip(positionDict.items(),colors))
+    values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
+    format(success['n']/len(singlecompany['interviews']), '.3f')] 
+    
+    pagination = Pagination(page=page, total=len(
+        singlecompany['reviews']), search=search, record_name=singlecompany['company'])
+    return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
+    set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
+    set2=zip(positionDict.items(),colors))
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
@@ -277,7 +268,6 @@ def singleupdate_person(person_id):
                     "last_modified": datetime.now()}
             }
         )
-        #invalidate_cache()
         return redirect(request.url)
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -311,5 +301,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    #app.run(debug=True)
-    serve(app, host='0.0.0.0', port=5000, url_scheme='http')
+    app.run(debug=True)

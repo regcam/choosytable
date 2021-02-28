@@ -65,7 +65,7 @@
 
                 </script>
             </td>
-            {% if company.interviews %}
+            {% if singlecompany.interviews %}
             <td>
                 <h2>Interview Success Rate</h2>
                 <canvas id="chart1" width="600" height="400"></canvas>
@@ -92,7 +92,7 @@
             </td>
             {% endif %}
         </tr>
-        {% if company.interviews %}
+        {% if singlecompany.interviews %}
         <tr>
             <td>
                 <h2>Most Interviewed for Position</h2>
