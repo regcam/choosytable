@@ -11,17 +11,12 @@ Persistent Storage - MongoDB
 WSGI Server - Gunicorn
 
 ## Requirements:
-[Homebrew](https://docs.brew.sh/Installation)
-
-Python 3: `brew install python`
-
-[Google API](console.developers.google.com/)
-
-[MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
-
-Gunicorn: `brew install gunicorn`
-
-Install Python dependencies (at root of the repo): `pip3 install -r requirements.txt`
+*[Homebrew](https://docs.brew.sh/Installation)
+*Python 3: `brew install python`
+*[Google API](console.developers.google.com/)
+*[MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+*Gunicorn: `brew install gunicorn`
+*Install Python dependencies (at root of the repo): `pip3 install -r requirements.txt`
 
 ## Getting Started:
 1. Export the following required variables to your environment:
