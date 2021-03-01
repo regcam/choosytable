@@ -11,13 +11,15 @@ Persistent Storage - MongoDB
 WSGI Server - Gunicorn
 
 ## Requirements:
-Google APIs account
+Python 3: `brew install python`
 
-MongoDB Compass
+[Google APIs](console.developers.google.com/) account
 
-`brew install gunicorn`
+[MongoDB](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
 
-Execute `pip3 install -r requirements.txt`
+Gunicorn: `brew install gunicorn`
+
+Install Python dependencies (at root of the repo): `pip3 install -r requirements.txt`
 
 ## Getting Started:
 1. Export the following required variables to your environment:
@@ -40,3 +42,6 @@ Execute `pip3 install -r requirements.txt`
 
 2. Then start the app locally:
 `gunicorn --bind 127.0.0.1:5000 mongo:app`
+
+## TODO
+*Data Structure*
