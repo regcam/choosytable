@@ -67,7 +67,7 @@ def find_creatorreviews(y):
           {'creator': y}, 
           {'reviews': {"$exists": True}}
         ]
-      })
+      }).sort('last_modified',-1)
 
 
 #@lru_cache
@@ -108,7 +108,7 @@ def home():
 
 #@lru_cache
 def find_reviews():
-    return star.find({'reviews': {"$exists": True}})
+    return star.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
 
 
 @lru_cache
