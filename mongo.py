@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, session, render_template, request, jsonify, g
+from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
@@ -7,6 +7,9 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
 from functools import lru_cache
+from flask_wtf import FlaskForm
+from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField
+from wtforms.validators import DataRequired
 
 
 app = Flask(__name__)
@@ -49,6 +52,13 @@ p = ['Software Engineer','Staff Engineer','Lead Engineer',
 'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
 'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
 'DBA','Operations Engineer']
+
+class MyCompany(FlaskForm):
+    company = StringField('Name of Company', validators=[DataRequired()])
+    reviews = TextAreaField('Your Review', validators=[DataRequired()])
+    rating = RadioField('Your Rating', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5')])
+    submit = SubmitField("Submit")
+
 
 @lru_cache
 @app.before_request
@@ -114,6 +124,7 @@ def find_reviews():
 @lru_cache
 @app.route('/company', methods=['GET'])
 def company():
+    form = MyCompany()
     search = False
     q = request.args.get('q')
     if q:
@@ -122,28 +133,33 @@ def company():
     companies = find_reviews()
     pagination = Pagination(
         page=page, total=companies.count(), search=search, record_name='companies')
-    return render_template('company.html', companies=companies, pagination=pagination)
+    return render_template('company.html', companies=companies, pagination=pagination,form=form)
 
 
 @app.route('/company', methods=['POST', 'PUT'])
 def company_post():
-    try:
-        star.insert(
-            {
-                'created': datetime.now(),
-                'company': request.form['company'],
-                'creator': session['resp']['name'],
-                'reviews': [
-                    {
-                        'review': request.form['reviews'],
-                        'rating':request.form['rating']
-                    }
-                ]
-            }
-        )
+    form = MyCompany()
+    if form.validate_on_submit():
+        try:
+            star.insert(
+                {
+                    'created': datetime.now(),
+                    'company': request.form['company'],
+                    'creator': session['resp']['name'],
+                    'reviews': [
+                        {
+                            'review': request.form['reviews'],
+                            'rating':request.form['rating']
+                        }
+                    ]
+                }
+            )
+            return redirect(request.url)
+        except Exception as e:
+            return jsonify({'error': str(e)})
+    else:
+        flash('All fields are required.')
         return redirect(request.url)
-    except Exception as e:
-        return jsonify({'error': str(e)})
 
 
 @lru_cache

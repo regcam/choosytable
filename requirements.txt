@@ -1,6 +1,8 @@
-Flask_Navigation==0.2.0
-Flask_PyMongo==2.3.0
 Flask==1.1.2
-Flask_Dance==3.3.0
+Flask_WTF==0.14.3
 pymongo==3.11.2
+Flask_PyMongo==2.3.0
+WTForms==2.3.3
+Flask_Navigation==0.2.0
 flask_paginate==0.8.1
+Flask_Dance==3.3.0
