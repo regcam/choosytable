@@ -180,15 +180,15 @@ def single_company(company_id):
     values=[]
     success={'y':0,'n':0}
     for i in range(len(singlecompany['reviews'])):
-        if singlecompany['reviews'][i]['rating']=="1":
+        if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
-        elif singlecompany['reviews'][i]['rating']=="2":
+        elif singlecompany['reviews'][i]['rating']==2:
             l['two']+=1
-        elif singlecompany['reviews'][i]['rating']=="3":
+        elif singlecompany['reviews'][i]['rating']==3:
             l['three']+=1
-        elif singlecompany['reviews'][i]['rating']=="4":
+        elif singlecompany['reviews'][i]['rating']==4:
             l['four']+=1
-        elif singlecompany['reviews'][i]['rating']=="5":
+        elif singlecompany['reviews'][i]['rating']==5:
             l['five']+=1
 
     for k in l.values():
