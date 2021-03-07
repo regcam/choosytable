@@ -8,7 +8,7 @@ from flask_paginate import Pagination, get_page_parameter
 from flask_navigation import Navigation
 from functools import lru_cache
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField
+from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -57,6 +57,13 @@ class MyCompany(FlaskForm):
     company = StringField('Name of Company', validators=[DataRequired()])
     reviews = TextAreaField('Your Review', validators=[DataRequired()])
     rating = RadioField('Your Rating', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5')])
+    submit = SubmitField("Submit")
+
+class MyInterview(FlaskForm):
+    ie = SelectField('Interviewer\'s Ethnicity:', choices=[(x) for x in iel])
+    gender = RadioField('Interviewer\'s Gender:', choices=[(x) for x in igl])
+    position = SelectField('Position Title:', choices=[(x) for x in p])
+    win = RadioField('Were you offered the position?', choices=[('n','Yes'),('n','No')])  
     submit = SubmitField("Submit")
 
 
@@ -170,6 +177,8 @@ def findone_company(c):
 @lru_cache
 @app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
+    form = MyCompany()
+    form1 = MyInterview()
     search = False
     q = request.args.get('q')
     if q:
@@ -214,52 +223,52 @@ def single_company(company_id):
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
     return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors))
+    set2=zip(positionDict.items(),colors),form=form,form1=form1)
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
 def single_companypost(company_id):
-    try:
-        if None not in [request.form.get('reviews'),request.form.get('rating')]:
-            star.update_one(
-                {'_id': ObjectId(company_id)},
+    form = MyCompany()
+    form1 = MyInterview()
+    if form.validate_on_submit():
+        star.update_one(
+            {'_id': ObjectId(company_id)},
+            {
+                '$push':
                 {
-                    '$push':
+                    'reviews':
                     {
-                        'reviews':
-                        {
-                            'review': request.form.get('reviews'),
-                            'rating': request.form.get('rating')
-                        }
-                    },
-                    '$set': {'last_modified': datetime.now()}
+                        'review': request.form.get('reviews'),
+                        'rating': request.form.get('rating')
+                    }
                 },
-                upsert=True
-            )
-        elif None not in [request.form.get('ie'),request.form.get('ig'),
-        request.form.get('position'),request.form.get('win')]:
-            star.update_one(
-                {'_id': ObjectId(company_id)},
+                '$set': {'last_modified': datetime.now()}
+            },
+            upsert=True
+        )
+    elif form1.validate_on_submit():
+        star.update_one(
+            {'_id': ObjectId(company_id)},
+            {
+                '$push':
                 {
-                    '$push':
+                    'interviews':
                     {
-                        'interviews':
-                        {
-                            'ie':request.form.get('ie'),
-                            'gender': request.form.get('ig'),
-                            'position': request.form.get('position'),
-                            'win': request.form.get('win')
-                        }
-                    },
-                    '$set': {'last_modified': datetime.now()}
+                        'ie':request.form.get('ie'),
+                        'gender': request.form.get('ig'),
+                        'position': request.form.get('position'),
+                        'win': request.form.get('win')
+                    }
                 },
-                upsert=True
-            )
+                '$set': {'last_modified': datetime.now()}
+            },
+            upsert=True
+        )
         findone_company.cache_clear()
         findone_company(company_id)
         return redirect(request.url)
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    else:
+        return jsonify({'error': "Something went wrong"})
 
 
 @lru_cache
