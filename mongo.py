@@ -324,7 +324,7 @@ def person():
 def person_post():
     form = MyPerson()
     if form.validate_on_submit():
-        star.insert_one(
+        x=star.insert_one(
             {'created': datetime.now(), 
             'name': session['resp']['name'], 
             'email': session['resp']['email'], 
