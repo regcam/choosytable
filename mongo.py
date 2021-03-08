@@ -67,7 +67,7 @@ class MyPerson(FlaskForm):
 class MyCompany(FlaskForm):
     company = StringField('Name of Company', validators=[DataRequired()])
     reviews = TextAreaField('Your Review', validators=[DataRequired()])
-    rating = RadioField('Your Rating', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5')])
+    rating = RadioField('Your Rating', choices=[x for x in range(1,6)])
     submit = SubmitField("Submit")
 
 class MyInterview(FlaskForm):
