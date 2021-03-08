@@ -297,7 +297,7 @@ def single_person(person_id):
 @app.route('/person/<person_id>', methods=['PUT', 'POST'])
 def singleupdate_person(person_id):
     form = MyPerson()
-    try:
+    if form.validate_on_submit():
         star.update(
             {'_id': ObjectId(person_id)},
             {
@@ -310,8 +310,8 @@ def singleupdate_person(person_id):
             }
         )
         return redirect(request.url)
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    else:
+        return jsonify({'error': "The form was not valid"})
 
 
 @lru_cache
@@ -322,17 +322,20 @@ def person():
 
 @app.route('/person', methods=['POST', 'PUT'])
 def person_post():
-    try:
-        x=star.insert_one(
+    form = MyPerson()
+    if form.validate_on_submit():
+        star.insert_one(
             {'created': datetime.now(), 
             'name': session['resp']['name'], 
             'email': session['resp']['email'], 
-            'ethnicity': request.form['ethnicity']})
+            'ethnicity': request.form['ethnicity'],
+            'gender': request.form['gender'],
+            'age': request.form['age']})
         find_creatorreviews.cache_clear()
         find_creatorreviews(x.name)
         return redirect(request.url)
-    except Exception as e:
-        return jsonify({'error': str(e)})
+    else:
+        return jsonify({'error': "Form wasn't valid"})
 
 
 @app.route("/logout")
