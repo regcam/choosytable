@@ -9,6 +9,7 @@ from flask_navigation import Navigation
 from functools import lru_cache
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField, SelectField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
 
@@ -45,13 +46,21 @@ labels = ['1 Star','2 Stars','3 Stars','4 Stars','5 Stars']
 labels1 = ['Offered the Job %','No Offer %']
 labels2 = ['# of Interviews']
 
-iel = ['White','Asian','Latino','Black','Afro-Latino','African','Indigenous People','Pacific Islander']
-igl = ['Female','Male','Transgender','Agender']
+iel = ['White','Asian','Latino','Black','Afro-Latino',
+'African','Indigenous People','Pacific Islander', 'Unspecified']
+igl = ['Female','Male','Transgender','Agender','Unspecified']
 p = ['Software Engineer','Staff Engineer','Lead Engineer',
 'Architect','Software Engineer Manager','Technical Manager','Technical Director',
 'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
 'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
 'DBA','Operations Engineer']
+
+class MyPerson(FlaskForm):
+    name = StringField('Your Name', validators=[DataRequired()])
+    email = EmailField('Your Email', validators=[DataRequired()])
+    gender = RadioField('Your Gender:', choices=[(x) for x in igl])
+    ie = SelectField('Your Ethnicity:', choices=[(x) for x in iel])
+    submit = SubmitField("Submit")
 
 class MyCompany(FlaskForm):
     company = StringField('Name of Company', validators=[DataRequired()])
@@ -98,6 +107,7 @@ def find_email(z):
 @app.route("/index")
 @app.route("/welcome")
 def home():
+    form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     x = find_email(session['resp']['email'])
     r = find_creatorreviews(x['name'])
@@ -114,13 +124,13 @@ def home():
             x=x,
             r=r,
             e=e,
-            pagination=pagination)
+            pagination=pagination, form=form)
     else:
         return render_template(
             'person.html',
             email=session['resp']['email'],
             name=session['resp']['name'],
-            e=e)
+            e=e, form=form)
 
 
 #@lru_cache
@@ -274,6 +284,7 @@ def single_companypost(company_id):
 @lru_cache
 @app.route('/person/<person_id>', methods=['GET'])
 def single_person(person_id):
+    form = MyPerson()
     if request.method == 'GET':
         try:
             return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
@@ -283,6 +294,7 @@ def single_person(person_id):
 
 @app.route('/person/<person_id>', methods=['PUT', 'POST'])
 def singleupdate_person(person_id):
+    form = MyPerson()
     try:
         star.update(
             {'_id': ObjectId(person_id)},

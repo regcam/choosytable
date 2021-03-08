@@ -47,18 +47,15 @@
     {% else %}
         <form action="/person" method="post">
     {% endif %}
-        <p>Name <input placeholder="Enter your name" type="text" name="name" value="{{x['name']}}"></input></p>
-        <p>Email <input disabled=True label="Email" type="email" name="email" value="{{x['email']}}"></input></p>
-        <p>Ethnicity <select name="ethnicity">
-            {% for n in e %}
-                {% if n==x['ethnicity'] %}
-                    <option value="{{n}}" selected>{{n}}</option>
-                {% else %}
-                    <option value="{{n}}">{{n}}</option>
-                {% endif %}
-            {% endfor %}
-        </select></p>
-        <p><input type="submit" value="Submit"></input></p>
+        {{ form.csrf_token }}
+        <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
+        <p>{{ form.email.label }}<br>{{ form.email(value=x['email']) }}</p>
+        <p>Gender:</p>
+        {% for subfield in form.gender %}
+        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
+        {% endfor %}
+        <p>{{ form.ie.label }}<br>{{ form.ie }}</p>
+        <p>{{ form.submit }}</p>
     </form>
 
     <p><a href={{url_for('company')}}>Post a Company review?</a></p>
