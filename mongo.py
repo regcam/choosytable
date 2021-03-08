@@ -54,12 +54,14 @@ p = ['Software Engineer','Staff Engineer','Lead Engineer',
 'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
 'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
 'DBA','Operations Engineer']
+age = ['18-24','25-34','35-44','45-54','55-64','65-74','75+']
 
 class MyPerson(FlaskForm):
     name = StringField('Your Name', validators=[DataRequired()])
     email = EmailField('Your Email', validators=[DataRequired()])
     gender = RadioField('Your Gender:', choices=[(x) for x in igl])
-    ie = SelectField('Your Ethnicity:', choices=[(x) for x in iel])
+    age = SelectField('Your Age:', choices=[(x) for x in age])
+    ethnicity = SelectField('Your Ethnicity:', choices=[(x) for x in iel])
     submit = SubmitField("Submit")
 
 class MyCompany(FlaskForm):
@@ -301,6 +303,8 @@ def singleupdate_person(person_id):
             {
                 '$set': {
                     'name': request.form['name'],
+                    'gender': request.form['gender'],
+                    'age': request.form['age'],
                     'ethnicity': request.form['ethnicity'],
                     "last_modified": datetime.now()}
             }
