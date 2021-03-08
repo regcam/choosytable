@@ -49,7 +49,7 @@
     {% endif %}
         {{ form.csrf_token }}
         <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
-        <p>{{ form.email.label }}<br>{{ form.email(value=x['email']) }}</p>
+        <p>{{ form.email.label }}<br>{{ form.email(value=x['email'],disabled=True) }}</p>
         <p>Gender:</p>
         {% for subfield in form.gender %}
         <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
