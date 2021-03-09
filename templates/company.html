@@ -13,7 +13,7 @@
     <br>
     <br>
     <h1>Choosy Table</h1>
-    
+
     {{ pagination.info }}
     {{ pagination.links }}
     <table class="styled-table">
@@ -48,10 +48,7 @@
             <p>{{ form.reviews.label }}<br>{{ form.reviews(size=20) }}</p>
             <p>Rating:</p>
             {% for subfield in form.rating %}
-            <tr>
-            <td>{{ subfield }}</td>
-            <td>{{ subfield.label }}</td>
-            </tr>
+            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
             {% endfor %}
             <p>{{ form.submit }}</p>
         </form>

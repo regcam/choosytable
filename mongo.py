@@ -74,6 +74,7 @@ class MyInterview(FlaskForm):
     ie = SelectField('Interviewer\'s Ethnicity:', choices=[(x) for x in iel])
     gender = RadioField('Interviewer\'s Gender:', choices=[(x) for x in igl])
     position = SelectField('Position Title:', choices=[(x) for x in p])
+    employee = RadioField('Are you an employee here?', choices=[('n','Yes'),('n','No')])
     win = RadioField('Were you offered the position?', choices=[('n','Yes'),('n','No')])  
     submit = SubmitField("Submit")
 
@@ -163,12 +164,12 @@ def company_post():
             star.insert(
                 {
                     'created': datetime.now(),
-                    'company': request.form['company'],
+                    'company': request.form.get('company'),
                     'creator': session['resp']['name'],
                     'reviews': [
                         {
-                            'review': request.form['reviews'],
-                            'rating':request.form['rating']
+                            'review':request.form.get('reviews'),
+                            'rating':request.form.get('rating')
                         }
                     ]
                 }
@@ -269,6 +270,7 @@ def single_companypost(company_id):
                         'ie':request.form.get('ie'),
                         'gender': request.form.get('ig'),
                         'position': request.form.get('position'),
+                        'employee': request.form.get('employee'),
                         'win': request.form.get('win')
                     }
                 },
@@ -302,10 +304,10 @@ def singleupdate_person(person_id):
             {'_id': ObjectId(person_id)},
             {
                 '$set': {
-                    'name': request.form['name'],
-                    'gender': request.form['gender'],
-                    'age': request.form['age'],
-                    'ethnicity': request.form['ethnicity'],
+                    'name': request.form.get('name'),
+                    'gender': request.form.get('gender'),
+                    'age': request.form.get('age'),
+                    'ethnicity': request.form.get('ethnicity'),
                     "last_modified": datetime.now()}
             }
         )
@@ -328,9 +330,9 @@ def person_post():
             {'created': datetime.now(), 
             'name': session['resp']['name'], 
             'email': session['resp']['email'], 
-            'ethnicity': request.form['ethnicity'],
-            'gender': request.form['gender'],
-            'age': request.form['age']})
+            'ethnicity': request.form.get('ethnicity'),
+            'gender': request.form.get('gender'),
+            'age': request.form.get('age')})
         find_creatorreviews.cache_clear()
         find_creatorreviews(x.name)
         return redirect(request.url)
