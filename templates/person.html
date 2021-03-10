@@ -15,41 +15,45 @@
     <br>
     <h1>Choosy Table</h1>
 
-    {{ pagination.info }}
-    {{ pagination.links }}
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Company</th>
-                <th>Reviews</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for s in r %}
-            <tr>
-                <td>{{ loop.index + pagination.skip }}</td>
-                <td>{{ s.company }}</td>
-                <td>
-                    {% for x in s.reviews %}
-                        {{ x }}<br>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {{ pagination.links }}
-
-    <p>Hey {{x['name']}}, is your info correct?</p>
+    {% if r is defined %}
+        {{ pagination.info }}
+        {{ pagination.links }}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Company</th>
+                    <th>Reviews</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in r %}
+                <tr>
+                    <td>{{ loop.index + pagination.skip }}</td>
+                    <td>{{ s.company }}</td>
+                    <td>
+                        {% for x in s.reviews %}
+                            {{ x }}<br>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ pagination.links }}
+    {% endif %}
+ 
+    <p>{{ "Hey x['name'], is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
     {% if x['_id'] %}
         <form action="/person/{{x['_id']}}" method="post">
+        {{ form.email(value=x['email'],hidden=True) }}</p>
+        <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
     {% else %}
         <form action="/person" method="post">
+        {{ form.email(value=x,hidden=True) }}</p>
+        <p>{{ form.name.label }}<br>{{ form.name }}</p>
     {% endif %}
         {{ form.csrf_token }}
-        <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
-        <p>{{ form.email.label }}<br>{{ form.email(value=x['email'],disabled=True) }}</p>
         <p>Gender:</p>
         {% for subfield in form.gender %}
         <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>

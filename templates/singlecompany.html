@@ -137,10 +137,6 @@
     <form action="/company/{{singlecompany._id}}" id="interview" method="post">
         {{ form1.csrf_token }}
         <p>{{ form1.ie.label }}<br>{{ form1.ie }}</p>
-        <p>Interview's Gender:</p>
-        {% for subfield in form1.gender %}
-        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-        {% endfor %}
         <p>{{ form1.position.label }}<br>{{ form1.position }}</p>
         <p>Are you currently employed at {{singlecompany.company}}?</p>
         {% for subfield in form1.employee %}

@@ -72,7 +72,6 @@ class MyCompany(FlaskForm):
 
 class MyInterview(FlaskForm):
     ie = SelectField('Interviewer\'s Ethnicity:', choices=[(x) for x in iel])
-    gender = RadioField('Interviewer\'s Gender:', choices=[(x) for x in igl])
     position = SelectField('Position Title:', choices=[(x) for x in p])
     employee = RadioField('Are you an employee here?', choices=[('n','Yes'),('n','No')])
     win = RadioField('Were you offered the position?', choices=[('n','Yes'),('n','No')])  
@@ -99,7 +98,7 @@ def find_creatorreviews(y):
       }).sort('last_modified',-1)
 
 
-#@lru_cache
+@lru_cache
 def find_email(z):
     return star.find_one({'email': z})
 
@@ -113,8 +112,8 @@ def home():
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     x = find_email(session['resp']['email'])
-    r = find_creatorreviews(x['name'])
-    if r is not None:
+    if x is not None:
+        r = find_creatorreviews(x['name'])
         search = False
         q = request.args.get('q')
         if q:
@@ -129,10 +128,17 @@ def home():
             e=e,
             pagination=pagination, form=form)
     else:
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        pagination = Pagination(
+            page=page, total=0, search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
-            email=session['resp']['email'],
-            name=session['resp']['name'],
+            x=session['resp']['email'],
+            pagination=pagination,
             e=e, form=form)
 
 
@@ -243,6 +249,7 @@ def single_company(company_id):
 def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
+    user = find_email(session['resp']['email'])
     if form.validate_on_submit():
         star.update_one(
             {'_id': ObjectId(company_id)},
@@ -268,9 +275,9 @@ def single_companypost(company_id):
                     'interviews':
                     {
                         'ie':request.form.get('ie'),
-                        'gender': request.form.get('ig'),
                         'position': request.form.get('position'),
                         'employee': request.form.get('employee'),
+                        'gender': user['gender'],
                         'win': request.form.get('win')
                     }
                 },
@@ -319,7 +326,7 @@ def singleupdate_person(person_id):
 @lru_cache
 @app.route('/person', methods=['GET'])
 def person():
-    return redirect("/home")
+    return redirect(url_for('home'))
 
 
 @app.route('/person', methods=['POST', 'PUT'])
@@ -328,14 +335,15 @@ def person_post():
     if form.validate_on_submit():
         x=star.insert_one(
             {'created': datetime.now(), 
-            'name': session['resp']['name'], 
-            'email': session['resp']['email'], 
+            'name': request.form.get('name'), 
+            'email': request.form.get('email'), 
             'ethnicity': request.form.get('ethnicity'),
             'gender': request.form.get('gender'),
             'age': request.form.get('age')})
-        find_creatorreviews.cache_clear()
-        find_creatorreviews(x.name)
-        return redirect(request.url)
+        #find_creatorreviews.cache_clear()
+        #find_creatorreviews(x.name)
+        home.cache_clear()
+        return redirect(url_for('home'))
     else:
         return jsonify({'error': "Form wasn't valid"})
 
