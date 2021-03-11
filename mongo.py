@@ -98,7 +98,7 @@ def find_creatorreviews(y):
       }).sort('last_modified',-1)
 
 
-#@lru_cache
+@lru_cache
 def find_email(z):
     return star.find_one({'email': z})
 
@@ -342,7 +342,7 @@ def person_post():
             'age': request.form.get('age')})
         #find_creatorreviews.cache_clear()
         #find_creatorreviews(x.name)
-        home.cache_clear()
+        find_email.cache_clear()
         return redirect(url_for('home'))
     else:
         return jsonify({'error': "Form wasn't valid"})
