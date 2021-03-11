@@ -16,6 +16,7 @@
     <h1>Choosy Table</h1>
 
     {% if r is defined %}
+    {% if r['reviews']|length > 0 %}
         {{ pagination.info }}
         {{ pagination.links }}
         <table class="styled-table">
@@ -42,8 +43,9 @@
         </table>
         {{ pagination.links }}
     {% endif %}
+    {% endif %}
  
-    <p>{{ "Hey x['name'], is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
+    <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
     {% if x['_id'] %}
         <form action="/person/{{x['_id']}}" method="post">
         {{ form.email(value=x['email'],hidden=True) }}</p>

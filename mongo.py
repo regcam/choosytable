@@ -98,7 +98,7 @@ def find_creatorreviews(y):
       }).sort('last_modified',-1)
 
 
-@lru_cache
+#@lru_cache
 def find_email(z):
     return star.find_one({'email': z})
 
