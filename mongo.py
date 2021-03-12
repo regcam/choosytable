@@ -250,6 +250,7 @@ def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
     user = find_email(session['resp']['email'])
+    print(form.validate_on_submit())
     if form.validate_on_submit():
         star.update_one(
             {'_id': ObjectId(company_id)},
@@ -259,7 +260,8 @@ def single_companypost(company_id):
                     'reviews':
                     {
                         'review': request.form.get('reviews'),
-                        'rating': request.form.get('rating')
+                        'rating': request.form.get('rating'),
+                        'user': str(user['_id'])
                     }
                 },
                 '$set': {'last_modified': datetime.now()}
@@ -278,6 +280,7 @@ def single_companypost(company_id):
                         'position': request.form.get('position'),
                         'employee': request.form.get('employee'),
                         'gender': user['gender'],
+                        'user': str(user['_id']),
                         'win': request.form.get('win')
                     }
                 },
@@ -287,9 +290,9 @@ def single_companypost(company_id):
         )
         findone_company.cache_clear()
         findone_company(company_id)
-        return redirect(request.url)
     else:
         return jsonify({'error': "Something went wrong"})
+    return redirect(request.url)
 
 
 @lru_cache
@@ -350,7 +353,7 @@ def person_post():
 
 @app.route("/logout")
 def logout():
-    session.clear()
+    session.pop('session', None)
     return render_template('bye.html')
 
 

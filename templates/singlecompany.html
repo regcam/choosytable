@@ -123,7 +123,7 @@
     </table>
     <h2>Add a new Company review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
-        <p><input disabled=True placeholder="{{singlecompany.company}}" type="text" name="company" value="{{singlecompany.company}}"></input></p>
+        <p>{{ form.company(value=singlecompany.company,hidden=True) }}</p>
         {{ form.csrf_token }}
         <p>{{ form.reviews.label }}<br>{{ form.reviews(size=20) }}</p>
         <p>Rating:</p>
