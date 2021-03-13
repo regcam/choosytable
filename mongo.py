@@ -114,6 +114,10 @@ def home():
     x = find_email(session['resp']['email'])
     if x is not None:
         r = find_creatorreviews(x['name'])
+        form.gender.default = x['gender']
+        form.age.default = x['age']
+        form.ethnicity.default = x['ethnicity']
+        form.process()
         search = False
         q = request.args.get('q')
         if q:
@@ -188,7 +192,7 @@ def company_post():
         return redirect(request.url)
 
 
-@lru_cache
+#@lru_cache
 def findone_company(c):
     return star.find_one({'_id': ObjectId(c)})
 
@@ -250,7 +254,6 @@ def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
     user = find_email(session['resp']['email'])
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         star.update_one(
             {'_id': ObjectId(company_id)},
