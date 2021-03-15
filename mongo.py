@@ -14,8 +14,8 @@ from wtforms.validators import DataRequired
 
 
 app = Flask(__name__)
-app.config['MONGO_DBNAME'] = 'restdb'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
+app.config['MONGO_DBNAME'] = 'choosytable'
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 app.secret_key = os.urandom(24).hex()
@@ -26,7 +26,7 @@ blueprint = make_google_blueprint(scope=["profile", "email"])
 app.register_blueprint(blueprint, url_prefix="/login")
 
 mongo = PyMongo(app)
-star = mongo.db.stars
+ct = mongo.db.choosytable
 db = mongo.db
 nav = Navigation(app)
 
@@ -89,7 +89,7 @@ def before_request():
 
 #@lru_cache
 def find_creatorreviews(y):
-    return star.find(
+    return ct.find(
       {
         "$and": [
           {'creator': y}, 
@@ -100,7 +100,7 @@ def find_creatorreviews(y):
 
 @lru_cache
 def find_email(z):
-    return star.find_one({'email': z})
+    return ct.find_one({'email': z})
 
 
 @lru_cache
@@ -148,7 +148,7 @@ def home():
 
 #@lru_cache
 def find_reviews():
-    return star.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
+    return ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
 
 
 @lru_cache
@@ -169,17 +169,18 @@ def company():
 @app.route('/company', methods=['POST', 'PUT'])
 def company_post():
     form = MyCompany()
+    user = find_email(session['resp']['email'])
     if form.validate_on_submit():
         try:
-            star.insert(
+            ct.insert(
                 {
                     'created': datetime.now(),
                     'company': request.form.get('company'),
-                    'creator': session['resp']['name'],
                     'reviews': [
                         {
                             'review':request.form.get('reviews'),
-                            'rating':request.form.get('rating')
+                            'rating':request.form.get('rating'),
+                            'user': str(user['_id'])
                         }
                     ]
                 }
@@ -194,7 +195,7 @@ def company_post():
 
 #@lru_cache
 def findone_company(c):
-    return star.find_one({'_id': ObjectId(c)})
+    return ct.find_one({'_id': ObjectId(c)})
 
 
 @lru_cache
@@ -227,26 +228,31 @@ def single_company(company_id):
         values.append(format(k/len(singlecompany['reviews']), '.3f'))
     
     positionDict={}
-
-    for a in range(len(singlecompany['interviews'])):
-        if singlecompany['interviews'][a]['win'] == "y":
-            success['y']+=1
-        else:
-            success['n']+=1
-        if positionDict.get(singlecompany['interviews'][a]['position']) is None:
-            positionDict[singlecompany['interviews'][a]['position']]=1
-        else:
-            positionDict[singlecompany['interviews'][a]['position']]=\
-                positionDict.get(singlecompany['interviews'][a]['position'])+1
-
-    values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
-    format(success['n']/len(singlecompany['interviews']), '.3f')] 
-    
-    pagination = Pagination(page=page, total=len(
+    if 'interviews' in singlecompany:
+        for a in range(len(singlecompany['interviews'])):
+            if singlecompany['interviews'][a]['win'] == "y":
+                success['y']+=1
+            else:
+                success['n']+=1
+            if positionDict.get(singlecompany['interviews'][a]['position']) is None:
+                positionDict[singlecompany['interviews'][a]['position']]=1
+            else:
+                positionDict[singlecompany['interviews'][a]['position']]=\
+                    positionDict.get(singlecompany['interviews'][a]['position'])+1
+        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
+        format(success['n']/len(singlecompany['interviews']), '.3f')] 
+        pagination = Pagination(page=page, total=len(
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
-    return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
+
+        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1)
+    else:
+        pagination = Pagination(page=page, total=len(
+            singlecompany['reviews']), search=search, record_name=singlecompany['company'])
+        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
+        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,
+        set2=zip(positionDict.items(),colors),form=form,form1=form1)
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
@@ -255,7 +261,7 @@ def single_companypost(company_id):
     form1 = MyInterview()
     user = find_email(session['resp']['email'])
     if form.validate_on_submit():
-        star.update_one(
+        ct.update_one(
             {'_id': ObjectId(company_id)},
             {
                 '$push':
@@ -272,7 +278,7 @@ def single_companypost(company_id):
             upsert=True
         )
     elif form1.validate_on_submit():
-        star.update_one(
+        ct.update_one(
             {'_id': ObjectId(company_id)},
             {
                 '$push':
@@ -304,7 +310,7 @@ def single_person(person_id):
     form = MyPerson()
     if request.method == 'GET':
         try:
-            return json_util.dumps(star.find_one({'_id': ObjectId(person_id)}))
+            return json_util.dumps(ct.find_one({'_id': ObjectId(person_id)}))
         except:
             return jsonify({'error': 'person not found'})
 
@@ -313,7 +319,7 @@ def single_person(person_id):
 def singleupdate_person(person_id):
     form = MyPerson()
     if form.validate_on_submit():
-        star.update(
+        ct.update(
             {'_id': ObjectId(person_id)},
             {
                 '$set': {
@@ -339,7 +345,7 @@ def person():
 def person_post():
     form = MyPerson()
     if form.validate_on_submit():
-        x=star.insert_one(
+        x=ct.insert_one(
             {'created': datetime.now(), 
             'name': request.form.get('name'), 
             'email': request.form.get('email'), 
