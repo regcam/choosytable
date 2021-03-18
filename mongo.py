@@ -360,17 +360,16 @@ def person_post():
         return jsonify({'error': "Form wasn't valid"})
 
 
-@app.route("/forgetme/<user>")
+@app.route('/forgetme/<user>')
 def forgetme(user):
-    ct.deleteMany(
-        {"$or": [
-            {'_id': ObjectId(user)},
-            {'user': ObjectId(user)}]}
-        )
+    ct.update(
+        {'reviews.$[].user': user},
+        {'$pull': {'reviews.$[].user': {'user':user}}}
+    )
     return render_template('bye.html')
 
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session.pop('session', None)
     return render_template('bye.html')
