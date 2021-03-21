@@ -225,7 +225,7 @@ def single_company(company_id):
             l['five']+=1
 
     for k in l.values():
-        values.append(format(k/len(singlecompany['reviews']), '.3f'))
+        values.append(format(k/len(singlecompany['reviews']), '.3f')) if len(singlecompany['reviews'])>0 else values.append(0)
     
     positionDict={}
     if 'interviews' in singlecompany:
@@ -239,8 +239,11 @@ def single_company(company_id):
             else:
                 positionDict[singlecompany['interviews'][a]['position']]=\
                     positionDict.get(singlecompany['interviews'][a]['position'])+1
-        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
-        format(success['n']/len(singlecompany['interviews']), '.3f')] 
+        if len(singlecompany['interviews'])>0:
+            values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
+            format(success['n']/len(singlecompany['interviews']), '.3f')]
+        else:
+            values1=[0,0]
         pagination = Pagination(page=page, total=len(
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
 
@@ -297,7 +300,6 @@ def single_companypost(company_id):
             },
             upsert=True
         )
-        findone_company.cache_clear()
         findone_company(company_id)
     else:
         return jsonify({'error': "Something went wrong"})
@@ -362,8 +364,19 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    ct.update({'reviews.user': user}, {'$pull': {'reviews': {'user':user}}})
-    return render_template('bye.html')
+    ct.update(
+        {'reviews.user': user}, 
+        {'$pull': {'reviews': {'user': user}}}
+    )
+    ct.update(
+        {'interviews.user': user}, 
+        {'$pull': {'interviews': {'user': user}}}
+    )
+    ct.remove(
+        {'_id': ObjectId(user)}, 
+    )
+    find_email.cache_clear()
+    return redirect(url_for('home'))
 
 
 @app.route('/logout')
