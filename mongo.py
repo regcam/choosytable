@@ -362,12 +362,7 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    print(ct.delete_one(
-        {'reviews': {'$elemMatch': {'user':user}}}
-    ))
-    ct.delete_one(
-        {'reviews': {'$elemMatch': {'user':user}}}
-    )
+    ct.update({'reviews.user': user}, {'$pull': {'reviews': {'user':user}}})
     return render_template('bye.html')
 
 
