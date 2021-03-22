@@ -179,7 +179,7 @@ def company_post():
                     'reviews': [
                         {
                             'review':request.form.get('reviews'),
-                            'rating':request.form.get('rating'),
+                            'rating':int(request.form.get('rating')),
                             'user': str(user['_id'])
                         }
                     ]
@@ -226,7 +226,7 @@ def single_company(company_id):
 
     for k in l.values():
         values.append(format(k/len(singlecompany['reviews']), '.3f')) if len(singlecompany['reviews'])>0 else values.append(0)
-    
+
     positionDict={}
     if 'interviews' in singlecompany:
         for a in range(len(singlecompany['interviews'])):
@@ -272,7 +272,7 @@ def single_companypost(company_id):
                     'reviews':
                     {
                         'review': request.form.get('reviews'),
-                        'rating': request.form.get('rating'),
+                        'rating': int(request.form.get('rating')),
                         'user': str(user['_id'])
                     }
                 },
@@ -300,7 +300,6 @@ def single_companypost(company_id):
             },
             upsert=True
         )
-        findone_company(company_id)
     else:
         return jsonify({'error': "Something went wrong"})
     return redirect(request.url)
