@@ -125,7 +125,11 @@
         </tr>
         {% endif %}
     </table>
-    <h2>Add a new Company review</h2>
+
+    <h2>Your chances at {{singlecompany.company}}?</h2>
+    <p></p>
+
+    <h2>Add a new {{singlecompany.company}} review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
         <p>{{ form.company(value=singlecompany.company,hidden=True) }}</p>
         {{ form.csrf_token }}

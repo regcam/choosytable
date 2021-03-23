@@ -74,7 +74,7 @@ class MyInterview(FlaskForm):
     ie = SelectField('Interviewer\'s Ethnicity:', choices=[(x) for x in iel])
     position = SelectField('Position Title:', choices=[(x) for x in p])
     employee = RadioField('Are you an employee here?', choices=[('n','Yes'),('n','No')])
-    win = RadioField('Were you offered the position?', choices=[('n','Yes'),('n','No')])  
+    win = RadioField('Were you offered the position?', choices=[('y','Yes'),('n','No'),('o','Offered a Different Position')])  
     submit = SubmitField("Submit")
 
 
@@ -263,7 +263,7 @@ def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
     user = find_email(session['resp']['email'])
-    if form.validate_on_submit():
+    if form.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
             {
@@ -280,7 +280,7 @@ def single_companypost(company_id):
             },
             upsert=True
         )
-    elif form1.validate_on_submit():
+    elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
             {
@@ -301,7 +301,7 @@ def single_companypost(company_id):
             upsert=True
         )
     else:
-        return jsonify({'error': "Something went wrong"})
+        return jsonify({'error': "Something went wrong.  Make sure you complete your profile!"})
     return redirect(request.url)
 
 
