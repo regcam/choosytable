@@ -198,6 +198,23 @@ def findone_company(c):
     return ct.find_one({'_id': ObjectId(c)})
 
 
+def your_chances(user):
+    print(
+        json_util.dumps(
+            ct.find(
+                {'interviews.win':'y',
+                'gender': user['gender'],
+                'ethnicity':user['ethnicity']}
+                )))
+    return ct.find(
+        {
+            'interviews.win':'y',
+            'gender': user['gender'],
+            'ethnicity':user['ethnicity']
+        })
+      #.sort('last_modified',-1)
+
+
 @lru_cache
 @app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
@@ -247,9 +264,11 @@ def single_company(company_id):
         pagination = Pagination(page=page, total=len(
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
 
+        x=find_email(session['resp']['email'])
+        ychance=json_util.dumps(your_chances(x))
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors),form=form,form1=form1)
+    set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance)
     else:
         pagination = Pagination(page=page, total=len(
             singlecompany['reviews']), search=search, record_name=singlecompany['company'])
