@@ -202,16 +202,17 @@ def your_chances(user):
     print(
         json_util.dumps(
             ct.find(
-                {'interviews.win':'y',
-                'gender': user['gender'],
-                'ethnicity':user['ethnicity']}
-                )))
+                {'$and': [
+                    {'interviews.win':'y'},
+                    {'interviews.user_gender': user['gender']},
+                    {'interviews.user_ethnicity':user['ethnicity']}
+                ]}
+                ).count()))
     return ct.find(
-        {
-            'interviews.win':'y',
-            'gender': user['gender'],
-            'ethnicity':user['ethnicity']
-        })
+                {'$and': [
+                    {'interviews.win':'y'},
+                    {'interviews.user_gender': user['gender']},
+                    {'interviews.user_ethnicity':user['ethnicity']}]}).count()
       #.sort('last_modified',-1)
 
 
@@ -292,7 +293,9 @@ def single_companypost(company_id):
                     {
                         'review': request.form.get('reviews'),
                         'rating': int(request.form.get('rating')),
-                        'user': str(user['_id'])
+                        'user': str(user['_id']),
+                        'gender':user['gender'],
+                        'ethnicity':user['ethnicity']
                     }
                 },
                 '$set': {'last_modified': datetime.now()}
@@ -312,6 +315,8 @@ def single_companypost(company_id):
                         'employee': request.form.get('employee'),
                         'gender': user['gender'],
                         'user': str(user['_id']),
+                        'user_gender':user['gender'],
+                        'user_ethnicity':user['ethnicity'],
                         'win': request.form.get('win')
                     }
                 },
@@ -350,6 +355,24 @@ def singleupdate_person(person_id):
                     "last_modified": datetime.now()}
             }
         )
+        ct.update(
+            {'interviews.user': person_id},
+            {
+                '$set': {
+                    'user_gender': request.form.get('gender'),
+                    'user_ethnicity': request.form.get('ethnicity')
+                }
+            }
+        )
+        ct.update(
+            {'reviews.user': person_id},
+            {
+                '$set': {
+                    'gender': request.form.get('gender'),
+                    'ethnicity': request.form.get('ethnicity')
+                }
+            }
+        )
         return redirect(request.url)
     else:
         return jsonify({'error': "The form was not valid"})
@@ -372,8 +395,6 @@ def person_post():
             'ethnicity': request.form.get('ethnicity'),
             'gender': request.form.get('gender'),
             'age': request.form.get('age')})
-        #find_creatorreviews.cache_clear()
-        #find_creatorreviews(x.name)
         find_email.cache_clear()
         return redirect(url_for('home'))
     else:
