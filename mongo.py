@@ -198,22 +198,40 @@ def findone_company(c):
     return ct.find_one({'_id': ObjectId(c)})
 
 
-def your_chances(user):
-    print(
-        json_util.dumps(
-            ct.find(
-                {'$and': [
-                    {'interviews.win':'y'},
-                    {'interviews.user_gender': user['gender']},
-                    {'interviews.user_ethnicity':user['ethnicity']}
-                ]}
-                ).count()))
-    return ct.find(
-                {'$and': [
-                    {'interviews.win':'y'},
-                    {'interviews.user_gender': user['gender']},
-                    {'interviews.user_ethnicity':user['ethnicity']}]}).count()
-      #.sort('last_modified',-1)
+def your_chances(user,company):
+    print(ct.find(
+        {'$and': [
+            {'_id':ObjectId(company)},
+            {'interviews.win':'y'},
+            {'interviews.user_gender': user['gender']},
+            {'interviews.user_ethnicity':user['ethnicity']}]}).count())
+    a=ct.find(
+        {'$and': [
+            {'_id':ObjectId(company)},
+            {'interviews.win':'y'},
+            {'interviews.user_gender': user['gender']},
+            {'interviews.user_ethnicity':user['ethnicity']}]})
+    print(ct.find(
+        {'$and': [
+            {'_id':ObjectId(company)},
+            {'interviews.win': {"$exists": True}},
+            {'interviews.user_gender': user['gender']},
+            {'interviews.user_ethnicity':user['ethnicity']}]}).count())
+    b=ct.find(
+        {'$and': [
+            {'_id':ObjectId(company)},
+            {'interviews.win': {"$exists": True}},
+            {'interviews.user_gender': user['gender']},
+            {'interviews.user_ethnicity':user['ethnicity']}]})
+    for idx,x in enumerate(a):
+        print(x['interviews'][idx]['win'])
+    for idx,y in enumerate(b):
+        print(y['interviews'][idx]['win'])
+    print(len(a))
+    print(len(b))
+    #print(f"a={a} and b={b}")
+    #return int(a/b)
+    return 
 
 
 @lru_cache
@@ -266,7 +284,7 @@ def single_company(company_id):
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
 
         x=find_email(session['resp']['email'])
-        ychance=json_util.dumps(your_chances(x))
+        ychance=json_util.dumps(your_chances(x,company_id))
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance)

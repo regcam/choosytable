@@ -11,9 +11,13 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
 </head>
 <body>
+    <br>
+    <br>
     <h1>Choosy Table</h1>
     {{ pagination.info }}
     {{ pagination.links }}
+    <h2>Your chances of getting an offer from {{singlecompany.company}}?</h2>
+    <h3>{{ychance}}%</h3>
     <table class="styled-table">
         <thead>
             <tr><th>{{singlecompany.company}}</th></tr>
@@ -125,10 +129,6 @@
         </tr>
         {% endif %}
     </table>
-
-    <h2>Your chances at {{singlecompany.company}}?</h2>
-    {{ychance}}
-    <p></p>
 
     <h2>Add a new {{singlecompany.company}} review</h2>
     <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
