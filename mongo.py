@@ -198,40 +198,8 @@ def findone_company(c):
     return ct.find_one({'_id': ObjectId(c)})
 
 
-def your_chances(user,company):
-    print(ct.find(
-        {'$and': [
-            {'_id':ObjectId(company)},
-            {'interviews.win':'y'},
-            {'interviews.user_gender': user['gender']},
-            {'interviews.user_ethnicity':user['ethnicity']}]}).count())
-    a=ct.find(
-        {'$and': [
-            {'_id':ObjectId(company)},
-            {'interviews.win':'y'},
-            {'interviews.user_gender': user['gender']},
-            {'interviews.user_ethnicity':user['ethnicity']}]})
-    print(ct.find(
-        {'$and': [
-            {'_id':ObjectId(company)},
-            {'interviews.win': {"$exists": True}},
-            {'interviews.user_gender': user['gender']},
-            {'interviews.user_ethnicity':user['ethnicity']}]}).count())
-    b=ct.find(
-        {'$and': [
-            {'_id':ObjectId(company)},
-            {'interviews.win': {"$exists": True}},
-            {'interviews.user_gender': user['gender']},
-            {'interviews.user_ethnicity':user['ethnicity']}]})
-    for idx,x in enumerate(a):
-        print(x['interviews'][idx]['win'])
-    for idx,y in enumerate(b):
-        print(y['interviews'][idx]['win'])
-    print(len(a))
-    print(len(b))
-    #print(f"a={a} and b={b}")
-    #return int(a/b)
-    return 
+def your_chances(success):
+    return (success['my_y']/(success['y']+success['n']+success['o']))*100
 
 
 @lru_cache
@@ -247,7 +215,7 @@ def single_company(company_id):
     singlecompany = findone_company(company_id)
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
-    success={'y':0,'n':0}
+    success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
@@ -264,27 +232,41 @@ def single_company(company_id):
         values.append(format(k/len(singlecompany['reviews']), '.3f')) if len(singlecompany['reviews'])>0 else values.append(0)
 
     positionDict={}
-    if 'interviews' in singlecompany:
+    x=find_email(session['resp']['email'])
+    values1=[0,0]
+    if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
-                success['y']+=1
+                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
+                    success['my_y']+=1
+                    success['y']+=1
+                else:
+                     success['y']+=1
+            elif singlecompany['interviews'][a]['win'] == "o":
+                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
+                    success['my_o']+=1
+                    success['o']+=1
+                else:
+                     success['o']+=1
             else:
-                success['n']+=1
+                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
+                    success['my_n']+=1
+                    success['n']+=1
+                else:
+                     success['n']+=1
             if positionDict.get(singlecompany['interviews'][a]['position']) is None:
                 positionDict[singlecompany['interviews'][a]['position']]=1
             else:
                 positionDict[singlecompany['interviews'][a]['position']]=\
                     positionDict.get(singlecompany['interviews'][a]['position'])+1
-        if len(singlecompany['interviews'])>0:
-            values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
-            format(success['n']/len(singlecompany['interviews']), '.3f')]
-        else:
-            values1=[0,0]
+
+        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
+        format(success['n']/len(singlecompany['interviews']), '.3f')]
+        ychance=your_chances(success)
+        
         pagination = Pagination(page=page, total=len(
         singlecompany['reviews']), search=search, record_name=singlecompany['company'])
 
-        x=find_email(session['resp']['email'])
-        ychance=json_util.dumps(your_chances(x,company_id))
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance)
