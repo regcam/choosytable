@@ -16,7 +16,8 @@
     <h1>Choosy Table</h1>
 
     {% if r is defined %}
-    {% if r['reviews']|length > 0 %}
+    <p>{{r['reviews']|count}} is defined</p>
+    {% if r['reviews']|count > 0 %}
         {{ pagination.info }}
         {{ pagination.links }}
         <table class="styled-table">

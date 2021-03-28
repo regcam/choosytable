@@ -89,13 +89,7 @@ def before_request():
 
 #@lru_cache
 def find_creatorreviews(y):
-    return ct.find(
-      {
-        "$and": [
-          {'creator': y}, 
-          {'reviews': {"$exists": True}}
-        ]
-      }).sort('last_modified',-1)
+    return list(ct.find({'reviews.user': str(y['_id'])}).sort('last_modified',-1))
 
 
 @lru_cache
@@ -113,7 +107,10 @@ def home():
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     x = find_email(session['resp']['email'])
     if x is not None:
-        r = find_creatorreviews(x['name'])
+        r = find_creatorreviews(x)
+        for index in range(len(r)):
+            for key in r[index]:
+                print(r[index][key])
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -124,7 +121,7 @@ def home():
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         pagination = Pagination(
-            page=page, total=r.count(), search=search, record_name='Your latest reviews')
+            page=page, total=len(r), search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=x,
