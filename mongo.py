@@ -78,7 +78,7 @@ class MyInterview(FlaskForm):
     submit = SubmitField("Submit")
 
 
-@lru_cache
+#@lru_cache
 @app.before_request
 def before_request():
     if not google.authorized and "google" not in request.path:
@@ -87,17 +87,14 @@ def before_request():
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
-#@lru_cache
 def find_creatorreviews(y):
-    return list(ct.find({'reviews.user': str(y['_id'])}).sort('last_modified',-1))
+    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1}).sort('last_modified',-1)
 
 
-@lru_cache
 def find_email(z):
     return ct.find_one({'email': z})
 
 
-@lru_cache
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
@@ -108,9 +105,8 @@ def home():
     x = find_email(session['resp']['email'])
     if x is not None:
         r = find_creatorreviews(x)
-        for index in range(len(r)):
-            for key in r[index]:
-                print(r[index][key])
+        for key in r:
+            print(f"key is {key}")
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -121,11 +117,11 @@ def home():
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         pagination = Pagination(
-            page=page, total=len(r), search=search, record_name='Your latest reviews')
+            page=page, total=len(dict(r).values()), search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=x,
-            r=r,
+            r=dict(r),
             e=e,
             pagination=pagination, form=form)
     else:
@@ -148,7 +144,7 @@ def find_reviews():
     return ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
 
 
-@lru_cache
+#@lru_cache
 @app.route('/company', methods=['GET'])
 def company():
     form = MyCompany()
@@ -199,7 +195,7 @@ def your_chances(success):
     return (success['my_y']/(success['y']+success['n']+success['o']))*100
 
 
-@lru_cache
+#@lru_cache
 @app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
     form = MyCompany()
@@ -326,7 +322,7 @@ def single_companypost(company_id):
     return redirect(request.url)
 
 
-@lru_cache
+#@lru_cache
 @app.route('/person/<person_id>', methods=['GET'])
 def single_person(person_id):
     form = MyPerson()
@@ -375,7 +371,7 @@ def singleupdate_person(person_id):
         return jsonify({'error': "The form was not valid"})
 
 
-@lru_cache
+#@lru_cache
 @app.route('/person', methods=['GET'])
 def person():
     return redirect(url_for('home'))
