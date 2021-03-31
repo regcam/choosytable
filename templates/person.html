@@ -32,12 +32,8 @@
                 {% for s in r_results %}
                 <tr>
                     <td>{{ loop.index + pagination.skip }}</td>
+                    <td>{{ s[-1] }}</td>
                     <td>{{ s[0] }}</td>
-                    <td>
-                        {% for x in s.reviews %}
-                            {{ x }}<br>
-                        {% endfor %}
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

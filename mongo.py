@@ -88,7 +88,7 @@ def before_request():
 
 
 def find_creatorreviews(y):
-    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1}).sort('last_modified',-1)
+    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'company':1}).sort('last_modified',-1)
 
 
 def find_email(z):
@@ -107,8 +107,9 @@ def home():
     if x is not None:
         r = find_creatorreviews(x)
         for indx,key in enumerate(r):
-            r_results+=key['reviews'][indx].items()
-            print(r_results)
+            r_results.append((list(key['reviews'][indx].items()),key['company']))
+        print(r_results)
+        print(r_results[0][0])
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
