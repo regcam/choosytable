@@ -102,11 +102,13 @@ def find_email(z):
 def home():
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
+    r_results=[]
     x = find_email(session['resp']['email'])
     if x is not None:
         r = find_creatorreviews(x)
-        for key in r:
-            print(f"key is {key}")
+        for indx,key in enumerate(r):
+            r_results+=key['reviews'][indx].items()
+            print(r_results)
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -117,11 +119,11 @@ def home():
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         pagination = Pagination(
-            page=page, total=len(dict(r).values()), search=search, record_name='Your latest reviews')
+            page=page, total=len(r_results), search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=x,
-            r=dict(r),
+            r_results=r_results,
             e=e,
             pagination=pagination, form=form)
     else:

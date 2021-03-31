@@ -15,9 +15,9 @@
     <br>
     <h1>Choosy Table</h1>
 
-    {% if r.keys() is defined %}
-    <p>{{r['reviews']}} is defined</p>
-    {% if r.values()|count > 0 %}
+    {% if r_results is defined %}
+    <p>{{r_results}} is defined</p>
+    {% if r_results|count > 0 %}
         {{ pagination.info }}
         {{ pagination.links }}
         <table class="styled-table">
@@ -29,10 +29,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for s in r %}
+                {% for s in r_results %}
                 <tr>
                     <td>{{ loop.index + pagination.skip }}</td>
-                    <td>{{ s.company }}</td>
+                    <td>{{ s[0] }}</td>
                     <td>
                         {% for x in s.reviews %}
                             {{ x }}<br>
