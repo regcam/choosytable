@@ -26,6 +26,7 @@
                     <th>#</th>
                     <th>Company</th>
                     <th>Reviews</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,6 +35,7 @@
                     <td>{{ loop.index + pagination.skip }}</td>
                     <td>{{ s[-1] }}</td>
                     <td>{{ s[0] }}</td>
+                    <td><a href="/deletereview/{{ s[-2] }}">Delete</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

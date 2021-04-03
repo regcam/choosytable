@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
-from bson import json_util
+from bson import json_util, objectid
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -88,7 +88,7 @@ def before_request():
 
 
 def find_creatorreviews(y):
-    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'company':1}).sort('last_modified',-1)
+    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
 
 
 def find_email(z):
@@ -106,10 +106,11 @@ def home():
     x = find_email(session['resp']['email'])
     if x is not None:
         r = find_creatorreviews(x)
+        print(json_util.dumps(r))
         for indx,key in enumerate(r):
+            print(list(key['reviews'][indx].items()),key['company'])
             r_results.append((list(key['reviews'][indx].items()),key['company']))
         print(r_results)
-        print(r_results[0][0])
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -287,6 +288,7 @@ def single_companypost(company_id):
                 {
                     'reviews':
                     {
+                        '_id': str(ObjectId()),
                         'review': request.form.get('reviews'),
                         'rating': int(request.form.get('rating')),
                         'user': str(user['_id']),
@@ -306,6 +308,7 @@ def single_companypost(company_id):
                 {
                     'interviews':
                     {
+                        '_id': str(ObjectId()),
                         'ie':request.form.get('ie'),
                         'position': request.form.get('position'),
                         'employee': request.form.get('employee'),
@@ -385,7 +388,8 @@ def person_post():
     form = MyPerson()
     if form.validate_on_submit():
         x=ct.insert_one(
-            {'created': datetime.now(), 
+            {'created': datetime.now(),
+            '_id': ObjectId(), 
             'name': request.form.get('name'), 
             'email': request.form.get('email'), 
             'ethnicity': request.form.get('ethnicity'),
@@ -409,6 +413,16 @@ def forgetme(user):
     )
     ct.remove(
         {'_id': ObjectId(user)}, 
+    )
+    find_email.cache_clear()
+    return redirect(url_for('home'))
+
+
+@app.route('/deletereview/<id>')
+def deletereview(id):
+    ct.update(
+        {'reviews._id': id}, 
+        {'$pull': {'reviews': {'_id': id}}}
     )
     find_email.cache_clear()
     return redirect(url_for('home'))
