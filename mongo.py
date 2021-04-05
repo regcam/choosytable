@@ -105,11 +105,9 @@ def home():
     r_results=[]
     x = find_email(session['resp']['email'])
     if x is not None:
-        r = find_creatorreviews(x)
-        print(json_util.dumps(r))
+        r = list(find_creatorreviews(x))
         for indx,key in enumerate(r):
-            print(list(key['reviews'][indx].items()),key['company'])
-            r_results.append((list(key['reviews'][indx].items()),key['company']))
+            r_results.append((key['reviews'],key['company']))
         print(r_results)
         form.gender.default = x['gender']
         form.age.default = x['age']

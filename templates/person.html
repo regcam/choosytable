@@ -15,8 +15,6 @@
     <br>
     <h1>Choosy Table</h1>
 
-    {% if r_results is defined %}
-    <p>{{r_results}} is defined</p>
     {% if r_results|count > 0 %}
         {{ pagination.info }}
         {{ pagination.links }}
@@ -34,14 +32,17 @@
                 <tr>
                     <td>{{ loop.index + pagination.skip }}</td>
                     <td>{{ s[-1] }}</td>
-                    <td>{{ s[0] }}</td>
-                    <td><a href="/deletereview/{{ s[-2] }}">Delete</a></td>
+                    <td>{% for j in s[0] %}
+                        <p>{{ j['review'] }}</p>
+                    {% endfor %}</td>
+                    <td>{% for j in s[0] %}
+                        <p><a href="/deletereview/{{ j['_id'] }}">Delete</a></p>
+                        {% endfor %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {{ pagination.links }}
-    {% endif %}
     {% endif %}
  
     <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
