@@ -104,11 +104,14 @@ def home():
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
     x = find_email(session['resp']['email'])
+    reviewcount=0
     if x is not None:
         r = list(find_creatorreviews(x))
+
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
-        print(r_results)
+            reviewcount+=len(key['reviews'])
+
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -119,7 +122,7 @@ def home():
             search = True
         page = request.args.get(get_page_parameter(), type=int, default=1)
         pagination = Pagination(
-            page=page, total=len(r_results), search=search, record_name='Your latest reviews')
+            page=page, total=reviewcount, search=search, record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=x,
@@ -422,7 +425,6 @@ def deletereview(id):
         {'reviews._id': id}, 
         {'$pull': {'reviews': {'_id': id}}}
     )
-    find_email.cache_clear()
     return redirect(url_for('home'))
 
 
