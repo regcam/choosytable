@@ -1,7 +1,7 @@
 # Choosy Table
 
 ## Purpose:
-Choosy Table is were People of Color can share and view their hiring and corporate experiences.  Before we lend our talents to any company we should know how they treat us during and after the interview process.  This app will empower POC to engage businesses whom value our collaboration and community.
+Choosy Table is were People of Color can share and analyze their corporate experiences before and after the interview phase with each other.  This purpose is give PoC concrete statistical analysis of landing an offer and having a fruitful career at a given company.  Before we lend our talents to any company we should know how they treat us.  
 
 ## Tech Stack:
 Backend/Frontend - Python3
