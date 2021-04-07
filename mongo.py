@@ -120,6 +120,7 @@ def home():
         q = request.args.get('q')
         if q:
             search = True
+        
         page = request.args.get(get_page_parameter(), type=int, default=1)
         pagination = Pagination(
             page=page, total=reviewcount, search=search, record_name='Your latest reviews')
