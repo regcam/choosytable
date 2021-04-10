@@ -4,7 +4,7 @@ from bson import json_util, objectid
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
-from flask_paginate import Pagination, get_page_parameter
+from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from functools import lru_cache
 from flask_wtf import FlaskForm
@@ -87,12 +87,39 @@ def before_request():
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
-def find_creatorreviews(y):
-    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+def find_creatorreviews(y,offset):
+    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1).limit(50).skip(offset)
 
 
 def find_email(z):
     return ct.find_one({'email': z})
+
+
+def get_pagination(**kwargs):
+    kwargs.setdefault("record_name", "records")
+    return Pagination(
+        css_framework=get_css_framework(),
+        link_size=get_link_size(),
+        alignment=get_alignment(),
+        show_single_page=show_single_page_or_not(),
+        **kwargs
+    )
+
+
+def get_css_framework():
+    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
+
+
+def get_link_size():
+    return app.config.get("LINK_SIZE", "sm")
+
+
+def get_alignment():
+    return app.config.get("LINK_ALIGNMENT", "")
+
+
+def show_single_page_or_not():
+    return app.config.get("SHOW_SINGLE_PAGE", False)
 
 
 @app.route("/")
@@ -106,7 +133,9 @@ def home():
     x = find_email(session['resp']['email'])
     reviewcount=0
     if x is not None:
-        r = list(find_creatorreviews(x))
+        page, per_page, offset = get_page_args(
+        page_parameter="p", per_page_parameter="pp", pp=10)
+        r = list(find_creatorreviews(x,offset))
 
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
@@ -116,28 +145,35 @@ def home():
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
         form.process()
-        search = False
-        q = request.args.get('q')
-        if q:
-            search = True
         
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        pagination = Pagination(
-            page=page, total=reviewcount, search=search, record_name='Your latest reviews')
+        pagination = get_pagination(
+            p=page, 
+            pp=per_page, 
+            format_total=True, 
+            format_number= True, 
+            total=reviewcount,
+            page_parameter="p",
+            per_page_parameter="pp",
+            record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=x,
             r_results=r_results,
             e=e,
-            pagination=pagination, form=form)
+            pagination=pagination, 
+            form=form)
     else:
-        search = False
-        q = request.args.get('q')
-        if q:
-            search = True
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        pagination = Pagination(
-            page=page, total=0, search=search, record_name='Your latest reviews')
+        page, per_page, offset = get_page_args(
+        page_parameter="p", per_page_parameter="pp", pp=10)
+        pagination = get_pagination(
+            p=page, 
+            pp=per_page, 
+            format_total=True, 
+            format_number= True, 
+            total=0,
+            page_parameter="p",
+            per_page_parameter="pp",
+            record_name='Your latest reviews')
         return render_template(
             'person.html',
             x=session['resp']['email'],
