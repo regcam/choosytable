@@ -87,8 +87,8 @@ def before_request():
         session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
-def find_creatorreviews(y,offset):
-    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1).limit(50).skip(offset)
+def find_creatorreviews(y):
+    return ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
 
 
 def find_email(z):
@@ -136,7 +136,7 @@ def home():
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
         print(f"per_page is {per_page}")
-        r = list(find_creatorreviews(x,offset))
+        r = list(find_creatorreviews(x).limit(50).skip(offset))
 
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
