@@ -119,7 +119,7 @@ def get_alignment():
 
 
 def show_single_page_or_not():
-    return app.config.get("SHOW_SINGLE_PAGE", False)
+    return app.config.get("SHOW_SINGLE_PAGE", True)
 
 
 @app.route("/")
@@ -135,11 +135,12 @@ def home():
     if x is not None:
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
+        print(f"per_page is {per_page}")
         r = list(find_creatorreviews(x,offset))
 
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
-            reviewcount+=len(key['reviews'])
+            reviewcount+=1
 
         form.gender.default = x['gender']
         form.age.default = x['age']
@@ -194,10 +195,18 @@ def company():
     q = request.args.get('q')
     if q:
         search = True
-    page = request.args.get(get_page_parameter(), type=int, default=1)
+    page, per_page, offset = get_page_args(
+        page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
-    pagination = Pagination(
-        page=page, total=companies.count(), search=search, record_name='companies')
+    pagination = get_pagination(
+            p=page, 
+            pp=per_page, 
+            format_total=True, 
+            format_number= True, 
+            total=companies.count(),
+            page_parameter="p",
+            per_page_parameter="pp",
+            record_name='companies')
     return render_template('company.html', companies=companies, pagination=pagination,form=form)
 
 
@@ -242,11 +251,9 @@ def your_chances(success):
 def single_company(company_id):
     form = MyCompany()
     form1 = MyInterview()
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
-    page = request.args.get(get_page_parameter(), type=int, default=1)
+    page, per_page, offset = get_page_args(
+        page_parameter="p", per_page_parameter="pp", pp=10)
+
     singlecompany = findone_company(company_id)
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
@@ -299,8 +306,15 @@ def single_company(company_id):
         format(success['n']/len(singlecompany['interviews']), '.3f')]
         ychance=your_chances(success)
         
-        pagination = Pagination(page=page, total=len(
-        singlecompany['reviews']), search=search, record_name=singlecompany['company'])
+        pagination = get_pagination(
+            p=page, 
+            pp=per_page, 
+            format_total=True, 
+            format_number= True, 
+            total=len(singlecompany['reviews']),
+            page_parameter="p",
+            per_page_parameter="pp",
+            record_name=singlecompany['company'])
 
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
