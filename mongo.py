@@ -136,8 +136,12 @@ def home():
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
         print(f"per_page is {per_page}")
-        r = list(find_creatorreviews(x).limit(50).skip(offset))
-
+        print(f"offset is {offset}")
+        if per_page:
+            r = list(find_creatorreviews(x).limit(per_page+1).skip(offset))
+        else:
+            r = list(find_creatorreviews(x))
+            
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
             reviewcount+=1
@@ -191,10 +195,6 @@ def find_reviews():
 @app.route('/company', methods=['GET'])
 def company():
     form = MyCompany()
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
     page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
@@ -321,7 +321,7 @@ def single_company(company_id):
     set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance)
     else:
         pagination = Pagination(page=page, total=len(
-            singlecompany['reviews']), search=search, record_name=singlecompany['company'])
+            singlecompany['reviews']), record_name=singlecompany['company'])
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
         set=zip(values,labels,colors),iel=iel,igl=igl,p=p,
         set2=zip(positionDict.items(),colors),form=form,form1=form1)
