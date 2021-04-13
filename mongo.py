@@ -197,6 +197,8 @@ def company():
     page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
+    if per_page:
+        companies.limit(per_page).skip(offset)
     pagination = get_pagination(
             p=page, 
             pp=per_page, 
@@ -254,6 +256,10 @@ def single_company(company_id):
         page_parameter="p", per_page_parameter="pp", pp=10)
 
     singlecompany = findone_company(company_id)
+
+    if per_page:
+        singlecompany.limit(per_page).skip(offset)
+        singlecompany{offset:(per_page + offset if per_page is not None else None)}
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
     success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
