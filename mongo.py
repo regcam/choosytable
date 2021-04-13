@@ -135,16 +135,15 @@ def home():
     if x is not None:
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
-        print(f"per_page is {per_page}")
-        print(f"offset is {offset}")
-        if per_page:
-            r = list(find_creatorreviews(x).limit(per_page+1).skip(offset))
-        else:
-            r = list(find_creatorreviews(x))
+
+        r = list(find_creatorreviews(x))
             
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
             reviewcount+=1
+
+        if per_page:
+            r_results= r_results[offset:(per_page + offset if per_page is not None else None)]
 
         form.gender.default = x['gender']
         form.age.default = x['age']
