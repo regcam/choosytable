@@ -256,10 +256,10 @@ def single_company(company_id):
         page_parameter="p", per_page_parameter="pp", pp=10)
 
     singlecompany = findone_company(company_id)
-
+    sc_results=[]
     if per_page:
-        singlecompany.limit(per_page).skip(offset)
-        singlecompany{offset:(per_page + offset if per_page is not None else None)}
+        sc_results.append(singlecompany['reviews'])
+        sc_results=sc_results[0][offset:(per_page + offset if per_page is not None else None)]
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
     success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
@@ -316,20 +316,20 @@ def single_company(company_id):
             pp=per_page, 
             format_total=True, 
             format_number= True, 
-            total=len(singlecompany['reviews']),
+            total=len(sc_results),
             page_parameter="p",
             per_page_parameter="pp",
             record_name=singlecompany['company'])
 
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance)
+    set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance,sc_results=sc_results)
     else:
         pagination = Pagination(page=page, total=len(
-            singlecompany['reviews']), record_name=singlecompany['company'])
+            sc_results), record_name=singlecompany['company'])
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
         set=zip(values,labels,colors),iel=iel,igl=igl,p=p,
-        set2=zip(positionDict.items(),colors),form=form,form1=form1)
+        set2=zip(positionDict.items(),colors),form=form,form1=form1,sc_results=sc_results)
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])

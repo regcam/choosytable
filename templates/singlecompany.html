@@ -23,11 +23,9 @@
             <tr><th>{{singlecompany.company}}</th></tr>
         </thead>
         <tbody>
-            {% for r in singlecompany.reviews %}
-            {% if loop.index <= 10 %}
+            {% for r in sc_results %}
             <tr>
                 <td>{{ r }}</td>
-            {% endif %}
             {% endfor %}
             </tr>
            <!-- <tr>
