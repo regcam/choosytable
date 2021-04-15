@@ -227,7 +227,13 @@ def company_post():
                             'rating':int(request.form.get('rating')),
                             'user': str(user['_id'])
                         }
-                    ]
+                    ],
+                    'reviews_avg': ct.aggregate(
+                        [
+                            { 'match': { 'company':request.form.get('company') } },
+                            { 'group': { '_id': null, '$avg': '$reviews.rating' } }  
+                        ]
+                    )
                 }
             )
             return redirect(request.url)
@@ -351,7 +357,13 @@ def single_companypost(company_id):
                         'user': str(user['_id']),
                         'gender':user['gender'],
                         'ethnicity':user['ethnicity']
-                    }
+                    },
+                    'reviews_avg': ct.aggregate(
+                        [
+                            { 'match': { 'company':request.form.get('company') } },
+                            { 'group': { '_id': null, '$avg': '$reviews.rating' } }  
+                        ]
+                    )
                 },
                 '$set': {'last_modified': datetime.now()}
             },
