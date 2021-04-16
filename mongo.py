@@ -228,12 +228,7 @@ def company_post():
                             'user': str(user['_id'])
                         }
                     ],
-                    'reviews_avg': ct.aggregate(
-                        [
-                            { 'match': { 'company':request.form.get('company') } },
-                            { 'group': { '_id': null, '$avg': '$reviews.rating' } }  
-                        ]
-                    )
+                    'reviews_avg': 0
                 }
             )
             return redirect(request.url)
@@ -358,17 +353,19 @@ def single_companypost(company_id):
                         'gender':user['gender'],
                         'ethnicity':user['ethnicity']
                     },
-                    'reviews_avg': ct.aggregate(
-                        [
-                            { 'match': { 'company':request.form.get('company') } },
-                            { 'group': { '_id': null, '$avg': '$reviews.rating' } }  
-                        ]
-                    )
+
                 },
                 '$set': {'last_modified': datetime.now()}
             },
             upsert=True
         )
+        
+        print(list(ct.aggregate(
+                        [
+                            { '$match': { '_id': ObjectId(company_id) } },
+                            { '$group': { '_id': None, 'reviews_avg':{'$avg': '$reviews.rating'} } }  
+                        ]
+                    )))
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
