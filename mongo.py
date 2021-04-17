@@ -355,17 +355,18 @@ def single_companypost(company_id):
                     },
 
                 },
-                '$set': {'last_modified': datetime.now()}
             },
             upsert=True
         )
-        
-        print(list(ct.aggregate(
-                        [
-                            { '$match': { '_id': ObjectId(company_id) } },
-                            { '$group': { '_id': None, 'reviews_avg':{'$avg': '$reviews.rating'} } }  
-                        ]
-                    )))
+        reviews_avg=list(ct.aggregate(
+                [
+                    { '$match': { '_id': ObjectId(company_id) } },
+                    { '$unwind': "$reviews" },
+                    { '$group': { '_id': None, 'reviews_avg':{'$avg': '$reviews.rating'} } }  
+                ]
+            ))
+        ct.update_one({'_id': ObjectId(company_id)},{'$set': 
+        {'reviews_avg': reviews_avg[0]['reviews_avg'],'last_modified': datetime.now()}})
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
