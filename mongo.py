@@ -470,27 +470,31 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    ct.update(
-        {'reviews.user': user}, 
-        {'$pull': {'reviews': {'user': user}}}
-    )
-    ct.update(
-        {'interviews.user': user}, 
-        {'$pull': {'interviews': {'user': user}}}
-    )
-    ct.remove(
-        {'_id': ObjectId(user)}, 
-    )
-    find_email.cache_clear()
+    user = find_email(session['resp']['email'])
+    if user:
+        ct.update(
+            {'reviews.user': user}, 
+            {'$pull': {'reviews': {'user': user}}}
+        )
+        ct.update(
+            {'interviews.user': user}, 
+            {'$pull': {'interviews': {'user': user}}}
+        )
+        ct.remove(
+            {'_id': ObjectId(user)}, 
+        )
+        find_email.cache_clear()
     return redirect(url_for('home'))
 
 
 @app.route('/deletereview/<id>')
 def deletereview(id):
-    ct.update(
-        {'reviews._id': id}, 
-        {'$pull': {'reviews': {'_id': id}}}
-    )
+    user = find_email(session['resp']['email'])
+    if user and ct.find_one({'reviews.user': str(user['_id'])}):
+        ct.update(
+            {'reviews._id': id}, 
+            {'$pull': {'reviews': {'_id': id}}}
+        )
     return redirect(url_for('home'))
 
 
