@@ -470,8 +470,8 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    user = find_email(session['resp']['email'])
-    if user:
+    verifyuser = find_email(session['resp']['email'])
+    if verifyuser:
         ct.update(
             {'reviews.user': user}, 
             {'$pull': {'reviews': {'user': user}}}
@@ -483,7 +483,6 @@ def forgetme(user):
         ct.remove(
             {'_id': ObjectId(user)}, 
         )
-        find_email.cache_clear()
     return redirect(url_for('home'))
 
 
