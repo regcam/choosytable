@@ -55,6 +55,11 @@ p = ['Software Engineer','Staff Engineer','Lead Engineer',
 'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
 'DBA','Operations Engineer']
 age = ['18-24','25-34','35-44','45-54','55-64','65-74','75+']
+location = ['AK','AL','AR','AS','AZ','CA''CO','CT','DC','DE',
+'FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA',
+'MD','ME','MI','MN','MO','MP','MS','MT','NC','ND','NE','NH','NJ',
+'NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD','TN',
+'TX','UT','VA','VI','VT','WA','WI','WV','WY']
 
 class MyPerson(FlaskForm):
     name = StringField('Your Name', validators=[DataRequired()])
@@ -62,6 +67,7 @@ class MyPerson(FlaskForm):
     gender = RadioField('Your Gender:', choices=[(x) for x in igl])
     age = SelectField('Your Age:', choices=[(x) for x in age])
     ethnicity = SelectField('Your Ethnicity:', choices=[(x) for x in iel])
+    location = SelectField('Your Location:', choices=[(x) for x in location])
     submit = SubmitField("Submit")
 
 class MyCompany(FlaskForm):
@@ -351,6 +357,7 @@ def single_companypost(company_id):
                         'rating': int(request.form.get('rating')),
                         'user': str(user['_id']),
                         'gender':user['gender'],
+                        'location':user['location'],
                         'ethnicity':user['ethnicity']
                     },
 
@@ -383,6 +390,7 @@ def single_companypost(company_id):
                         'user': str(user['_id']),
                         'user_gender':user['gender'],
                         'user_ethnicity':user['ethnicity'],
+                        'user_location':user['location'],
                         'win': request.form.get('win')
                     }
                 },
@@ -418,6 +426,7 @@ def singleupdate_person(person_id):
                     'gender': request.form.get('gender'),
                     'age': request.form.get('age'),
                     'ethnicity': request.form.get('ethnicity'),
+                    'location': request.form.get('location'),
                     "last_modified": datetime.now()}
             }
         )
@@ -426,6 +435,7 @@ def singleupdate_person(person_id):
             {
                 '$set': {
                     'user_gender': request.form.get('gender'),
+                    'user_location': request.form.get('location'),
                     'user_ethnicity': request.form.get('ethnicity')
                 }
             }
@@ -435,6 +445,7 @@ def singleupdate_person(person_id):
             {
                 '$set': {
                     'gender': request.form.get('gender'),
+                    'location': request.form.get('location'),
                     'ethnicity': request.form.get('ethnicity')
                 }
             }
@@ -461,6 +472,7 @@ def person_post():
             'email': request.form.get('email'), 
             'ethnicity': request.form.get('ethnicity'),
             'gender': request.form.get('gender'),
+            'location': request.form.get('location'),
             'age': request.form.get('age')})
         find_email.cache_clear()
         return redirect(url_for('home'))
@@ -470,8 +482,7 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    verifyuser = find_email(session['resp']['email'])
-    if verifyuser:
+    if find_email(session['resp']['email']):
         ct.update(
             {'reviews.user': user}, 
             {'$pull': {'reviews': {'user': user}}}
@@ -481,7 +492,7 @@ def forgetme(user):
             {'$pull': {'interviews': {'user': user}}}
         )
         ct.remove(
-            {'_id': ObjectId(user)}, 
+            {'_id': ObjectId(user)} 
         )
     return redirect(url_for('home'))
 
