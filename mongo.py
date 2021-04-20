@@ -154,6 +154,7 @@ def home():
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
+        form.location.default = x['location']
         form.process()
         
         pagination = get_pagination(
