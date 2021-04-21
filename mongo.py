@@ -475,7 +475,6 @@ def person_post():
             'gender': request.form.get('gender'),
             'location': request.form.get('location'),
             'age': request.form.get('age')})
-        find_email.cache_clear()
         return redirect(url_for('home'))
     else:
         return jsonify({'error': "Form wasn't valid"})
