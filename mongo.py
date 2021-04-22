@@ -271,7 +271,6 @@ def single_company(company_id):
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
     success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
-    l_success={}
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
@@ -296,7 +295,10 @@ def single_company(company_id):
                 if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
                     success['my_y']+=1
                     success['y']+=1
-                    l_success[x['gender']]+=1
+                    try:
+                        success['y_'+str(x['location'])]+=1 
+                    finally:
+                        success.update({'y_'+str(x['location']):1})
                 else:
                      success['y']+=1
             elif singlecompany['interviews'][a]['win'] == "o":
