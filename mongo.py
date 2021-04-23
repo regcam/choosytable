@@ -344,6 +344,9 @@ def single_company(company_id):
             per_page_parameter="pp",
             record_name=singlecompany['company'])
 
+        if ln_success
+        ln_success=ln_success,
+    ly_success=max(ly_success, key=ly_success.get),lo_success=lo_success)
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1,
