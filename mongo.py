@@ -271,6 +271,9 @@ def single_company(company_id):
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
     success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
+    ly_success={}
+    lo_success={}
+    ln_success={}
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
@@ -295,22 +298,30 @@ def single_company(company_id):
                 if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
                     success['my_y']+=1
                     success['y']+=1
-                    try:
-                        success['y_'+str(x['location'])]+=1 
-                    finally:
-                        success.update({'y_'+str(x['location']):1})
+                    if ly_success.get(x['location']):
+                        ly_success[x['location']]+=1
+                    else:
+                        ly_success.update({x['location']:1})
                 else:
                      success['y']+=1
             elif singlecompany['interviews'][a]['win'] == "o":
                 if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
                     success['my_o']+=1
                     success['o']+=1
+                    if lo_success.get(x['location']):
+                        lo_success[x['location']]+=1
+                    else:
+                        lo_success.update({x['location']:1})
                 else:
                      success['o']+=1
             else:
                 if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
                     success['my_n']+=1
                     success['n']+=1
+                    if ln_success.get(x['location']):
+                        ln_success[x['location']]+=1
+                    else:
+                        ln_success.update({x['location']:1})
                 else:
                      success['n']+=1
             if positionDict.get(singlecompany['interviews'][a]['position']) is None:
@@ -335,7 +346,9 @@ def single_company(company_id):
 
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors),form=form,form1=form1,ychance=ychance,sc_results=sc_results)
+    set2=zip(positionDict.items(),colors),form=form,form1=form1,
+    ychance=ychance,sc_results=sc_results,ln_success=ln_success,
+    ly_success=max(ly_success, key=ly_success.get),lo_success=lo_success)
     else:
         pagination = Pagination(page=page, total=len(
             sc_results), record_name=singlecompany['company'])
