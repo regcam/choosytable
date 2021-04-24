@@ -344,14 +344,25 @@ def single_company(company_id):
             per_page_parameter="pp",
             record_name=singlecompany['company'])
 
-        if ln_success
-        ln_success=ln_success,
-    ly_success=max(ly_success, key=ly_success.get),lo_success=lo_success)
+        
+        if ln_success:
+            ln_success=max(ln_success, key=ln_success.get) 
+        else:
+            ln_success="No Results"
+        if ly_success: 
+            ly_success=max(ly_success, key=ly_success.get) 
+        else:
+            ly_success="No Results"
+        if lo_success:
+            lo_success=max(lo_success, key=lo_success.get)
+        else:
+            lo_success="No Results"
+
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1,
     ychance=ychance,sc_results=sc_results,ln_success=ln_success,
-    ly_success=max(ly_success, key=ly_success.get),lo_success=lo_success)
+    ly_success=ly_success,lo_success=lo_success)
     else:
         pagination = Pagination(page=page, total=len(
             sc_results), record_name=singlecompany['company'])
@@ -430,7 +441,7 @@ def single_person(person_id):
     form = MyPerson()
     if request.method == 'GET':
         try:
-            return json_util.dumps(ct.find_one({'_id': ObjectId(person_id)}))
+            return redirect(request.url)
         except:
             return jsonify({'error': 'person not found'})
 
