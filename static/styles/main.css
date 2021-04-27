@@ -1,4 +1,7 @@
-body {background-color: #ffffff;}
+body {background-color: #ffffff;
+    margin:0;
+    padding:0;
+    padding-left: 10px; }
 
 .page-subnav,
 .pagination-nav {
@@ -104,8 +107,7 @@ td:hover { /* th:hover also if you wish */
   }
 
   .styled-nav ul {
-    margin: 0;
-    padding: 0;
+
     overflow: hidden;
   }
   
