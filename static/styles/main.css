@@ -107,7 +107,6 @@ td:hover { /* th:hover also if you wish */
   }
 
   .styled-nav ul {
-
     overflow: hidden;
   }
   
@@ -115,6 +114,7 @@ td:hover { /* th:hover also if you wish */
     float: left;
     background-color: #707070;
     list-style-type: none;
+    margin-left: -40px;
   }
   
   .styled-nav li a {
