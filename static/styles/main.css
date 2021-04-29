@@ -108,13 +108,13 @@ td:hover { /* th:hover also if you wish */
 
   .styled-nav ul {
     overflow: hidden;
+    margin-left: 0px;
   }
   
   .styled-nav li {
-    float: left;
     background-color: #707070;
     list-style-type: none;
-    margin-left: -40px;
+    float: left;
   }
   
   .styled-nav li a {
