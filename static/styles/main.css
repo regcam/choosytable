@@ -1,3 +1,10 @@
+body {
+
+    border: 10px solid green;
+    padding: 100px;
+    margin-left: 40px;
+}
+
 .page-subnav,
 .pagination-nav {
     width: 100%;
@@ -103,23 +110,23 @@ td:hover { /* th:hover also if you wish */
 
 .styled-nav ul {
 overflow: hidden;
-margin-left: 0px;
 }
 
 .styled-nav li {
 background-color: #707070;
 list-style-type: none;
 float: left;
-}
-
-.styled-nav li a {
 display: block;
 color: #202020;
 text-align: left;
-padding: 16px;
 text-decoration: none;
+padding: 8px;
 }
 
-.styled-nav li a:hover {
+.styled-nav li a {
+    color: #202020;
+}
+
+.styled-nav li:hover {
 background-color: #FFDF6C;
 }
