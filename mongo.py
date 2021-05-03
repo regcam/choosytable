@@ -191,12 +191,10 @@ def home():
             e=e, form=form)
 
 
-#@lru_cache
 def find_reviews():
     return ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
 
 
-#@lru_cache
 @app.route('/company', methods=['GET'])
 def company():
     form = MyCompany()
@@ -245,7 +243,6 @@ def company_post():
         return redirect(request.url)
 
 
-#@lru_cache
 def findone_company(c):
     return ct.find_one({'_id': ObjectId(c)})
 
@@ -254,7 +251,15 @@ def your_chances(success):
     return (success['my_y']/(success['y']+success['n']+success['o']))*100
 
 
-#@lru_cache
+def ethnicity_count(success, singlecompany):
+    if success.get(singlecompany['interviews'][a]['user_ethnicity']) is None:
+        success[singlecompany['interviews'][a]['user_ethnicity']]=1
+    else:
+        success[singlecompany['interviews'][a]['user_ethnicity']]=\
+    success.get(singlecompany['interviews'][a]['user_ethnicity'])+1
+    return success
+
+
 @app.route('/company/<company_id>', methods=['GET'])
 def single_company(company_id):
     form = MyCompany()
@@ -269,10 +274,8 @@ def single_company(company_id):
         sc_results=sc_results[0][offset:(per_page + offset if per_page is not None else None)]
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
-    success={'y':0,'n':0,'o':0,'my_y':0,'my_o':0,'my_n':0}
-    ly_success={}
-    lo_success={}
-    ln_success={}
+    success={'y':0,'n':0,'o':0}
+
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
@@ -294,35 +297,14 @@ def single_company(company_id):
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
-                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
-                    success['my_y']+=1
-                    success['y']+=1
-                    if ly_success.get(x['location']):
-                        ly_success[x['location']]+=1
-                    else:
-                        ly_success.update({x['location']:1})
-                else:
-                     success['y']+=1
+                success['y']+=1
+                success=ethnicity_count(success, singlecompany)
             elif singlecompany['interviews'][a]['win'] == "o":
-                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
-                    success['my_o']+=1
-                    success['o']+=1
-                    if lo_success.get(x['location']):
-                        lo_success[x['location']]+=1
-                    else:
-                        lo_success.update({x['location']:1})
-                else:
-                     success['o']+=1
+                success['o']+=1
+                success=ethnicity_count(success, singlecompany)
             else:
-                if singlecompany['interviews'][a]['user_gender']==x['gender'] and singlecompany['interviews'][a]['user_ethnicity']==x['ethnicity']:
-                    success['my_n']+=1
-                    success['n']+=1
-                    if ln_success.get(x['location']):
-                        ln_success[x['location']]+=1
-                    else:
-                        ln_success.update({x['location']:1})
-                else:
-                     success['n']+=1
+                success['n']+=1
+                success=ethnicity_count(success, singlecompany)
             if positionDict.get(singlecompany['interviews'][a]['position']) is None:
                 positionDict[singlecompany['interviews'][a]['position']]=1
             else:
@@ -343,25 +325,10 @@ def single_company(company_id):
             per_page_parameter="pp",
             record_name=singlecompany['company'])
 
-        
-        if ln_success:
-            ln_success=max(ln_success, key=ln_success.get) 
-        else:
-            ln_success="No Results"
-        if ly_success: 
-            ly_success=max(ly_success, key=ly_success.get) 
-        else:
-            ly_success="No Results"
-        if lo_success:
-            lo_success=max(lo_success, key=lo_success.get)
-        else:
-            lo_success="No Results"
-
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
     set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
     set2=zip(positionDict.items(),colors),form=form,form1=form1,
-    ychance=ychance,sc_results=sc_results,ln_success=ln_success,
-    ly_success=ly_success,lo_success=lo_success)
+    ychance=ychance,sc_results=sc_results)
     else:
         pagination = Pagination(page=page, total=len(
             sc_results), record_name=singlecompany['company'])
