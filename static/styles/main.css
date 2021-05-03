@@ -67,6 +67,20 @@ body {
     font-size: 150%;
 }
 
+.title {
+    color: black;
+    border: 0;
+    opacity: 0.25;
+    float: left;
+    font-size: 300%;
+  }
+  
+  #page-wrap {
+    text-align: left;
+    width: 800px;
+    margin: 0 auto;
+  }
+
 .styled-table {
     border-collapse: collapse;
     margin: 25px 0;
