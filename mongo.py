@@ -248,15 +248,15 @@ def findone_company(c):
 
 
 def your_chances(success):
-    return (success['my_y']/(success['y']+success['n']+success['o']))*100
+    return (success['y']/(success['y']+success['n']+success['o']))*100
 
 
 def ethnicity_count(success, singlecompany):
-    if success.get(singlecompany['interviews'][a]['user_ethnicity']) is None:
-        success[singlecompany['interviews'][a]['user_ethnicity']]=1
+    if success.get(singlecompany) is None:
+        success[singlecompany]=1
     else:
-        success[singlecompany['interviews'][a]['user_ethnicity']]=\
-    success.get(singlecompany['interviews'][a]['user_ethnicity'])+1
+        success[singlecompany]=\
+    success.get(singlecompany)+1
     return success
 
 
@@ -298,13 +298,13 @@ def single_company(company_id):
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
                 success['y']+=1
-                success=ethnicity_count(success, singlecompany)
+                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
             elif singlecompany['interviews'][a]['win'] == "o":
                 success['o']+=1
-                success=ethnicity_count(success, singlecompany)
+                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
             else:
                 success['n']+=1
-                success=ethnicity_count(success, singlecompany)
+                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
             if positionDict.get(singlecompany['interviews'][a]['position']) is None:
                 positionDict[singlecompany['interviews'][a]['position']]=1
             else:
