@@ -256,7 +256,7 @@ def ethnicity_count(success, singlecompany):
         success[singlecompany]=1
     else:
         success[singlecompany]=\
-    success.get(singlecompany)+1
+        success.get(singlecompany)+1
     return success
 
 
@@ -294,6 +294,11 @@ def single_company(company_id):
     positionDict={}
     x=find_email(session['resp']['email'])
     values1=[0,0]
+
+    #Create a for loop that does an aggregate call for (y,n,o),race,
+    #per position for company_id
+    #ct.find({'_id': ObjectId(company_id)},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
@@ -326,9 +331,9 @@ def single_company(company_id):
             record_name=singlecompany['company'])
 
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-    set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors),form=form,form1=form1,
-    ychance=ychance,sc_results=sc_results)
+        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
+        set2=zip(positionDict.items(),colors),form=form,form1=form1,
+        ychance=ychance,sc_results=sc_results)
     else:
         pagination = Pagination(page=page, total=len(
             sc_results), record_name=singlecompany['company'])
