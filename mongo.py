@@ -48,11 +48,11 @@ labels2 = ['# of Interviews']
 iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']
 igl = ['Female','Male','Transgender','Agender','Unspecified']
-p = ['Software Engineer','Staff Engineer','Lead Engineer',
-'Architect','Software Engineer Manager','Technical Manager','Technical Director',
-'VP','CTO','Network Engineer','Principal Architect','QA Engineer','SRE','SDET',
-'Project Manager','Program Manager','DevOps Engineer','Systems Admin',
-'DBA','Operations Engineer']
+p = [('software_engineer','Software Engineer'),('staff_engineer','Staff Engineer'),('lead_engineering','Lead Engineer'),
+('architect','Architect'),('software_engineer_mngr','Software Engineer Manager'),('technical_mngr','Technical Manager'),('technical_mngr','Technical Director'),
+('vp','VP'),('cto','CTO'),('network_engineer','Network Engineer'),('principal_architect','Principal Architect'),('qa_engineer','QA Engineer'),('sre','SRE'),('sdet','SDET'),
+('project_mngr','Project Manager'),('program_mngr','Program Manager'),('devops_engineer','DevOps Engineer'),('systems_admin','Systems Admin'),
+('dba','DBA'),('operations_engineer','Operations Engineer')]
 age = ['18-24','25-34','35-44','45-54','55-64','65-74','75+']
 location = ['AK','AL','AR','AS','AZ','CA''CO','CT','DC','DE',
 'FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA',
@@ -77,8 +77,8 @@ class MyCompany(FlaskForm):
 
 class MyInterview(FlaskForm):
     ie = SelectField('Interviewer\'s Ethnicity:', choices=[(x) for x in iel])
-    position = SelectField('Position Title:', choices=[(x) for x in p])
-    employee = RadioField('Are you an employee here?', choices=[('n','Yes'),('n','No')])
+    position = SelectField('Position Title:', choices=[x for x in p])
+    employee = RadioField('Are you an employee here?', choices=[('y','Yes'),('n','No')])
     win = RadioField('Were you offered the position?', choices=[('y','Yes'),('n','No'),('o','Offered a Different Position')])  
     submit = SubmitField("Submit")
 
@@ -251,7 +251,7 @@ def your_chances(success):
     return (success['y']/(success['y']+success['n']+success['o']))*100
 
 
-def ethnicity_count(success, singlecompany):
+def win_count(success, singlecompany):
     if success.get(singlecompany) is None:
         success[singlecompany]=1
     else:
@@ -302,14 +302,11 @@ def single_company(company_id):
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
-                success['y']+=1
-                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
+                success=win_count(success, singlecompany['interviews'][a]['win'])
             elif singlecompany['interviews'][a]['win'] == "o":
-                success['o']+=1
-                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
+                success=win_count(success, singlecompany['interviews'][a]['win'])
             else:
-                success['n']+=1
-                success=ethnicity_count(success, singlecompany['interviews'][a]['win'])
+                success=win_count(success, singlecompany['interviews'][a]['win'])
             if positionDict.get(singlecompany['interviews'][a]['position']) is None:
                 positionDict[singlecompany['interviews'][a]['position']]=1
             else:
@@ -329,7 +326,7 @@ def single_company(company_id):
             page_parameter="p",
             per_page_parameter="pp",
             record_name=singlecompany['company'])
-
+        
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
         set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
         set2=zip(positionDict.items(),colors),form=form,form1=form1,
@@ -383,13 +380,10 @@ def single_companypost(company_id):
             {
                 '$push':
                 {
-                    'interviews':
+                    p[p.index(request.form.get('position'))][0]:
                     {
                         '_id': str(ObjectId()),
-                        'ie':request.form.get('ie'),
-                        'position': request.form.get('position'),
                         'employee': request.form.get('employee'),
-                        'gender': user['gender'],
                         'user': str(user['_id']),
                         'user_gender':user['gender'],
                         'user_ethnicity':user['ethnicity'],
