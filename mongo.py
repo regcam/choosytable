@@ -380,7 +380,7 @@ def single_companypost(company_id):
             {
                 '$push':
                 {
-                    p[p.index(request.form.get('position'))][0]:
+                    request.form.get('position'):
                     {
                         '_id': str(ObjectId()),
                         'employee': request.form.get('employee'),
