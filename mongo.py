@@ -298,6 +298,12 @@ def single_company(company_id):
     #Create a for loop that does an aggregate call for (y,n,o),race,
     #per position for company_id
     #ct.find({'_id': ObjectId(company_id)},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+    for x in p:
+        if x[0] in singlecompany:
+            for a in range(len(singlecompany[x[0]])):
+                success=win_count(success, singlecompany[x[0]][a]['win'])
+                # need to account for ethnicity
+
 
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
