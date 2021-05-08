@@ -7,10 +7,13 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
+from pandas.core.frame import DataFrame
+from pandas.core.groupby.generic import DataFrameGroupBy
 from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
-
+import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -298,11 +301,14 @@ def single_company(company_id):
     #Create a for loop that does an aggregate call for (y,n,o),race,
     #per position for company_id
     #ct.find({'_id': ObjectId(company_id)},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+    sum=0
     for x in p:
         if x[0] in singlecompany:
-            for a in range(len(singlecompany[x[0]])):
-                success=win_count(success, singlecompany[x[0]][a]['win'])
-                # need to account for ethnicity
+            print(f"This is for the {x[1]} role:")
+            df=pd.DataFrame(singlecompany[x[0]])
+            grouped=df.groupby('user_ethnicity')
+            print(grouped['win'].value_counts())
+        print(f"{(grouped['win'].value_counts()/grouped['win'].value_counts().sum())*100} of {x[1]}")
 
 
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
