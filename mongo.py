@@ -308,7 +308,11 @@ def single_company(company_id):
             df=pd.DataFrame(singlecompany[x[0]])
             grouped=df.groupby('user_ethnicity')
             print(grouped['win'].value_counts())
-        print(f"{(grouped['win'].value_counts()/grouped['win'].value_counts().sum())*100} of {x[1]}")
+            #print(grouped['win'].value_counts().sum())
+            print(len(df.index))
+            for i in range(len(df.index)-1):
+                #need to add conditional for y,n,o
+                print(f"{int((grouped['win'].value_counts().values[i]/grouped['win'].value_counts().sum())*100)}% of {x[1]}s")
 
 
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
