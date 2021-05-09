@@ -301,7 +301,8 @@ def single_company(company_id):
     #Create a for loop that does an aggregate call for (y,n,o),race,
     #per position for company_id
     #ct.find({'_id': ObjectId(company_id)},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
-    sum=0
+    winDict=[]
+    wintype={}
     for x in p:
         if x[0] in singlecompany:
             print(f"This is for the {x[1]} role:")
@@ -309,11 +310,22 @@ def single_company(company_id):
             grouped=df.groupby('user_ethnicity')
             print(grouped['win'].value_counts())
             #print(grouped['win'].value_counts().sum())
-            print(len(df.index))
-            for i in range(len(df.index)-1):
-                #need to add conditional for y,n,o
-                print(f"{int((grouped['win'].value_counts().values[i]/grouped['win'].value_counts().sum())*100)}% of {x[1]}s")
-
+            if (len(df.index)-1)>=0:
+                for i in range(len(df.index)-1):
+                    #need to add conditional for y,n,o
+                    typow=grouped['win'].value_counts().values[i]
+                    if typow == 'y':
+                        wintype['y']=int((typow/grouped['win'].value_counts().sum())*100)
+                        winDict.append(singlecompany[x[0]],singlecompany['user_ethnicity'],wintype.copy())
+                        print(f"{int((typow/grouped['win'].value_counts().sum())*100)}% of {x[1]}s")
+                    elif typow == 'n':
+                        wintype['n']=int((typow/grouped['win'].value_counts().sum())*100)
+                        winDict.append(singlecompany[x[0]],singlecompany['user_ethnicity'],wintype.copy())
+                        print(f"{int((typow/grouped['win'].value_counts().sum())*100)}% of {x[1]}s")
+                    elif typow == 'o':
+                        wintype['o']=int((typow/grouped['win'].value_counts().sum())*100)
+                        winDict.append(singlecompany[x[0]],singlecompany['user_ethnicity'],wintype.copy())
+                        print(f"{int((typow/grouped['win'].value_counts().sum())*100)}% of {x[1]}s")
 
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
