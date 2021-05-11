@@ -310,26 +310,27 @@ def single_company(company_id):
             print(grouped['win'].value_counts())
             #print(grouped['win'].value_counts().sum())
             if (len(df.index)-1)>=0:
-                for i in range(len(df.index)-1):
-                    winDict=[]
-                    wintype={}
-                    #need to add conditional for y,n,o
-                    typow=grouped['win'].value_counts().index[i][1]
-                    numow=grouped['win'].value_counts().values[i]
-                    if typow == 'y':
-                        wintype['y']=int((numow/grouped['win'].value_counts().sum())*100)
-                        #winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
-                        #print(f"{winDict}% of {x[1]}s")
-                    elif typow == 'n':
-                        wintype['n']=int((numow/grouped['win'].value_counts().sum())*100)
-                        #winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
-                        #print(f"{winDict}% of {x[1]}s")
-                    elif typow == 'o':
-                        wintype['o']=int((numow/grouped['win'].value_counts().sum())*100)
-                        #winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
-                        #print(f"{winDict}% of {x[1]}s")
-                    winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
-                    print(f"{winDict}% of {x[1]}s")
+                winDict=[]
+                wintype={}
+                #need to add conditional for y,n,o
+                #typow=grouped['win'].value_counts().index[i][1]
+                #typow=grouped['win'].value_counts().index[i][1]
+                y_df=df[grouped.win =='y'].value_counts()
+                n_df=grouped[grouped['win']=='n'].value_counts()
+                o_df=grouped[grouped['win']=='o'].value_counts()
+                print(y_df)
+                if len(y_df) > 0:
+                    numow=grouped[grouped['win']=='y'].value_counts().values
+                    wintype['y']=int((numow/grouped['win'].value_counts().sum())*100)
+                if len(n_df) > 0:
+                    numow=grouped[grouped['win']=='n'].value_counts().values
+                    wintype['n']=int((numow/grouped['win'].value_counts().sum())*100)
+                if len(o_df) > 0:
+                    numow=grouped[grouped['win']=='o'].value_counts().values
+                    wintype['o']=int((numow/grouped['win'].value_counts().sum())*100)
+                winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
+                print(f"{winDict}% of {x[1]}s")
+
     if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
         for a in range(len(singlecompany['interviews'])):
             if singlecompany['interviews'][a]['win'] == "y":
