@@ -307,6 +307,7 @@ def single_company(company_id):
             print(f"This is for the {x[1]} role:")
             df=pd.DataFrame(singlecompany[x[0]])
             grouped=df.groupby('user_ethnicity')
+            print("this is grouped win:")
             print(grouped['win'].value_counts())
             #print(grouped['win'].value_counts().sum())
             if (len(df.index)-1)>=0:
@@ -315,7 +316,8 @@ def single_company(company_id):
                 #need to add conditional for y,n,o
                 #typow=grouped['win'].value_counts().index[i][1]
                 #typow=grouped['win'].value_counts().index[i][1]
-                y_df=df[grouped.win =='y'].value_counts()
+                y_df=grouped['win'].value_counts().values
+                print(y_df)
                 n_df=grouped[grouped['win']=='n'].value_counts()
                 o_df=grouped[grouped['win']=='o'].value_counts()
                 print(y_df)
