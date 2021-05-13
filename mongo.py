@@ -308,7 +308,7 @@ def single_company(company_id):
             df=pd.DataFrame(singlecompany[x[0]])
             grouped=df.groupby('user_ethnicity')
             print("this is grouped win:")
-            print(grouped['win'].value_counts())
+            print(len(grouped.apply(lambda x: x[x['win']=='y']).index))
             #print(grouped['win'].value_counts().sum())
             if (len(df.index)-1)>=0:
                 winDict=[]
@@ -316,7 +316,8 @@ def single_company(company_id):
                 #need to add conditional for y,n,o
                 #typow=grouped['win'].value_counts().index[i][1]
                 #typow=grouped['win'].value_counts().index[i][1]
-                y_df=grouped['win'].value_counts().values
+                y_df=grouped.apply(lambda g: g['win']=='y')
+                print("This is y_df")
                 print(y_df)
                 n_df=grouped[grouped['win']=='n'].value_counts()
                 o_df=grouped[grouped['win']=='o'].value_counts()
