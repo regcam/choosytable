@@ -277,7 +277,6 @@ def single_company(company_id):
         sc_results=sc_results[0][offset:(per_page + offset if per_page is not None else None)]
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
-    success={'y':0,'n':0,'o':0}
 
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
@@ -298,59 +297,22 @@ def single_company(company_id):
     x=find_email(session['resp']['email'])
     values1=[0,0]
 
-    #Create a for loop that does an aggregate call for (y,n,o),race,
-    #per position for company_id
-    #ct.find({'_id': ObjectId(company_id)},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
-
-    for x in p:
-        if x[0] in singlecompany:
-            print(f"This is for the {x[1]} role:")
-            df=pd.DataFrame(singlecompany[x[0]])
+    for j in p:
+        if j[0] in singlecompany:
+            print(f"This is for the {j[1]} role:")
+            df=pd.DataFrame(singlecompany[j[0]])
             grouped=df.groupby('user_ethnicity')
-            print("this is grouped win:")
-            print(len(grouped.apply(lambda x: x[x['win']=='y']).index))
-            #print(grouped['win'].value_counts().sum())
+
             if (len(df.index)-1)>=0:
                 winDict=[]
                 wintype={}
-                #need to add conditional for y,n,o
-                #typow=grouped['win'].value_counts().index[i][1]
-                #typow=grouped['win'].value_counts().index[i][1]
-                y_df=grouped.apply(lambda g: g['win']=='y')
-                print("This is y_df")
-                print(y_df)
-                n_df=grouped[grouped['win']=='n'].value_counts()
-                o_df=grouped[grouped['win']=='o'].value_counts()
-                print(y_df)
-                if len(y_df) > 0:
-                    numow=grouped[grouped['win']=='y'].value_counts().values
-                    wintype['y']=int((numow/grouped['win'].value_counts().sum())*100)
-                if len(n_df) > 0:
-                    numow=grouped[grouped['win']=='n'].value_counts().values
-                    wintype['n']=int((numow/grouped['win'].value_counts().sum())*100)
-                if len(o_df) > 0:
-                    numow=grouped[grouped['win']=='o'].value_counts().values
-                    wintype['o']=int((numow/grouped['win'].value_counts().sum())*100)
-                winDict.append([x[0],singlecompany['user_ethnicity'],wintype.copy()])
-                print(f"{winDict}% of {x[1]}s")
+                for i in ['y','n','o']:
+                    numow=len(grouped.apply(lambda x: x[x['win']==i]).index)
+                    if(numow>0):
+                        wintype[i]=int((numow/grouped['win'].value_counts().sum())*100)
 
-    if 'interviews' in singlecompany and len(singlecompany['interviews'])>0:
-        for a in range(len(singlecompany['interviews'])):
-            if singlecompany['interviews'][a]['win'] == "y":
-                success=win_count(success, singlecompany['interviews'][a]['win'])
-            elif singlecompany['interviews'][a]['win'] == "o":
-                success=win_count(success, singlecompany['interviews'][a]['win'])
-            else:
-                success=win_count(success, singlecompany['interviews'][a]['win'])
-            if positionDict.get(singlecompany['interviews'][a]['position']) is None:
-                positionDict[singlecompany['interviews'][a]['position']]=1
-            else:
-                positionDict[singlecompany['interviews'][a]['position']]=\
-                    positionDict.get(singlecompany['interviews'][a]['position'])+1
-
-        values1=[format(success['y']/len(singlecompany['interviews']), '.3f'),
-        format(success['n']/len(singlecompany['interviews']), '.3f')]
-        ychance=your_chances(success)
+                winDict.append([j[0],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
+                print(f"{winDict}% of {j[1]}s")
         
         pagination = get_pagination(
             p=page, 
@@ -365,7 +327,7 @@ def single_company(company_id):
         return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
         set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
         set2=zip(positionDict.items(),colors),form=form,form1=form1,
-        ychance=ychance,sc_results=sc_results)
+        winDict=winDict,sc_results=sc_results)
     else:
         pagination = Pagination(page=page, total=len(
             sc_results), record_name=singlecompany['company'])
@@ -441,7 +403,7 @@ def single_person(person_id):
     form = MyPerson()
     if request.method == 'GET':
         try:
-            return redirect(request.url)
+            return redirect(url_for('home'))
         except:
             return jsonify({'error': 'person not found'})
 
@@ -482,7 +444,7 @@ def singleupdate_person(person_id):
                 }
             }
         )
-        return redirect(request.url)
+        return redirect(url_for('home'))
     else:
         return jsonify({'error': "The form was not valid"})
 
