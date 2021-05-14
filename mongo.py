@@ -253,6 +253,24 @@ def findone_company(c):
 def your_chances(success):
     return (success['y']/(success['y']+success['n']+success['o']))*100
 
+def pd_interviews(p,singlecompany):
+    for j in p:
+        if j[0] in singlecompany:
+            print(f"This is for the {j[1]} role:")
+            df=pd.DataFrame(singlecompany[j[0]])
+            grouped=df.groupby('user_ethnicity')
+
+            if (len(df.index)-1)>=0:
+                winDict=[]
+                wintype={}
+                for i in ['y','n','o']:
+                    numow=len(grouped.apply(lambda x: x[x['win']==i]).index)
+                    if(numow>0):
+                        wintype[i]=int((numow/grouped['win'].value_counts().sum())*100)
+
+                winDict.append([j[0],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
+                print(f"{winDict}% of {j[1]}s")
+    return winDict
 
 def win_count(success, singlecompany):
     if success.get(singlecompany) is None:
@@ -278,6 +296,11 @@ def single_company(company_id):
     l={'one':0,'two':0,'three':0,'four':0,'five':0}
     values=[]
 
+    reviews=pd.DataFrame(singlecompany['reviews'])
+    ratings=reviews.groupby('rating')
+    print("this is ratings")
+    print(ratings)
+
     for i in range(len(singlecompany['reviews'])):
         if singlecompany['reviews'][i]['rating']==1:
             l['one']+=1
@@ -297,43 +320,23 @@ def single_company(company_id):
     x=find_email(session['resp']['email'])
     values1=[0,0]
 
-    for j in p:
-        if j[0] in singlecompany:
-            print(f"This is for the {j[1]} role:")
-            df=pd.DataFrame(singlecompany[j[0]])
-            grouped=df.groupby('user_ethnicity')
-
-            if (len(df.index)-1)>=0:
-                winDict=[]
-                wintype={}
-                for i in ['y','n','o']:
-                    numow=len(grouped.apply(lambda x: x[x['win']==i]).index)
-                    if(numow>0):
-                        wintype[i]=int((numow/grouped['win'].value_counts().sum())*100)
-
-                winDict.append([j[0],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
-                print(f"{winDict}% of {j[1]}s")
+    winDict=pd_interviews(p,singlecompany)
         
-        pagination = get_pagination(
-            p=page, 
-            pp=per_page, 
-            format_total=True, 
-            format_number= True, 
-            total=len(sc_results),
-            page_parameter="p",
-            per_page_parameter="pp",
-            record_name=singlecompany['company'])
+    pagination = get_pagination(
+        p=page, 
+        pp=per_page, 
+        format_total=True, 
+        format_number= True, 
+        total=len(sc_results),
+        page_parameter="p",
+        per_page_parameter="pp",
+        record_name=singlecompany['company'])
         
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-        set2=zip(positionDict.items(),colors),form=form,form1=form1,
-        winDict=winDict,sc_results=sc_results)
-    else:
-        pagination = Pagination(page=page, total=len(
-            sc_results), record_name=singlecompany['company'])
-        return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-        set=zip(values,labels,colors),iel=iel,igl=igl,p=p,
-        set2=zip(positionDict.items(),colors),form=form,form1=form1,sc_results=sc_results)
+    return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
+    set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
+    set2=zip(positionDict.items(),colors),form=form,form1=form1,
+    winDict=winDict,sc_results=sc_results)
+
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
