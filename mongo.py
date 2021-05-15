@@ -254,22 +254,21 @@ def your_chances(success):
     return (success['y']/(success['y']+success['n']+success['o']))*100
 
 def pd_interviews(p,singlecompany):
+    winDict=[]
+    wintype={}
     for j in p:
         if j[0] in singlecompany:
-            print(f"This is for the {j[1]} role:")
             df=pd.DataFrame(singlecompany[j[0]])
             grouped=df.groupby('user_ethnicity')
 
             if (len(df.index)-1)>=0:
-                winDict=[]
-                wintype={}
                 for i in ['y','n','o']:
                     numow=len(grouped.apply(lambda x: x[x['win']==i]).index)
                     if(numow>0):
                         wintype[i]=int((numow/grouped['win'].value_counts().sum())*100)
 
-                winDict.append([j[0],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
-                print(f"{winDict}% of {j[1]}s")
+                winDict.append([j[1],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
+                wintype.clear()
     return winDict
 
 def win_count(success, singlecompany):
@@ -297,24 +296,7 @@ def single_company(company_id):
     values=[]
 
     reviews=pd.DataFrame(singlecompany['reviews'])
-    ratings=reviews.groupby('rating')
-    print("this is ratings")
-    print(ratings)
-
-    for i in range(len(singlecompany['reviews'])):
-        if singlecompany['reviews'][i]['rating']==1:
-            l['one']+=1
-        elif singlecompany['reviews'][i]['rating']==2:
-            l['two']+=1
-        elif singlecompany['reviews'][i]['rating']==3:
-            l['three']+=1
-        elif singlecompany['reviews'][i]['rating']==4:
-            l['four']+=1
-        elif singlecompany['reviews'][i]['rating']==5:
-            l['five']+=1
-
-    for k in l.values():
-        values.append(format(k/len(singlecompany['reviews']), '.3f')) if len(singlecompany['reviews'])>0 else values.append(0)
+    rating_avg=reviews['rating'].mean()
 
     positionDict={}
     x=find_email(session['resp']['email'])
@@ -332,10 +314,9 @@ def single_company(company_id):
         per_page_parameter="pp",
         record_name=singlecompany['company'])
         
-    return render_template('singlecompany.html', singlecompany=singlecompany, pagination=pagination, 
-    set=zip(values,labels,colors),iel=iel,igl=igl,p=p,set1=zip(values1,labels1,colors),
-    set2=zip(positionDict.items(),colors),form=form,form1=form1,
-    winDict=winDict,sc_results=sc_results)
+    return render_template('singlecompany.html', singlecompany=singlecompany, 
+    pagination=pagination, iel=iel,igl=igl,p=p,form=form,form1=form1,
+    winDict=winDict,sc_results=sc_results,rating_avg=rating_avg)
 
 
 
@@ -365,15 +346,9 @@ def single_companypost(company_id):
             },
             upsert=True
         )
-        reviews_avg=list(ct.aggregate(
-                [
-                    { '$match': { '_id': ObjectId(company_id) } },
-                    { '$unwind': "$reviews" },
-                    { '$group': { '_id': None, 'reviews_avg':{'$avg': '$reviews.rating'} } }  
-                ]
-            ))
+
         ct.update_one({'_id': ObjectId(company_id)},{'$set': 
-        {'reviews_avg': reviews_avg[0]['reviews_avg'],'last_modified': datetime.now()}})
+        {'last_modified': datetime.now()}})
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},

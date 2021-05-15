@@ -20,8 +20,7 @@
     {{ pagination.links }}
     <h1>{{singlecompany.company}}</h1>
     <h3>{{ychance}}%</h3>
-
-    <h2>{{singlecompany.company}} hires mostly from {{ly_success}}</h2>
+    <h2>{{singlecompany.company}} Rating - {{rating_avg}}</h2>
     <table class="styled-table">
         <thead>
             <tr><th>{{singlecompany.company}}</th></tr>
@@ -31,6 +30,7 @@
             <tr>
                 <td>{{ r }}</td>
             {% endfor %}
+            </tr>
         </tbody>
     </table>
     {{ pagination.links }}
@@ -41,63 +41,21 @@
     {% else %}
     <h1>{{pagination.total}} Reviews - </h1>
     {% endif %}
-    <table>
-        <tr>
-            {% if singlecompany.reviews %}
-            <td>
-                <h2>{{singlecompany.company}} Rating - {{singlecompany.reviews_avg}}</h2>
-                <canvas id="chart" width="600" height="400"></canvas>
-                <script>
-                var pieData = [
-                    {% for item, label, colors in set %}
-                    {
-                        value: parseFloat({{item}}*100).toFixed(2),
-                        label: "{{label}}",
-                        color : "{{colors}}"
-                    },
-                    {% endfor %}
-                ];
+    <p>The majority of the reviews came from "ethnicity" "sex"</p>
 
-                // get bar chart canvas
-                var mychart = document.getElementById("chart").getContext("2d");
-                steps = 10
-                //max = {{ max }}
-
-                // draw pie chart
-                new Chart(document.getElementById("chart").getContext("2d")).Pie(pieData);
-
-                </script>
-            </td>
-            {% endif %}
-        </tr>
-        {% if singlecompany.interviews %}
-        <tr>
-            <td>
-                <h2>Most Interviewed for Position</h2>
-                <canvas id="chart2" width="600" height="400"></canvas>
-                <script>
-                var pieData2 = [
-                    {% for value2, colors in set2 %}
-                    {
-                        value: {{value2[1]}},
-                        label: "{{value2[0]}}",
-                        color : "{{colors}}"
-                    },
-                    {% endfor %}
-                ];
-
-                // get bar chart canvas
-                var mychart2 = document.getElementById("chart2").getContext("2d");
-                steps = 10
-                //max = {{ max }}
-
-                // draw pie chart
-                new Chart(document.getElementById("chart2").getContext("2d")).Pie(pieData2);
-
-                </script>
-            </td>
-        </tr>
-        {% endif %}
+    <table class="styled-table">
+        <thead>
+            <tr><th>{{singlecompany.company}} Interviews</th></tr>
+        </thead>
+        <tbody>
+            {% for x in winDict %}
+            <tr>
+                <td>{{ x[0] }}</td>
+                <td>{{ x[1] }}</td>
+                <td>{{ x[2] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
     <h2>Add a new {{singlecompany.company}} review</h2>
