@@ -45,14 +45,26 @@
 
     <table class="styled-table">
         <thead>
-            <tr><th>{{singlecompany.company}} Interviews</th></tr>
+            <tr>
+                <th>Position</th>
+                <th>Ethnicity</th>
+                <th>Received Offer?</th>
+            </tr>
         </thead>
         <tbody>
             {% for x in winDict %}
             <tr>
                 <td>{{ x[0] }}</td>
                 <td>{{ x[1] }}</td>
-                <td>{{ x[2] }}</td>
+                <td>{% for win in x[2] %}
+                {% if win=='y' %}
+                <p>{{ x[2]['y'] }}% received an offer</p>
+                {% elif win=='n' %}
+                <p>{{ x[2]['n'] }}% didn't receive an offer</p>
+                {% else %}
+                <p>{{ x[2]['o'] }}% received an offer for a different position</p></td>
+                {% endif %}
+                {% endfor %}
             </tr>
             {% endfor %}
         </tbody>
