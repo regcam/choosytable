@@ -261,14 +261,17 @@ def pd_interviews(p,singlecompany):
             df=pd.DataFrame(singlecompany[j[0]])
             grouped=df.groupby('user_ethnicity')
 
-            if (len(df.index)-1)>=0:
+            for key,value in grouped:
+                numow={}
                 for i in ['y','n','o']:
-                    numow=len(grouped.apply(lambda x: x[x['win']==i]).index)
-                    if(numow>0):
-                        wintype[i]=int((numow/grouped['win'].value_counts().sum())*100)
+                    if(any(i == value['win'])):
+                        numow=win_count(numow,i)
+                        print(numow[i])
+                        wintype[i]=int((numow[i]/grouped['win'].value_counts().sum())*100)
 
-                winDict.append([j[1],singlecompany[j[0]][0]['user_ethnicity'],wintype.copy()])
+                winDict.append([j[1],key,wintype.copy()])
                 wintype.clear()
+    print(winDict)
     return winDict
 
 
