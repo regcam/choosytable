@@ -52,7 +52,7 @@ iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']
 igl = ['Female','Male','Transgender','Agender','Unspecified']
 p = [('software_engineer','Software Engineer'),('staff_engineer','Staff Engineer'),('lead_engineering','Lead Engineer'),
-('architect','Architect'),('software_engineer_mngr','Software Engineer Manager'),('technical_mngr','Technical Manager'),('technical_mngr','Technical Director'),
+('architect','Architect'),('software_engineer_mngr','Software Engineer Manager'),('technical_mngr','Technical Manager'),('technical_drtr','Technical Director'),
 ('vp','VP'),('cto','CTO'),('network_engineer','Network Engineer'),('principal_architect','Principal Architect'),('qa_engineer','QA Engineer'),('sre','SRE'),('sdet','SDET'),
 ('project_mngr','Project Manager'),('program_mngr','Program Manager'),('devops_engineer','DevOps Engineer'),('systems_admin','Systems Admin'),
 ('dba','DBA'),('operations_engineer','Operations Engineer')]
