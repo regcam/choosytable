@@ -264,14 +264,10 @@ def pd_interviews(p,singlecompany):
             for key,value in grouped:
                 numow={}
                 for i in ['y','n','o']:
-                    if(any(i == value['win'])):
-                        numow=win_count(numow,i)
-                        print(numow[i])
-                        wintype[i]=int((numow[i]/grouped['win'].value_counts().sum())*100)
+                    wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
 
                 winDict.append([j[1],key,wintype.copy()])
                 wintype.clear()
-    print(winDict)
     return winDict
 
 
