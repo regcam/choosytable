@@ -42,7 +42,6 @@
     </table>
     {{ pagination.links }}
     
-    <p>The majority of the reviews came from "ethnicity" "sex"</p>
     <table class="styled-table">
         <thead>
             <tr>
@@ -53,7 +52,6 @@
         </thead>
         <tbody>
             {% for x in winDict %}
-            x is {{x}}
             <tr>
                 <td>{{ x[0] }}</td>
                 <td>{{ x[1] }}</td>

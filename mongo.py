@@ -13,7 +13,6 @@ from wtforms import StringField, IntegerField, TextAreaField, RadioField, Submit
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
-import numpy as np
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -38,15 +37,6 @@ nav.Bar('top', [
     nav.Item('People', 'person'),
     nav.Item('Logout', 'logout')
 ])
-
-colors = [
-    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
-    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
-    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
-
-labels = ['1 Star','2 Stars','3 Stars','4 Stars','5 Stars']
-labels1 = ['Offered the Job %','No Offer %']
-labels2 = ['# of Interviews']
 
 iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']
@@ -251,9 +241,6 @@ def findone_company(c):
     return ct.find_one({'_id': ObjectId(c)})
 
 
-def your_chances(success):
-    return (success['y']/(success['y']+success['n']+success['o']))*100
-
 def pd_interviews(p,singlecompany):
     winDict=[]
     wintype={}
@@ -263,22 +250,12 @@ def pd_interviews(p,singlecompany):
             grouped=df.groupby('user_ethnicity')
 
             for key,value in grouped:
-                numow={}
                 for i in ['y','n','o']:
                     wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
 
                 winDict.append([j[1],key,wintype.copy()])
                 wintype.clear()
     return winDict
-
-
-def win_count(success, singlecompany):
-    if success.get(singlecompany) is None:
-        success[singlecompany]=1
-    else:
-        success[singlecompany]=\
-        success.get(singlecompany)+1
-    return success
 
 
 @app.route('/company/<company_id>', methods=['GET'])
@@ -376,7 +353,6 @@ def single_companypost(company_id):
     return redirect(request.url)
 
 
-#@lru_cache
 @app.route('/person/<person_id>', methods=['GET'])
 def single_person(person_id):
     form = MyPerson()
@@ -428,7 +404,6 @@ def singleupdate_person(person_id):
         return jsonify({'error': "The form was not valid"})
 
 
-#@lru_cache
 @app.route('/person', methods=['GET'])
 def person():
     return redirect(url_for('home'))
