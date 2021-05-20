@@ -149,10 +149,12 @@ def home():
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['company']))
             reviewcount+=1
-
+        print("r_results is")
+        print(f"{r_results}")
         if per_page:
             r_results= r_results[offset:(per_page + offset if per_page is not None else None)]
-
+        print(f"r_results after per_page update")
+        print(f"{r_results}")
         form.gender.default = x['gender']
         form.age.default = x['age']
         form.ethnicity.default = x['ethnicity']
@@ -230,6 +232,7 @@ def company_post():
                     'company': request.form.get('company'),
                     'reviews': [
                         {
+                            '_id': str(ObjectId()),
                             'review':request.form.get('reviews'),
                             'rating':int(request.form.get('rating')),
                             'user': str(user['_id'])
