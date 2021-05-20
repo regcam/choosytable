@@ -23,9 +23,9 @@
     {% if pagination.total==0 %}
     <h2>Company Rating - No Reviews Yet</h2>
     {% elif pagination.total==1 %}
-    <h2>Company Rating - {{rating_avg}} of {{pagination.total}} Review</h2>
+    <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Review</h2>
     {% else %}
-    <h2>Company Rating - {{rating_avg}} of {{pagination.total}} Reviews</h2>
+    <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Reviews</h2>
     {% endif %}
 
     <table class="styled-table">
