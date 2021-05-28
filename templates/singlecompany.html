@@ -1,101 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/main.css') }}">
-    <ul class="styled-nav">
-        {% for item in nav.top %}
-        <li class="{{ 'active' if item.is_active else '' }}">
-            <b><a href="{{ item.url }}">{{ item.label }}</a></b>
-        </li>
-        {% endfor %}
-    </ul>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
+    <link rel="stylesheet" href="static/css/fontawesome.css">
+    <link rel="stylesheet" href="static/css/templatemo-space-dynamic.css">
+    <link rel="stylesheet" href="static/css/animated.css">
+    <link rel="stylesheet" href="static/css/owl.css">
 </head>
 <body>
-    <br>
-    <br>
-    <h1>Choosy Table</h1>
-    {{ pagination.info }}
-    {{ pagination.links }}
-    <h1>{{singlecompany.company}}</h1>
-
-    {% if pagination.total==0 %}
-    <h2>Company Rating - No Reviews Yet</h2>
-    {% elif pagination.total==1 %}
-    <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Review</h2>
-    {% else %}
-    <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Reviews</h2>
-    {% endif %}
-
-    <table class="styled-table">
-        <thead>
-            <tr><th>{{singlecompany.company}}</th></tr>
-        </thead>
-        <tbody>
-            {% for r in sc_results %}
-            <tr>
-                <td>{{ r }}</td>
+    <div id="page-wrap">
+        <p class="title">Choosy Table</p>
+        <ul class="styled-nav">
+            {% for item in nav.top %}
+            <li class="{{ 'active' if item.is_active else '' }}">
+                <b><a href="{{ item.url }}">{{ item.label }}</a></b>
+            </li>
             {% endfor %}
-            </tr>
-        </tbody>
-    </table>
-    {{ pagination.links }}
-    
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th>Position</th>
-                <th>Ethnicity</th>
-                <th>Received Offer?</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for x in winDict %}
-            <tr>
-                <td>{{ x[0] }}</td>
-                <td>{{ x[1] }}</td>
-                <td>{% for win in x[2] %}
-                {% if win=='y' %}
-                <p>{{ x[2]['y'] }}% received an offer</p>
-                {% elif win=='n' %}
-                <p>{{ x[2]['n'] }}% didn't receive an offer</p>
-                {% else %}
-                <p>{{ x[2]['o'] }}% received an offer for a different position</p></td>
-                {% endif %}
+        </ul>
+        <br>
+        <br>
+        <p>
+        {{ pagination.info }}
+        {{ pagination.links }}</p>
+        <h1>{{singlecompany.company}}</h1>
+
+        {% if pagination.total==0 %}
+        <h2>Company Rating - No Reviews Yet</h2>
+        {% elif pagination.total==1 %}
+        <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Review</h2>
+        {% else %}
+        <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Reviews</h2>
+        {% endif %}
+
+        <table class="styled-table">
+            <thead>
+                <tr><th>{{singlecompany.company}}</th></tr>
+            </thead>
+            <tbody>
+                {% for r in sc_results %}
+                <tr>
+                    <td>{{ r }}</td>
                 {% endfor %}
-            </tr>
+                </tr>
+            </tbody>
+        </table>
+        {{ pagination.links }}
+        
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Ethnicity</th>
+                    <th>Received Offer?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in winDict %}
+                <tr>
+                    <td>{{ x[0] }}</td>
+                    <td>{{ x[1] }}</td>
+                    <td>{% for win in x[2] %}
+                    {% if win=='y' %}
+                    <p>{{ x[2]['y'] }}% received an offer</p>
+                    {% elif win=='n' %}
+                    <p>{{ x[2]['n'] }}% didn't receive an offer</p>
+                    {% else %}
+                    <p>{{ x[2]['o'] }}% received an offer for a different position</p></td>
+                    {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Add a new {{singlecompany.company}} review</h2>
+        <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
+            <p>{{ form.company(value=singlecompany.company,hidden=True) }}</p>
+            {{ form.csrf_token }}
+            <p>{{ form.reviews.label }}<br>{{ form.reviews(size=20) }}</p>
+            <p>Rating:</p>
+            {% for subfield in form.rating %}
+            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
             {% endfor %}
-        </tbody>
-    </table>
+            <p>{{ form.submit }}</p>
+        </form>
 
-    <h2>Add a new {{singlecompany.company}} review</h2>
-    <form action="/company/{{singlecompany._id}}" id="updatecompany" method="post">
-        <p>{{ form.company(value=singlecompany.company,hidden=True) }}</p>
-        {{ form.csrf_token }}
-        <p>{{ form.reviews.label }}<br>{{ form.reviews(size=20) }}</p>
-        <p>Rating:</p>
-        {% for subfield in form.rating %}
-        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-        {% endfor %}
-        <p>{{ form.submit }}</p>
-    </form>
-
-    <h2>Have you interviewed with {{singlecompany.company}}?</h2>
-    <form action="/company/{{singlecompany._id}}" id="interview" method="post">
-        {{ form1.csrf_token }}
-        <p>{{ form1.ie.label }}<br>{{ form1.ie }}</p>
-        <p>{{ form1.position.label }}<br>{{ form1.position }}</p>
-        <p>Are you currently employed at {{singlecompany.company}}?</p>
-        {% for subfield in form1.employee %}
-        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-        {% endfor %}
-        <p>Were you offered the position?</p>
-        {% for subfield in form1.win %}
-        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-        {% endfor %}
-        <p>{{ form1.submit }}</p>
-    </form>
+        <h2>Have you interviewed with {{singlecompany.company}}?</h2>
+        <form action="/company/{{singlecompany._id}}" id="interview" method="post">
+            {{ form1.csrf_token }}
+            <p>{{ form1.ie.label }}<br>{{ form1.ie }}</p>
+            <p>{{ form1.position.label }}<br>{{ form1.position }}</p>
+            <p>Are you currently employed at {{singlecompany.company}}?</p>
+            {% for subfield in form1.employee %}
+            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
+            {% endfor %}
+            <p>Were you offered the position?</p>
+            {% for subfield in form1.win %}
+            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
+            {% endfor %}
+            <p>{{ form1.submit }}</p>
+        </form>
+    </div>
 </body>
 
 </html>
