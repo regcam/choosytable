@@ -18,21 +18,20 @@
             </li>
             {% endfor %}
         </ul>
-        <br>
-        <br>
-        <p>
-        {{ pagination.info }}
-        {{ pagination.links }}</p>
+        <br><br>
+        <br><br>
+
         <h1>{{singlecompany.company}}</h1>
 
         {% if pagination.total==0 %}
-        <h2>Company Rating - No Reviews Yet</h2>
+        <h3>Company Rating - No Reviews Yet</h3>
         {% elif pagination.total==1 %}
-        <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Review</h2>
+        <h3>Company Rating - {{rating_avg}} out of {{pagination.total}} Review</h3>
         {% else %}
-        <h2>Company Rating - {{rating_avg}} out of {{pagination.total}} Reviews</h2>
+        <h3>Company Rating - {{rating_avg}} out of {{pagination.total}} Reviews</h3>
         {% endif %}
 
+        {{ pagination.info }}
         <table class="styled-table">
             <thead>
                 <tr><th>{{singlecompany.company}}</th></tr>
@@ -45,8 +44,8 @@
                 </tr>
             </tbody>
         </table>
-        {{ pagination.links }}
-        
+
+        <h3>Interview Stats by Ethnicity</h3>
         <table class="styled-table">
             <thead>
                 <tr>
