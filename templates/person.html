@@ -38,7 +38,7 @@
                     {% for s in r_results %}
                     <tr>
                         <td>{{ loop.index + pagination.skip }}</td>
-                        <td>{{ s[-1] }}</td>
+                        <td><a href="company/{{ s[-2] }}">{{ s[-1] }}</a></td>
                         <td>{% for j in s[0] %}
                             <p>{{ j['review'] }}</p>
                         {% endfor %}</td>

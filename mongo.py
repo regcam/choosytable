@@ -137,7 +137,7 @@ def home():
         r = list(find_creatorreviews(x))
             
         for indx,key in enumerate(r):
-            r_results.append((key['reviews'],key['company']))
+            r_results.append((key['reviews'],key['_id'],key['company']))
             reviewcount+=1
 
         if per_page:
