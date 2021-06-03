@@ -76,7 +76,6 @@ class MyInterview(FlaskForm):
     submit = SubmitField("Submit")
 
 
-#@lru_cache
 @app.before_request
 def before_request():
     if not google.authorized and "google" not in request.path:
