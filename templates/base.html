@@ -1,5 +1,5 @@
 <!doctype html>
-<title>{% block title %}{% endblock %} - Flaskr</title>
+<title>{% block title %}{% endblock %} - Choosy Table</title>
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="static/css/animated.css">
     <link rel="stylesheet" href="static/css/owl.css">
 </head>
+
+<div id="page-wrap">
 <p class="title">Choosy Table</p>
 <ul class="styled-nav">
     {% for item in nav.top %}
@@ -17,11 +19,10 @@
     {% endfor %}
 </ul>
 <section class="content">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
+  
   {% block content %}{% endblock %}
+  </div>
 </section>

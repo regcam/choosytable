@@ -1,80 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
-    <link rel="stylesheet" href="static/css/fontawesome.css">
-    <link rel="stylesheet" href="static/css/templatemo-space-dynamic.css">
-    <link rel="stylesheet" href="static/css/animated.css">
-    <link rel="stylesheet" href="static/css/owl.css">
-</head>
-<br>
-<body>
-    <div id="page-wrap">
-        <p class="title">Choosy Table</p>
-        <ul class="styled-nav">
-            {% for item in nav.top %}
-            <li class="{{ 'active' if item.is_active else '' }}">
-                <b><a href="{{ item.url }}">{{ item.label }}</a></b>
-            </li>
-            {% endfor %}
-        </ul>
-        <br>
-        <br>
+{% extends 'base.html' %}
 
-        {% if r_results|count > 0 %}
-            {{ pagination.info }}
-            <nav>{{ pagination.links }}</nav>
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Company</th>
-                        <th>Reviews</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for s in r_results %}
-                    <tr>
-                        <td>{{ loop.index + pagination.skip }}</td>
-                        <td><a href="company/{{ s[-2] }}">{{ s[-1] }}</a></td>
-                        <td>{% for j in s[0] %}
-                            <p>{{ j['review'] }}</p>
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    {% if r_results|count > 0 %}
+        <br>
+        <br>
+        {{ pagination.info }}
+        {{ pagination.links }}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Company</th>
+                    <th>Reviews</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in r_results %}
+                <tr>
+                    <td>{{ loop.index + pagination.skip }}</td>
+                    <td><a href="company/{{ s[-2] }}">{{ s[-1] }}</a></td>
+                    <td>{% for j in s[0] %}
+                        <p>{{ j['review'] }}</p>
+                    {% endfor %}</td>
+                    <td>{% for j in s[0] %}
+                        <p><a href="/deletereview/{{ j['_id'] }}">Delete</a></p>
                         {% endfor %}</td>
-                        <td>{% for j in s[0] %}
-                            <p><a href="/deletereview/{{ j['_id'] }}">Delete</a></p>
-                            {% endfor %}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {{ pagination.links }}
-        {% endif %}
-    
-        <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
-        {% if x['_id'] %}
-            <form action="/person/{{x['_id']}}" method="post">
-            <p>{{ form.email(value=x['email'],hidden=True) }}</p>
-            <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
-        {% else %}
-            <form action="/person" method="post">
-            <p>{{ form.email(value=x,hidden=True) }}</p>
-            <p>{{ form.name.label }}<br>{{ form.name }}</p>
-        {% endif %}
-            {{ form.csrf_token }}
-            <p>Gender:</p>
-            {% for subfield in form.gender %}
-            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-            {% endfor %}
-            <p>{{ form.age.label }}<br>{{ form.age }}</p>
-            <p>{{ form.ethnicity.label }}<br>{{ form.ethnicity }}</p>
-            <p>{{ form.location.label }}<br>{{ form.location }}</p>
-            <p>{{ form.submit }}</p>
-        </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ pagination.links }}
+    {% endif %}
 
-        <p><a href='forgetme/{{x['_id']}}'>Delete My Data</a></p>
-        <p><a href={{url_for('company')}}>Post a Company review?</a></p>
-    </div>
-</body>
-</html>
+    <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
+    {% if x['_id'] %}
+        <form action="/person/{{x['_id']}}" method="post">
+        <p>{{ form.email(value=x['email'],hidden=True) }}</p>
+        <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
+    {% else %}
+        <form action="/person" method="post">
+        <p>{{ form.email(value=x,hidden=True) }}</p>
+        <p>{{ form.name.label }}<br>{{ form.name }}</p>
+    {% endif %}
+        {{ form.csrf_token }}
+        <p>Gender:</p>
+        {% for subfield in form.gender %}
+        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
+        {% endfor %}
+        <p>{{ form.age.label }}<br>{{ form.age }}</p>
+        <p>{{ form.ethnicity.label }}<br>{{ form.ethnicity }}</p>
+        <p>{{ form.location.label }}<br>{{ form.location }}</p>
+        <p>{{ form.submit }}</p>
+    </form>
+
+    <p><a href='forgetme/{{x['_id']}}'>Delete My Data</a></p>
+    <p><a href={{url_for('company')}}>Post a Company review?</a></p>
+{% endblock %}
