@@ -13,9 +13,8 @@ from wtforms import StringField, IntegerField, TextAreaField, RadioField, Submit
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
-from pymemcache.client import base
-
-client = base.Client(('localhost', 11211))
+from pymemcache.client.base import Client
+client = Client('localhost')
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -91,8 +90,10 @@ def find_creatorreviews(y):
     reviews=client.get('creatorreviews')
     if reviews == None:
         reviews=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        print(f"original reviews is {reviews}")
         client.set('creatorreviews', reviews)
-    return reviews
+    print(f"reviews is {client.get('creatorreviews')}")
+    return client.get('creatorreviews')
 
 
 def find_email(z):
@@ -141,7 +142,7 @@ def home():
         page_parameter="p", per_page_parameter="pp", pp=10)
 
         r = list(find_creatorreviews(x))
-            
+        print(f"r is {r}")
         for indx,key in enumerate(r):
             r_results.append((key['reviews'],key['_id'],key['company']))
             reviewcount+=1
