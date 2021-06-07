@@ -87,13 +87,16 @@ def before_request():
 
 
 def find_creatorreviews(y):
-    reviews=client.get('creatorreviews')
-    if reviews == None:
-        reviews=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
-        print(f"original reviews is {reviews}")
-        client.set('creatorreviews', reviews)
-    print(f"reviews is {client.get('creatorreviews')}")
-    return client.get('creatorreviews')
+    key=str(y['_id'])+"_reviews"
+    print(key)
+    querykey=client.get(key)
+    if querykey == None:
+        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        print(f"original reviews is {querykey}")
+        client.set(key, querykey)
+    for doc in querykey:
+        print(doc)
+    return querykey
 
 
 def find_email(z):
@@ -141,10 +144,11 @@ def home():
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
 
-        r = list(find_creatorreviews(x))
+        r = find_creatorreviews(x)
         print(f"r is {r}")
-        for indx,key in enumerate(r):
-            r_results.append((key['reviews'],key['_id'],key['company']))
+        for key in r:
+            print(key)
+            r_results.append((key[2],key[0],key[1]))
             reviewcount+=1
 
         if per_page:
