@@ -104,7 +104,6 @@ def find_creatorreviews(y):
     querykey=client.get(key)
     if querykey == None:
         querykey=list(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
-        print(f"original reviews is {querykey}")
         client.set(key, querykey)
     return querykey
 
@@ -149,17 +148,14 @@ def home():
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
     x = find_email(session['resp']['email'])
-    reviewcount=0
+
     if x is not None:
         page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
 
         r = find_creatorreviews(x)
-        print(f"r is {r}")
         for key in r:
-            print(key)
             r_results.append((key['reviews'],key['_id'],key['company']))
-            reviewcount+=1
 
         if per_page:
             r_results= r_results[offset:(per_page + offset if per_page is not None else None)]
@@ -175,7 +171,7 @@ def home():
             pp=per_page, 
             format_total=True, 
             format_number= True, 
-            total=reviewcount,
+            total=len(r_results),
             page_parameter="p",
             per_page_parameter="pp",
             record_name='Your latest reviews')
