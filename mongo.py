@@ -14,9 +14,21 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
-from pymemcache import serde
 
-client = Client('localhost', serde=serde.pickle_serde)
+class JsonSerde(object):
+    def serialize(self, key, value):
+        if isinstance(value, str):
+            return value.encode('utf-8'), 1
+        return json_util.dumps(value).encode('utf-8'), 2
+
+    def deserialize(self, key, value, flags):
+       if flags == 1:
+           return value.decode('utf-8')
+       if flags == 2:
+           return json_util.loads(value.decode('utf-8'))
+       raise Exception("Unknown serialization format")
+
+client = Client('localhost', serde=JsonSerde())
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -32,7 +44,6 @@ app.register_blueprint(blueprint, url_prefix="/login")
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
-db = mongo.db
 nav = Navigation(app)
 
 nav.Bar('top', [
@@ -92,11 +103,9 @@ def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        querykey=list(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
         print(f"original reviews is {querykey}")
         client.set(key, querykey)
-    for doc in querykey:
-        print(doc)
     return querykey
 
 
