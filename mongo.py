@@ -381,7 +381,7 @@ def single_person(person_id):
 def singleupdate_person(person_id):
     form = MyPerson()
     if form.validate_on_submit():
-        ct.update(
+        ct.update_one(
             {'_id': ObjectId(person_id)},
             {
                 '$set': {
@@ -393,7 +393,7 @@ def singleupdate_person(person_id):
                     "last_modified": datetime.now()}
             }
         )
-        ct.update(
+        ct.update_one(
             {'interviews.user': person_id},
             {
                 '$set': {
@@ -403,7 +403,7 @@ def singleupdate_person(person_id):
                 }
             }
         )
-        ct.update(
+        ct.update_one(
             {'reviews.user': person_id},
             {
                 '$set': {
@@ -413,6 +413,8 @@ def singleupdate_person(person_id):
                 }
             }
         )
+        x=ct.find_one({'_id': ObjectId(person_id)})
+        client.delete(x['email'])
         return redirect(url_for('home'))
     else:
         return jsonify({'error': "The form was not valid"})
