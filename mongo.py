@@ -109,7 +109,11 @@ def find_creatorreviews(y):
 
 
 def find_email(z):
-    return ct.find_one({'email': z})
+    querykey=client.get(z)
+    if querykey == None:
+        querykey=ct.find_one({'email': z})
+        client.set(z,querykey)
+    return querykey
 
 
 def get_pagination(**kwargs):
