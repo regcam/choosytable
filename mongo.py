@@ -242,8 +242,7 @@ def company_post():
                             'rating':int(request.form.get('rating')),
                             'user': str(user['_id'])
                         }
-                    ],
-                    'reviews_avg': 0
+                    ]
                 }
             )
             return redirect(request.url)
@@ -287,16 +286,9 @@ def single_company(company_id):
     if per_page:
         sc_results.append(singlecompany['reviews'])
         sc_results=sc_results[0][offset:(per_page + offset if per_page is not None else None)]
-    l={'one':0,'two':0,'three':0,'four':0,'five':0}
-    values=[]
 
     reviews=pd.DataFrame(singlecompany['reviews'])
     rating_avg=reviews['rating'].mean()
-
-    positionDict={}
-    x=find_email(session['resp']['email'])
-    values1=[0,0]
-
     winDict=pd_interviews(p,singlecompany)
         
     pagination = get_pagination(
@@ -312,7 +304,6 @@ def single_company(company_id):
     return render_template('singlecompany.html', singlecompany=singlecompany, 
     pagination=pagination, iel=iel,igl=igl,p=p,form=form,form1=form1,
     winDict=winDict,sc_results=sc_results,rating_avg=rating_avg)
-
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
@@ -344,6 +335,8 @@ def single_companypost(company_id):
 
         ct.update_one({'_id': ObjectId(company_id)},{'$set': 
         {'last_modified': datetime.now()}})
+
+        client.delete(str(user['_id'])+"_reviews")
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
@@ -458,6 +451,7 @@ def forgetme(user):
         ct.remove(
             {'_id': ObjectId(user)} 
         )
+        client.delete(str(user['_id'])+"_reviews")
     return redirect(url_for('home'))
 
 
@@ -469,6 +463,7 @@ def deletereview(id):
             {'reviews._id': id}, 
             {'$pull': {'reviews': {'_id': id}}}
         )
+        client.delete(str(user['_id'])+"_reviews")
     return redirect(url_for('home'))
 
 
