@@ -272,7 +272,7 @@ def findone_company(c):
 
 
 def pd_interviews(p,singlecompany):
-    querykey=client.get(singlecompany["company"]+"_pd_interviews")
+    querykey=client.get(singlecompany["_id"]+"_pd_interviews")
     if querykey == None:
         winDict=[]
         wintype={}
@@ -288,7 +288,7 @@ def pd_interviews(p,singlecompany):
                     winDict.append([j[1],key,wintype.copy()])
                     wintype.clear()
         querykey=winDict
-        client.set(singlecompany["company"]+"_pd_interviews",querykey)
+        client.set(singlecompany["_id"]+"_pd_interviews",querykey)
     return querykey
 
 
@@ -378,6 +378,7 @@ def single_companypost(company_id):
             upsert=True
         )
         client.delete(company_id)
+        client.delete(company_id+"_pd_interviews")
     else:
         return jsonify({'error': "Something went wrong.  Make sure you complete your profile!"})
     return redirect(request.url)
