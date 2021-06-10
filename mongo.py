@@ -206,7 +206,12 @@ def home():
 
 
 def find_reviews():
-    return ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
+    z="find_reviews"
+    querykey=client.get(z)
+    if querykey == None:
+        querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
+        client.set(z,querykey)
+    return querykey
 
 
 @app.route('/company', methods=['GET'])
@@ -249,6 +254,7 @@ def company_post():
                     ]
                 }
             )
+            client.delete("find_reviews")
             return redirect(request.url)
         except Exception as e:
             return jsonify({'error': str(e)})
@@ -258,24 +264,32 @@ def company_post():
 
 
 def findone_company(c):
-    return ct.find_one({'_id': ObjectId(c)})
+    querykey=client.get(c)
+    if querykey == None:
+        querykey=ct.find_one({'_id': ObjectId(c)})
+        client.set(c,querykey)
+    return querykey
 
 
 def pd_interviews(p,singlecompany):
-    winDict=[]
-    wintype={}
-    for j in p:
-        if j[0] in singlecompany:
-            df=pd.DataFrame(singlecompany[j[0]])
-            grouped=df.groupby('user_ethnicity')
+    querykey=client.get(singlecompany["company"]+"_pd_interviews")
+    if querykey == None:
+        winDict=[]
+        wintype={}
+        for j in p:
+            if j[0] in singlecompany:
+                df=pd.DataFrame(singlecompany[j[0]])
+                grouped=df.groupby('user_ethnicity')
 
-            for key,value in grouped:
-                for i in ['y','n','o']:
-                    wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
+                for key,value in grouped:
+                    for i in ['y','n','o']:
+                        wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
 
-                winDict.append([j[1],key,wintype.copy()])
-                wintype.clear()
-    return winDict
+                    winDict.append([j[1],key,wintype.copy()])
+                    wintype.clear()
+        querykey=winDict
+        client.set(singlecompany["company"]+"_pd_interviews",querykey)
+    return querykey
 
 
 @app.route('/company/<company_id>', methods=['GET'])
@@ -341,6 +355,7 @@ def single_companypost(company_id):
         {'last_modified': datetime.now()}})
 
         client.delete(str(user['_id'])+"_reviews")
+        client.delete(company_id)
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
@@ -362,6 +377,7 @@ def single_companypost(company_id):
             },
             upsert=True
         )
+        client.delete(company_id)
     else:
         return jsonify({'error': "Something went wrong.  Make sure you complete your profile!"})
     return redirect(request.url)
@@ -458,6 +474,7 @@ def forgetme(user):
             {'_id': ObjectId(user)} 
         )
         client.delete(str(user['_id'])+"_reviews")
+        client.delete(session['resp']['email'])
     return redirect(url_for('home'))
 
 
@@ -470,6 +487,7 @@ def deletereview(id):
             {'$pull': {'reviews': {'_id': id}}}
         )
         client.delete(str(user['_id'])+"_reviews")
+        client.delete(session['resp']['email'])
     return redirect(url_for('home'))
 
 
