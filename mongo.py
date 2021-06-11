@@ -272,7 +272,7 @@ def findone_company(c):
 
 
 def pd_interviews(p,singlecompany):
-    querykey=client.get(singlecompany["_id"]+"_pd_interviews")
+    querykey=client.get(str(singlecompany['_id'])+"_pd_interviews")
     if querykey == None:
         winDict=[]
         wintype={}
@@ -288,7 +288,7 @@ def pd_interviews(p,singlecompany):
                     winDict.append([j[1],key,wintype.copy()])
                     wintype.clear()
         querykey=winDict
-        client.set(singlecompany["_id"]+"_pd_interviews",querykey)
+        client.set(str(singlecompany['_id'])+"_pd_interviews",querykey)
     return querykey
 
 
@@ -354,8 +354,7 @@ def single_companypost(company_id):
         ct.update_one({'_id': ObjectId(company_id)},{'$set': 
         {'last_modified': datetime.now()}})
 
-        client.delete(str(user['_id'])+"_reviews")
-        client.delete(company_id)
+        client.delete_multi([str(user['_id'])+"_reviews",company_id])
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
@@ -377,8 +376,7 @@ def single_companypost(company_id):
             },
             upsert=True
         )
-        client.delete(company_id)
-        client.delete(company_id+"_pd_interviews")
+        client.delete_multi([company_id, company_id+"_pd_interviews"])
     else:
         return jsonify({'error': "Something went wrong.  Make sure you complete your profile!"})
     return redirect(request.url)
@@ -474,8 +472,7 @@ def forgetme(user):
         ct.remove(
             {'_id': ObjectId(user)} 
         )
-        client.delete(str(user['_id'])+"_reviews")
-        client.delete(session['resp']['email'])
+        client.delete_multi([str(user['_id'])+"_reviews"],session['resp']['email'])
     return redirect(url_for('home'))
 
 
@@ -487,8 +484,7 @@ def deletereview(id):
             {'reviews._id': id}, 
             {'$pull': {'reviews': {'_id': id}}}
         )
-        client.delete(str(user['_id'])+"_reviews")
-        client.delete(session['resp']['email'])
+        client.delete_multi([str(user['_id'])+"_reviews", session['resp']['email']])
     return redirect(url_for('home'))
 
 
