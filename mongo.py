@@ -39,11 +39,24 @@ app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 app.secret_key = os.urandom(24).hex()
-app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
-app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
-    "GOOGLE_CLIENT_SECRET")
+
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
 blueprint = make_google_blueprint(scope=["profile", "email"])
 app.register_blueprint(blueprint, url_prefix="/login")
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+# Flask-Login helper to retrieve a user from our db
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
@@ -96,10 +109,17 @@ class MyInterview(FlaskForm):
 
 @app.before_request
 def before_request():
-    if not google.authorized and "google" not in request.path:
-        return render_template("index.html")
+    if current_user.is_authenticated:
+        return (
+            "<p>Hello, {}! You're logged in! Email: {}</p>"
+            "<div><p>Google Profile Picture:</p>"
+            '<img src="{}" alt="Google profile pic"></img></div>'
+            '<a class="button" href="/logout">Logout</a>'.format(
+                current_user.name, current_user.email, current_user.profile_pic
+            )
+        )
     else:
-        session['resp'] = google.get("/oauth2/v1/userinfo").json()
+        return '<a class="button" href="/login">Google Login</a>'
 
 
 def find_creatorreviews(y):
