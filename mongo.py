@@ -174,9 +174,9 @@ def show_single_page_or_not():
 def home():
     if not google.authorized:
         return redirect(url_for("google.login"))
-    working=MongoBackend.get(blueprint)
-    if working is None:
-        MongoBackend.set(blueprint,token)
+    existing=MongoBackend.get(blueprint)
+    if existing is None:
+        MongoBackend.set(blueprint,google.get("access_token").json())
     print(f"MongoBacken")
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
