@@ -4,9 +4,7 @@ from bson import json_util, objectid
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-from oauthlib.oauth2 import WebApplicationClient
-import requests
+from flask_dance.consumer.backend import BaseBackend
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
@@ -17,6 +15,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
+from flask_login import current_user, login_user, logout_user, login_required
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -39,28 +38,22 @@ app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 app.secret_key = os.urandom(24).hex()
-
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
-GOOGLE_DISCOVERY_URL = (
-    "https://accounts.google.com/.well-known/openid-configuration"
-)
-blueprint = make_google_blueprint(scope=["profile", "email"])
+app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
+app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
+    "GOOGLE_CLIENT_SECRET")
+blueprint = make_google_blueprint(
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secrets=os.environ.get(
+    "GOOGLE_CLIENT_SECRET"),
+    scope=["profile", "email"]
+    )
 app.register_blueprint(blueprint, url_prefix="/login")
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-client = WebApplicationClient(GOOGLE_CLIENT_ID)
-
-# Flask-Login helper to retrieve a user from our db
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
 nav = Navigation(app)
+login = LoginManager(app)
+login.login_view = 'login'
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
@@ -107,19 +100,27 @@ class MyInterview(FlaskForm):
     submit = SubmitField("Submit")
 
 
+class MongoBackend(BaseBackend):
+    def get(self, blueprint):
+        try:
+            user = ct.find_one({'_id': ObjectId(current_user.id), 'oauth.provider': 'google'})
+            return user['oauth']['token']
+        except:
+            return None
+
+    def set(self, blueprint, token):
+        ct.update_one({'_id': ObjectId(current_user.id)}, {'$set': {'oauth.token': token}})
+
+    def delete(self, blueprint):
+        ct.update_one({'_id': ObjectId(current_user.id), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
+        return None
+
 @app.before_request
 def before_request():
-    if current_user.is_authenticated:
-        return (
-            "<p>Hello, {}! You're logged in! Email: {}</p>"
-            "<div><p>Google Profile Picture:</p>"
-            '<img src="{}" alt="Google profile pic"></img></div>'
-            '<a class="button" href="/logout">Logout</a>'.format(
-                current_user.name, current_user.email, current_user.profile_pic
-            )
-        )
+    if not google.authorized:
+        return redirect(url_for("google.login"))
     else:
-        return '<a class="button" href="/login">Google Login</a>'
+        session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
 def find_creatorreviews(y):
@@ -171,6 +172,12 @@ def show_single_page_or_not():
 @app.route("/index")
 @app.route("/welcome")
 def home():
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+    working=MongoBackend.get(blueprint)
+    if working is None:
+        MongoBackend.set(blueprint,token)
+    print(f"MongoBacken")
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
