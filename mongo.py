@@ -4,7 +4,7 @@ from bson import json_util, objectid
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.consumer.backend import BaseBackend
+from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
@@ -15,7 +15,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import current_user, login_user, logout_user, login_required, login_manager
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -43,8 +43,7 @@ app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
     "GOOGLE_CLIENT_SECRET")
 blueprint = make_google_blueprint(
     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
-    client_secrets=os.environ.get(
-    "GOOGLE_CLIENT_SECRET"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"]
     )
 app.register_blueprint(blueprint, url_prefix="/login")
@@ -52,8 +51,10 @@ app.register_blueprint(blueprint, url_prefix="/login")
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
 nav = Navigation(app)
-login = LoginManager(app)
-login.login_view = 'login'
+login_manager= LoginManager()
+login_manager.init_app(app)
+#login = LoginManager(app)
+login_manager.login_view = 'login'
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
@@ -176,7 +177,7 @@ def home():
         return redirect(url_for("google.login"))
     existing=MongoBackend.get(blueprint)
     if existing is None:
-        MongoBackend.set(blueprint,google.get("access_token").json())
+        MongoBackend.set(blueprint,blueprint.token["access_token"])
     print(f"MongoBacken")
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
