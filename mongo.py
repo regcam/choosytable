@@ -15,7 +15,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
-from flask_login import current_user, login_user, logout_user, login_required, login_manager
+from flask_login import current_user, login_user, logout_user, login_required, LoginManager
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -51,10 +51,6 @@ app.register_blueprint(blueprint, url_prefix="/login")
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
 nav = Navigation(app)
-login_manager= LoginManager()
-login_manager.init_app(app)
-#login = LoginManager(app)
-login_manager.login_view = 'login'
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
@@ -101,7 +97,7 @@ class MyInterview(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class MongoBackend(BaseBackend):
+class MongoBackend(BaseStorage):
     def get(self, blueprint):
         try:
             user = ct.find_one({'_id': ObjectId(current_user.id), 'oauth.provider': 'google'})
@@ -115,13 +111,6 @@ class MongoBackend(BaseBackend):
     def delete(self, blueprint):
         ct.update_one({'_id': ObjectId(current_user.id), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
         return None
-
-@app.before_request
-def before_request():
-    if not google.authorized:
-        return redirect(url_for("google.login"))
-    else:
-        session['resp'] = google.get("/oauth2/v1/userinfo").json()
 
 
 def find_creatorreviews(y):
@@ -175,14 +164,19 @@ def show_single_page_or_not():
 def home():
     if not google.authorized:
         return redirect(url_for("google.login"))
-    existing=MongoBackend.get(blueprint)
-    if existing is None:
-        MongoBackend.set(blueprint,blueprint.token["access_token"])
-    print(f"MongoBacken")
+
+    resp = google.get("/oauth2/v1/userinfo")
+    assert resp.ok, resp.txt
+    email=resp.json()['email']
+    print(f"You are {email} on Google")    
+    #existing=MongoBackend.get(blueprint)
+    #if existing is None:
+    #    MongoBackend.set(blueprint,blueprint.token["access_token"])
+    #print(f"MongoBacken")
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
-    x = find_email(session['resp']['email'])
+    x = find_email(email)
 
     if x is not None:
         page, per_page, offset = get_page_args(
