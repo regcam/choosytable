@@ -15,7 +15,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
-from flask_login import current_user, login_user, logout_user, login_required, LoginManager
+from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -48,9 +48,31 @@ blueprint = make_google_blueprint(
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
+# setup login manager
+login_manager = LoginManager()
+login_manager.login_view = "google.login"
+login_manager.init_app(app)
+
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
 nav = Navigation(app)
+    
+
+class MongoBackend(BaseStorage):
+    def get(self, blueprint):
+        try:
+            user = ct.find_one({'_id': ObjectId(current_user.id), 'oauth.provider': 'google'})
+            return user['oauth']['token']
+        except:
+            return None
+
+    def set(self, blueprint, token):
+        ct.update_one({'_id': ObjectId(current_user.id)}, {'$set': {'oauth.token': token}})
+
+    def delete(self, blueprint):
+        ct.update_one({'_id': ObjectId(current_user.id), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
+        return None
+
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
@@ -58,6 +80,22 @@ nav.Bar('top', [
     nav.Item('People', 'person'),
     nav.Item('Logout', 'logout')
 ])
+
+def get_css_framework():
+    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
+
+
+def get_link_size():
+    return app.config.get("LINK_SIZE", "sm")
+
+
+def get_alignment():
+    return app.config.get("LINK_ALIGNMENT", "")
+
+
+def show_single_page_or_not():
+    return app.config.get("SHOW_SINGLE_PAGE", True)
+
 
 iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']
@@ -97,22 +135,6 @@ class MyInterview(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class MongoBackend(BaseStorage):
-    def get(self, blueprint):
-        try:
-            user = ct.find_one({'_id': ObjectId(current_user.id), 'oauth.provider': 'google'})
-            return user['oauth']['token']
-        except:
-            return None
-
-    def set(self, blueprint, token):
-        ct.update_one({'_id': ObjectId(current_user.id)}, {'$set': {'oauth.token': token}})
-
-    def delete(self, blueprint):
-        ct.update_one({'_id': ObjectId(current_user.id), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
-        return None
-
-
 def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
@@ -139,23 +161,6 @@ def get_pagination(**kwargs):
         show_single_page=show_single_page_or_not(),
         **kwargs
     )
-
-
-def get_css_framework():
-    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
-
-
-def get_link_size():
-    return app.config.get("LINK_SIZE", "sm")
-
-
-def get_alignment():
-    return app.config.get("LINK_ALIGNMENT", "")
-
-
-def show_single_page_or_not():
-    return app.config.get("SHOW_SINGLE_PAGE", True)
-
 
 @app.route("/")
 @app.route("/home")
@@ -513,9 +518,11 @@ def deletereview(id):
     return redirect(url_for('home'))
 
 
-@app.route('/logout')
+@app.route("/logout")
+@login_required
 def logout():
-    session.pop('session', None)
+    logout_user()
+    flash("You have logged out")
     return render_template('bye.html')
 
 
