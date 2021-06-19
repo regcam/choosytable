@@ -58,21 +58,35 @@ ct = mongo.db.choosytable
 nav = Navigation(app)
     
 
-class MongoBackend(BaseStorage):
-    def get(email):
-        try:
-            user = ct.find_one({'_id': ObjectId(email), 'oauth.provider': 'google'})
-            print(f"user with BaseStorage is {user}")
-            return user['oauth']['token']
-        except:
+class User(UserMixin):
+    def __init__(self, email):
+        self.email = email
+
+    @staticmethod
+    def is_authenticated():
+        return True
+
+    @staticmethod
+    def is_active():
+        return True
+
+    @staticmethod
+    def is_anonymous():
+        return False
+
+    def get_id(self):
+        return str(self.email)
+
+    @staticmethod
+    def check_password(password_hash, password):
+        return check_password_hash(password_hash, password)
+
+    @login_manager.user_loader
+    def load_user(email):
+        u = ct.find_one({'email': email})
+        if not u:
             return None
-
-    def set(email, token):
-        ct.update_one({'_id': ObjectId(email)}, {'$set': {'oauth.token': token}})
-
-    def delete(email):
-        ct.update_one({'_id': ObjectId(email), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
-        return None
+        return User(u)
 
 
 nav.Bar('top', [
@@ -163,9 +177,6 @@ def get_pagination(**kwargs):
         **kwargs
     )
 
-@login_manager.user_loader
-def load_user(email):
-	return MongoBackend.get(email)
 
 @app.route("/")
 @app.route("/home")
@@ -180,14 +191,13 @@ def home():
     email=resp.json()['email']
     print(f"You are {email} on Google")    
     try:
-        user=MongoBackend.get(email)
+        user=find_email(email)
         print(f"user is {user}")
     except:
-        user=MongoBackend.set(email,blueprint.token["access_token"])
+        user=ct.insert_one(blueprint)
         print(f"set user is {user}")
-        print(f"MongoBackend failed. user is {email}")
 
-    login_user(user)
+    login_user(User(user))
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
