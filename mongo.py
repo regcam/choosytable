@@ -59,18 +59,19 @@ nav = Navigation(app)
     
 
 class MongoBackend(BaseStorage):
-    def get(self, blueprint):
+    def get(email):
         try:
-            user = ct.find_one({'_id': ObjectId(current_user.id), 'oauth.provider': 'google'})
+            user = ct.find_one({'_id': ObjectId(email), 'oauth.provider': 'google'})
+            print(f"user with BaseStorage is {user}")
             return user['oauth']['token']
         except:
             return None
 
-    def set(self, blueprint, token):
-        ct.update_one({'_id': ObjectId(current_user.id)}, {'$set': {'oauth.token': token}})
+    def set(email, token):
+        ct.update_one({'_id': ObjectId(email)}, {'$set': {'oauth.token': token}})
 
-    def delete(self, blueprint):
-        ct.update_one({'_id': ObjectId(current_user.id), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
+    def delete(email):
+        ct.update_one({'_id': ObjectId(email), 'oauth': {'$set': {'token': ''}}})  # i know that didnt work
         return None
 
 
@@ -162,6 +163,10 @@ def get_pagination(**kwargs):
         **kwargs
     )
 
+@login_manager.user_loader
+def load_user(email):
+	return MongoBackend.get(email)
+
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
@@ -174,10 +179,15 @@ def home():
     assert resp.ok, resp.txt
     email=resp.json()['email']
     print(f"You are {email} on Google")    
-    #existing=MongoBackend.get(blueprint)
-    #if existing is None:
-    #    MongoBackend.set(blueprint,blueprint.token["access_token"])
-    #print(f"MongoBacken")
+    try:
+        user=MongoBackend.get(email)
+        print(f"user is {user}")
+    except:
+        user=MongoBackend.set(email,blueprint.token["access_token"])
+        print(f"set user is {user}")
+        print(f"MongoBackend failed. user is {email}")
+
+    login_user(user)
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
