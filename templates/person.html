@@ -34,7 +34,7 @@
         </table>
         {{ pagination.links }}
     {% endif %}
-
+    <br><br>
     <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
     {% if x['_id'] %}
         <form action="/person/{{x['_id']}}" method="post">
@@ -53,6 +53,7 @@
         <p>{{ form.age.label }}<br>{{ form.age }}</p>
         <p>{{ form.ethnicity.label }}<br>{{ form.ethnicity }}</p>
         <p>{{ form.location.label }}<br>{{ form.location }}</p>
+        <br>
         <p>{{ form.submit }}</p>
     </form>
 

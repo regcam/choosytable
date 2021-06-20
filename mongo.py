@@ -77,15 +77,11 @@ class User(UserMixin):
     def get_id(self):
         return str(self.email)
 
-    @staticmethod
-    def check_password(password_hash, password):
-        return check_password_hash(password_hash, password)
-
     @login_manager.user_loader
     def load_user(email):
         u = ct.find_one({'email': email})
         if not u:
-            return None
+            return False
         return User(u)
 
 
@@ -189,11 +185,14 @@ def home():
     resp = google.get("/oauth2/v1/userinfo")
     assert resp.ok, resp.txt
     email=resp.json()['email']
+    all=resp.json()
+    print(f"This is all of your Google data: {all}")
     print(f"You are {email} on Google")    
     try:
         user=find_email(email)
         print(f"user is {user}")
     except:
+        print(f"this is the blueprint: {blueprint}")
         user=ct.insert_one(blueprint)
         print(f"set user is {user}")
 
@@ -250,7 +249,7 @@ def home():
             record_name='Your latest reviews')
         return render_template(
             'person.html',
-            x=session['resp']['email'],
+            x=resp.json()['email'],
             pagination=pagination,
             e=e, form=form)
 
@@ -287,7 +286,8 @@ def company():
 @app.route('/company', methods=['POST', 'PUT'])
 def company_post():
     form = MyCompany()
-    user = find_email(session['resp']['email'])
+    resp = google.get("/oauth2/v1/userinfo")
+    user = find_email(resp.json()['email'])
     if form.validate_on_submit():
         try:
             ct.insert(
@@ -378,7 +378,8 @@ def single_company(company_id):
 def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
-    user = find_email(session['resp']['email'])
+    resp = google.get("/oauth2/v1/userinfo")
+    user = find_email(resp.json()['email'])
     if form.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
@@ -493,12 +494,13 @@ def person():
 @app.route('/person', methods=['POST', 'PUT'])
 def person_post():
     form = MyPerson()
+    resp = google.get("/oauth2/v1/userinfo")
     if form.validate_on_submit():
         x=ct.insert_one(
             {'created': datetime.now(),
             '_id': ObjectId(), 
             'name': request.form.get('name'), 
-            'email': request.form.get('email'), 
+            'email': resp.json()['email'],
             'ethnicity': request.form.get('ethnicity'),
             'gender': request.form.get('gender'),
             'location': request.form.get('location'),
@@ -510,7 +512,8 @@ def person_post():
 
 @app.route('/forgetme/<user>')
 def forgetme(user):
-    if find_email(session['resp']['email']):
+    resp = google.get("/oauth2/v1/userinfo")
+    if find_email(resp.json()['email'],):
         ct.update(
             {'reviews.user': user}, 
             {'$pull': {'reviews': {'user': user}}}
@@ -522,19 +525,21 @@ def forgetme(user):
         ct.remove(
             {'_id': ObjectId(user)} 
         )
-        client.delete_multi([str(user['_id'])+"_reviews"],session['resp']['email'])
+        resp = google.get("/oauth2/v1/userinfo")
+        client.delete_multi([str(user['_id'])+"_reviews"],resp.json()['email'],)
     return redirect(url_for('home'))
 
 
 @app.route('/deletereview/<id>')
 def deletereview(id):
-    user = find_email(session['resp']['email'])
+    resp = google.get("/oauth2/v1/userinfo")
+    user = find_email(resp.json()['email'])
     if user and ct.find_one({'reviews.user': str(user['_id'])}):
         ct.update(
             {'reviews._id': id}, 
             {'$pull': {'reviews': {'_id': id}}}
         )
-        client.delete_multi([str(user['_id'])+"_reviews", session['resp']['email']])
+        client.delete_multi([str(user['_id'])+"_reviews", resp.json()['email']])
     return redirect(url_for('home'))
 
 
