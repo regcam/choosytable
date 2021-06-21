@@ -191,16 +191,18 @@ def home():
     try:
         user=find_email(email)
         print(f"user is {user}")
+        raise ValueError("User not found")
     except:
         print(f"this is the blueprint: {blueprint}")
-        user=ct.insert_one(blueprint)
+        user=ct.insert(resp.json())
+        ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified'}})
         print(f"set user is {user}")
 
     login_user(User(user))
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
-    x = find_email(email)
+    x = user
 
     if x is not None:
         page, per_page, offset = get_page_args(
