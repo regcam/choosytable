@@ -191,11 +191,13 @@ def home():
     try:
         user=find_email(email)
         print(f"user is {user}")
-        raise ValueError("User not found")
+        if user is None:
+            raise ValueError("User not found")
     except:
         print(f"this is the blueprint: {blueprint}")
         user=ct.insert(resp.json())
         ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified'}})
+        user=find_email(email)
         print(f"set user is {user}")
 
     login_user(User(user))
