@@ -196,7 +196,7 @@ def home():
     except:
         print(f"this is the blueprint: {blueprint}")
         user=ct.insert(resp.json())
-        ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified'}})
+        #ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified','age':'18-24'}})
         user=find_email(email)
         print(f"set user is {user}")
 
@@ -217,10 +217,10 @@ def home():
         if per_page:
             r_results= r_results[offset:(per_page + offset if per_page is not None else None)]
 
-        form.gender.default = x['gender']
-        form.age.default = x['age']
-        form.ethnicity.default = x['ethnicity']
-        form.location.default = x['location']
+        form.gender.default = x.get('gender') or 'Unspecified'
+        form.age.default = x.get('age') or '18-24'
+        form.ethnicity.default = x.get('ethnicity') or 'Unspecified'
+        form.location.default = x.get('location') or 'GA'
         form.process()
         
         pagination = get_pagination(
@@ -457,9 +457,9 @@ def singleupdate_person(person_id):
                 '$set': {
                     'name': request.form.get('name'),
                     'gender': request.form.get('gender'),
-                    'age': request.form.get('age'),
-                    'ethnicity': request.form.get('ethnicity'),
-                    'location': request.form.get('location'),
+                    'age': request.form.get('age') or '18-24',
+                    'ethnicity': request.form.get('ethnicity') or 'Unknown',
+                    'location': request.form.get('location') or 'GA',
                     "last_modified": datetime.now()}
             }
         )
