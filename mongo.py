@@ -201,6 +201,8 @@ def home():
         print(f"set user is {user}")
 
     login_user(User(user))
+    print("Inserting current.user into database")
+    print(current_user)
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
