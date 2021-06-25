@@ -17,6 +17,24 @@ import pandas as pd
 from pymemcache.client.base import Client
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
+class MongoStorage(BaseStorage):
+    def __init__(self, user_id):
+        super(MongoStorage, self).__init__()
+        self.user_id = user_id
+
+    def get(self, blueprint):
+        if not os.path.exists(self.user_id):
+            return None
+        with open(self.user_id) as f:
+            return json.load(f)
+
+    def set(self, blueprint, token):
+        with open(self.user_id, "w") as f:
+            json.dump(token, f)
+
+    def delete(self, blueprint):
+        os.remove(self.user_id)
+
 class JsonSerde(object):
     def serialize(self, key, value):
         if isinstance(value, str):
@@ -44,7 +62,9 @@ app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
 blueprint = make_google_blueprint(
     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
-    scope=["profile", "email"]
+    scope=["profile", "email"],
+    offline=True,
+    reprompt_consent=True,
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
@@ -182,9 +202,7 @@ def home():
     if not google.authorized:
         return redirect(url_for("google.login"))
 
-    resp = google.get("/oauth2/v1/userinfo")
-    auth = google.get("/oauth2/v1/token")
-    print(f"this is auth: {auth}")
+    resp = google.get("/oauth2/v2/userinfo")
     assert resp.ok, resp.txt
     email=resp.json()['email']
     all=resp.json()
@@ -197,7 +215,7 @@ def home():
             raise ValueError("User not found")
     except:
         print(f"this is the blueprint: {blueprint}")
-        user=ct.insert(user)
+        user=ct.insert(resp.json())
         #ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified','age':'18-24'}})
         user=find_email(email)
         print(f"set user is {user}")
