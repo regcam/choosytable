@@ -183,6 +183,8 @@ def home():
         return redirect(url_for("google.login"))
 
     resp = google.get("/oauth2/v1/userinfo")
+    auth = google.get("/oauth2/v1/token")
+    print(f"this is auth: {auth}")
     assert resp.ok, resp.txt
     email=resp.json()['email']
     all=resp.json()
@@ -195,12 +197,12 @@ def home():
             raise ValueError("User not found")
     except:
         print(f"this is the blueprint: {blueprint}")
-        user=ct.insert(resp.json())
+        user=ct.insert(user)
         #ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified','age':'18-24'}})
         user=find_email(email)
         print(f"set user is {user}")
 
-    login_user(User(user))
+    login_user(User(email))
     print("Inserting current.user into database")
     print(current_user)
     form = MyPerson()
