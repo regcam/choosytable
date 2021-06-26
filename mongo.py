@@ -18,22 +18,25 @@ from pymemcache.client.base import Client
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
-    def __init__(self, user_id):
+    def __init__(self, email):
         super(MongoStorage, self).__init__()
-        self.user_id = user_id
+        self.email = email
 
     def get(self, blueprint):
-        if not os.path.exists(self.user_id):
+        u = ct.find_one({'email': self.email})
+        if u is None:
             return None
-        with open(self.user_id) as f:
-            return json.load(f)
+        else:
+            return u
 
     def set(self, blueprint, token):
-        with open(self.user_id, "w") as f:
-            json.dump(token, f)
+        ct.update_one({'email': self.email},{'$set': {'token': token}})
 
     def delete(self, blueprint):
-        os.remove(self.user_id)
+        ct.update(
+            {'email': self.email}, 
+            {'$pull': {'email': self.email}}
+        )
 
 class JsonSerde(object):
     def serialize(self, key, value):
