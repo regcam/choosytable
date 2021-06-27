@@ -2,7 +2,7 @@ pandas==1.2.4
 Flask_WTF==0.14.3
 Flask_Login==0.4.1
 pymongo==3.11.2
-Flask_Dance==3.3.0
+Flask_Dance==5.0.0
 Flask_Navigation==0.2.0
 WTForms==2.3.3
 Flask_PyMongo==2.3.0

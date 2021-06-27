@@ -67,7 +67,7 @@ blueprint = make_google_blueprint(
     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"],
     offline=True,
-    reprompt_consent=True,
+    reprompt_consent=True
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
@@ -79,7 +79,7 @@ login_manager.init_app(app)
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
 nav = Navigation(app)
-    
+
 
 class User(UserMixin):
     def __init__(self, email):
@@ -208,12 +208,14 @@ def home():
     resp = google.get("/oauth2/v2/userinfo")
     assert resp.ok, resp.txt
     email=resp.json()['email']
-    all=resp.json()
-    print(f"This is all of your Google data: {all}")
-    print(f"You are {email} on Google")    
+    blueprint.storage = MongoStorage(email)
+    print(f"is the google client access_token loaded: {google.authorized}")
+    token=app.blueprints["google"].token["access_token"]
+    print(f"token is {token}")
+    MongoStorage.set(MongoStorage(email),blueprint,token)
+    all=resp.json()   
     try:
         user=find_email(email)
-        print(f"user is {user}")
         if user is None:
             raise ValueError("User not found")
     except:
@@ -221,7 +223,6 @@ def home():
         user=ct.insert(resp.json())
         #ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified','age':'18-24'}})
         user=find_email(email)
-        print(f"set user is {user}")
 
     login_user(User(email))
     print("Inserting current.user into database")
