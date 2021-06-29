@@ -209,9 +209,7 @@ def home():
     assert resp.ok, resp.txt
     email=resp.json()['email']
     blueprint.storage = MongoStorage(email)
-    print(f"is the google client access_token loaded: {google.authorized}")
-    token=app.blueprints["google"].token["access_token"]
-    print(f"token is {token}")
+    token=google.token
     MongoStorage.set(MongoStorage(email),blueprint,token)
     all=resp.json()   
     try:
@@ -219,14 +217,10 @@ def home():
         if user is None:
             raise ValueError("User not found")
     except:
-        print(f"this is the blueprint: {blueprint}")
         user=ct.insert(resp.json())
-        #ct.update_one({'_id': ObjectId(user)},{'$set': {'gender': 'Unspecified','age':'18-24'}})
         user=find_email(email)
 
     login_user(User(email))
-    print("Inserting current.user into database")
-    print(current_user)
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
