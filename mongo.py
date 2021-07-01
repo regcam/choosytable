@@ -18,25 +18,22 @@ from pymemcache.client.base import Client
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
-    def __init__(self, email):
-        super(MongoStorage, self).__init__()
-        self.email = email
-
     def get(self, blueprint):
-        u = ct.find_one({'email': self.email})
-        if u is None:
+        u = ct.find_one({'email': current_user.email})
+        try:
+            return u['token']
+        except:
             return None
-        else:
-            return u
 
     def set(self, blueprint, token):
-        ct.update_one({'email': self.email},{'$set': {'token': token}})
+        ct.update_one({'email': current_user.email},{'$set': {'token': token}})
 
     def delete(self, blueprint):
         ct.update(
-            {'email': self.email}, 
-            {'$pull': {'email': self.email}}
+            {'email': current_user.email}, 
+            {'$pull': {'email': current_user.email}}
         )
+        return None
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -67,7 +64,8 @@ blueprint = make_google_blueprint(
     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"],
     offline=True,
-    reprompt_consent=True
+    reprompt_consent=True,
+    storage=MongoStorage()
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
@@ -208,9 +206,9 @@ def home():
     resp = google.get("/oauth2/v2/userinfo")
     assert resp.ok, resp.txt
     email=resp.json()['email']
-    blueprint.storage = MongoStorage(email)
+    #blueprint.storage = MongoStorage(email)
     token=google.token
-    MongoStorage.set(MongoStorage(email),blueprint,token)
+    #MongoStorage.set(MongoStorage(email),blueprint,token)
     all=resp.json()   
     try:
         user=find_email(email)
