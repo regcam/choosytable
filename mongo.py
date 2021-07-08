@@ -17,6 +17,27 @@ import pandas as pd
 from pymemcache.client.base import Client
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
+class MongoStorage(BaseStorage):
+    def __init__(self, email):
+        super(MongoStorage, self).__init__()
+        self.email = email
+
+    def get(self, blueprint):
+        u = ct.find_one({'email': self.email})
+        if u is None:
+            return None
+        else:
+            return u
+
+    def set(self, blueprint, token):
+        ct.update_one({'email': self.email},{'$set': {'token': token}})
+
+    def delete(self, blueprint):
+        ct.update(
+            {'email': self.email}, 
+            {'$pull': {'email': self.email}}
+        )
+
 class JsonSerde(object):
     def serialize(self, key, value):
         if isinstance(value, str):
@@ -57,30 +78,8 @@ login_manager.init_app(app)
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
-
-class MongoStorage(BaseStorage):
-    def get(self, blueprint):
-        try:
-            u = ct.find_one({'_id': ObjectId(current_user.id)})
-            return u['token']
-        except:
-            return None
-
-    def set(self, blueprint, token):
-        try:
-            return ct.update_one({'_id': ObjectId(current_user.id)},{'$set': {'token': token}})
-        except:
-            return ct.insert_one({'_id': ObjectId(current_user.id),'token': token})
-
-    def delete(self, blueprint):
-        ct.update(
-            {'_id': ObjectId(current_user.id)}, 
-            {'$pull': {'_id': ObjectId(current_user.id)}}
-        )
-        return None
-        
-blueprint.storage=MongoStorage()
 nav = Navigation(app)
+
 
 class User(UserMixin):
     def __init__(self, email):
@@ -107,6 +106,7 @@ class User(UserMixin):
         if not u:
             return False
         return User(u)
+
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
@@ -208,9 +208,8 @@ def home():
     resp = google.get("/oauth2/v2/userinfo")
     assert resp.ok, resp.txt
     email=resp.json()['email']
-    #blueprint.storage = MongoStorage(email)
+    blueprint.storage = MongoStorage(email)
     token=google.token
-    #MongoStorage.set(MongoStorage(email),blueprint,token)
     all=resp.json()   
     try:
         user=find_email(email)
@@ -218,6 +217,7 @@ def home():
             raise ValueError("User not found")
     except:
         user=ct.insert(resp.json())
+        MongoStorage.set(MongoStorage(email),blueprint,token)
         user=find_email(email)
 
     login_user(User(email))
