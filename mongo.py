@@ -60,14 +60,17 @@ ct = mongo.db.choosytable
 
 class MongoStorage(BaseStorage):
     def get(self, blueprint):
-        u = ct.find_one({'_id': ObjectId(current_user.id)})
         try:
+            u = ct.find_one({'_id': ObjectId(current_user.id)})
             return u['token']
         except:
             return None
 
     def set(self, blueprint, token):
-        ct.update_one({'_id': ObjectId(current_user.id)},{'$set': {'token': token}})
+        try:
+            return ct.update_one({'_id': ObjectId(current_user.id)},{'$set': {'token': token}})
+        except:
+            return ct.insert_one({'_id': ObjectId(current_user.id),'token': token})
 
     def delete(self, blueprint):
         ct.update(
