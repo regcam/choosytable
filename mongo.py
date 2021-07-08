@@ -17,24 +17,6 @@ import pandas as pd
 from pymemcache.client.base import Client
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
-class MongoStorage(BaseStorage):
-    def get(self, blueprint):
-        u = ct.find_one({'email': current_user.email})
-        try:
-            return u['token']
-        except:
-            return None
-
-    def set(self, blueprint, token):
-        ct.update_one({'email': current_user.email},{'$set': {'token': token}})
-
-    def delete(self, blueprint):
-        ct.update(
-            {'email': current_user.email}, 
-            {'$pull': {'email': current_user.email}}
-        )
-        return None
-
 class JsonSerde(object):
     def serialize(self, key, value):
         if isinstance(value, str):
@@ -64,8 +46,7 @@ blueprint = make_google_blueprint(
     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"],
     offline=True,
-    reprompt_consent=True,
-    storage=MongoStorage()
+    reprompt_consent=True
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
@@ -76,8 +57,27 @@ login_manager.init_app(app)
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
-nav = Navigation(app)
 
+class MongoStorage(BaseStorage):
+    def get(self, blueprint):
+        u = ct.find_one({'_id': ObjectId(current_user.id)})
+        try:
+            return u['token']
+        except:
+            return None
+
+    def set(self, blueprint, token):
+        ct.update_one({'_id': ObjectId(current_user.id)},{'$set': {'token': token}})
+
+    def delete(self, blueprint):
+        ct.update(
+            {'_id': ObjectId(current_user.id)}, 
+            {'$pull': {'_id': ObjectId(current_user.id)}}
+        )
+        return None
+        
+blueprint.storage=MongoStorage()
+nav = Navigation(app)
 
 class User(UserMixin):
     def __init__(self, email):
@@ -104,7 +104,6 @@ class User(UserMixin):
         if not u:
             return False
         return User(u)
-
 
 nav.Bar('top', [
     nav.Item('Home', 'person'),
