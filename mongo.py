@@ -288,6 +288,7 @@ def find_reviews():
 
 
 @app.route('/company', methods=['GET'])
+@login_required
 def company():
     form = MyCompany()
     page, per_page, offset = get_page_args(
@@ -308,6 +309,7 @@ def company():
 
 
 @app.route('/company', methods=['POST', 'PUT'])
+@login_required
 def company_post():
     form = MyCompany()
     resp = google.get("/oauth2/v1/userinfo")
@@ -367,6 +369,7 @@ def pd_interviews(p,singlecompany):
 
 
 @app.route('/company/<company_id>', methods=['GET'])
+@login_required
 def single_company(company_id):
     form = MyCompany()
     form1 = MyInterview()
@@ -399,6 +402,7 @@ def single_company(company_id):
 
 
 @app.route('/company/<company_id>', methods=['POST', 'PUT'])
+@login_required
 def single_companypost(company_id):
     form = MyCompany()
     form1 = MyInterview()
@@ -458,6 +462,7 @@ def single_companypost(company_id):
 
 
 @app.route('/person/<person_id>', methods=['GET'])
+@login_required
 def single_person(person_id):
     form = MyPerson()
     if request.method == 'GET':
@@ -468,6 +473,7 @@ def single_person(person_id):
 
 
 @app.route('/person/<person_id>', methods=['PUT', 'POST'])
+@login_required
 def singleupdate_person(person_id):
     form = MyPerson()
     if form.validate_on_submit():
@@ -511,11 +517,13 @@ def singleupdate_person(person_id):
 
 
 @app.route('/person', methods=['GET'])
+@login_required
 def person():
     return redirect(url_for('home'))
 
 
 @app.route('/person', methods=['POST', 'PUT'])
+@login_required
 def person_post():
     form = MyPerson()
     resp = google.get("/oauth2/v1/userinfo")
@@ -535,6 +543,7 @@ def person_post():
 
 
 @app.route('/forgetme/<user>')
+@login_required
 def forgetme(user):
     resp = google.get("/oauth2/v1/userinfo")
     if find_email(resp.json()['email'],):
@@ -555,6 +564,7 @@ def forgetme(user):
 
 
 @app.route('/deletereview/<id>')
+@login_required
 def deletereview(id):
     resp = google.get("/oauth2/v1/userinfo")
     user = find_email(resp.json()['email'])
