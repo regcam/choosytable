@@ -105,7 +105,7 @@ class User(UserMixin):
         u = ct.find_one({'email': email})
         if not u:
             return False
-        return User(u)
+        return User(u['email'])
 
 
 nav.Bar('top', [
