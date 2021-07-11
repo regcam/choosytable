@@ -10,6 +10,8 @@ from flask_navigation import Navigation
 from flask_wtf import FlaskForm
 from pandas.core.frame import DataFrame
 from pandas.core.groupby.generic import DataFrameGroupBy
+from pymongo import cursor
+import pymongo
 from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
@@ -284,7 +286,7 @@ def find_reviews():
     if querykey == None:
         querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
         client.set(z,querykey)
-    return querykey
+    return pymongo.cursor(querykey)
 
 
 @app.route('/company', methods=['GET'])
@@ -294,7 +296,9 @@ def company():
     page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
+    print(f"companies' type is: {type(companies)}")
     if per_page:
+        print(f"per_page is: {per_page}")
         companies.limit(per_page).skip(offset)
     pagination = get_pagination(
             p=page, 
