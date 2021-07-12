@@ -53,7 +53,7 @@ class JsonSerde(object):
            return json_util.loads(value.decode('utf-8'))
        raise Exception("Unknown serialization format")
 
-client = Client('localhost', serde=JsonSerde())
+client = Client('localhost')
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -286,7 +286,7 @@ def find_reviews():
     if querykey == None:
         querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
         client.set(z,querykey)
-    return pymongo.cursor(querykey)
+    return querykey
 
 
 @app.route('/company', methods=['GET'])
