@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, session, render_template, request, j
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util, objectid
 import ast
+import json
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -173,8 +174,10 @@ class MyInterview(FlaskForm):
 
 
 def find_creatorreviews(y):
-    y=y.decode("UTF-8")
-    y=ast.literal_eval(y)
+    y=y.decode("utf-8")
+    print(f"This is y: {type(y)}")
+    y=json.loads(json.dumps(y))
+    print(f"This is y: {type(y)}")
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
@@ -218,7 +221,6 @@ def home():
     all=resp.json()   
     try:
         user=find_email(email)
-        print(f"user is: {user}")
         if user is None:
             raise ValueError("User not found")
     except:
