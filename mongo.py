@@ -163,9 +163,8 @@ def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=list(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
+        querykey=dict(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
         client.set(key, querykey)
-    print(f"querykey is: {querykey}")
     return querykey
 
 
@@ -275,6 +274,7 @@ def find_reviews():
     if querykey == None:
         querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
         client.set(z,querykey)
+    print(f"querykey is: {type(querykey)}")
     return querykey
 
 
@@ -285,9 +285,7 @@ def company():
     page, per_page, offset = get_page_args(
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
-    print(f"companies' type is: {type(companies)}")
     if per_page:
-        print(f"per_page is: {per_page}")
         companies.limit(per_page).skip(offset)
     pagination = get_pagination(
             p=page, 
@@ -579,4 +577,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run()
