@@ -1,8 +1,6 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util, objectid
-import ast
-import json
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -19,6 +17,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import Client
+from pymemcache import serde
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
@@ -42,20 +41,7 @@ class MongoStorage(BaseStorage):
             {'$pull': {'email': self.email}}
         )
 
-class JsonSerde(object):
-    def serialize(self, key, value):
-        if isinstance(value, str):
-            return value.encode('utf-8'), 1
-        return json_util.dumps(value).encode('utf-8'), 2
-
-    def deserialize(self, key, value, flags):
-       if flags == 1:
-           return value.decode('utf-8')
-       if flags == 2:
-           return json_util.loads(value.decode('utf-8'))
-       raise Exception("Unknown serialization format")
-
-client = Client('localhost')
+client = Client('localhost', serde=serde.pickle_serde)
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -174,15 +160,12 @@ class MyInterview(FlaskForm):
 
 
 def find_creatorreviews(y):
-    y=y.decode("utf-8")
-    print(f"This is y: {type(y)}")
-    y=json.loads(json.dumps(y))
-    print(f"This is y: {type(y)}")
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
         querykey=list(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
         client.set(key, querykey)
+    print(f"querykey is: {querykey}")
     return querykey
 
 
