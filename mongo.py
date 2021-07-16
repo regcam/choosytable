@@ -1,8 +1,9 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
-from bson import json_util, objectid
+from bson.json_util import loads, dumps
 from datetime import datetime
 import os
+import json
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
@@ -273,7 +274,7 @@ def find_reviews():
     querykey=client.get(z)
     if querykey == None:
         querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
-        client.set(z,querykey)
+        client.set(z, querykey)
     print(f"querykey is: {type(querykey)}")
     return querykey
 
