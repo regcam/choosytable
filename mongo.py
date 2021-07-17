@@ -278,7 +278,7 @@ def find_reviews():
 
 
 @app.route('/company', methods=['GET'])
-#@login_required
+@login_required
 def company():
     form = MyCompany()
     page, per_page, offset = get_page_args(
@@ -300,7 +300,7 @@ def company():
 
 
 @app.route('/company', methods=['POST', 'PUT'])
-#@login_required
+@login_required
 def company_post():
     form = MyCompany()
     resp = google.get("/oauth2/v1/userinfo")
