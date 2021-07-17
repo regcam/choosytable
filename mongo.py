@@ -1,9 +1,8 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
-from bson.json_util import loads, dumps
+from bson.json_util import loads, dumps, bson
 from datetime import datetime
 import os
-import json
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
@@ -17,7 +16,7 @@ from wtforms import StringField, IntegerField, TextAreaField, RadioField, Submit
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
-from pymemcache.client.base import Client
+from pymemcache.client.base import Client, PooledClient
 from pymemcache import serde
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
@@ -42,7 +41,7 @@ class MongoStorage(BaseStorage):
             {'$pull': {'email': self.email}}
         )
 
-client = Client('localhost', serde=serde.pickle_serde)
+client = PooledClient('localhost')
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -164,7 +163,7 @@ def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=dict(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
+        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
         client.set(key, querykey)
     return querykey
 
@@ -275,7 +274,6 @@ def find_reviews():
     if querykey == None:
         querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
         client.set(z, querykey)
-    print(f"querykey is: {type(querykey)}")
     return querykey
 
 
@@ -288,6 +286,7 @@ def company():
     companies = find_reviews()
     if per_page:
         companies.limit(per_page).skip(offset)
+
     pagination = get_pagination(
             p=page, 
             pp=per_page, 
@@ -301,7 +300,7 @@ def company():
 
 
 @app.route('/company', methods=['POST', 'PUT'])
-@login_required
+#@login_required
 def company_post():
     form = MyCompany()
     resp = google.get("/oauth2/v1/userinfo")
