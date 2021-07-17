@@ -1,6 +1,5 @@
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
-from bson.json_util import loads, dumps, bson
 from datetime import datetime
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -8,16 +7,11 @@ from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
-from pandas.core.frame import DataFrame
-from pandas.core.groupby.generic import DataFrameGroupBy
-from pymongo import cursor
-import pymongo
-from wtforms import StringField, IntegerField, TextAreaField, RadioField, SubmitField, SelectField
+from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
-from pymemcache.client.base import Client, PooledClient
-from pymemcache import serde
+from pymemcache.client.base import PooledClient
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
