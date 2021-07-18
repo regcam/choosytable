@@ -180,6 +180,10 @@ def get_pagination(**kwargs):
         **kwargs
     )
 
+@app.before_first_request
+def init_app():
+    logout_user()
+
 
 @app.route("/")
 @app.route("/home")
@@ -203,8 +207,8 @@ def home():
         user=ct.insert(resp.json())
         MongoStorage.set(MongoStorage(email),blueprint,token)
         user=find_email(email)
-
-    login_user(User(email))
+    if not current_user:
+        login_user(User(email))
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
