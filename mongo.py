@@ -190,27 +190,28 @@ def init_app():
 @app.route("/index")
 @app.route("/welcome")
 def home():
-    print(f"before google.authorized: {google.authorized}")
-    if not google.authorized:
-        return redirect(url_for("google.login"))
-    print(f"after google.authorized: {google.authorized}")
-    resp = google.get("/oauth2/v2/userinfo")
-    assert resp.ok, resp.txt
-    email=resp.json()['email']
-    blueprint.storage = MongoStorage(email)
-    token=google.token
-    all=resp.json()   
-    try:
-        user=find_email(email)
-        if user is None:
-            raise ValueError("User not found")
-    except:
-        user=ct.insert(resp.json())
-        MongoStorage.set(MongoStorage(email),blueprint,token)
-        user=find_email(email)
-    print(f"before login_user: {current_user}")
-    login_user(User(email))
-    print(f"after login_user: {current_user}")
+    if current_user.is_authenticated:
+        print(f"before google.authorized: {google.authorized}")
+        if not google.authorized:
+            return redirect(url_for("google.login"))
+        print(f"after google.authorized: {google.authorized}")
+        resp = google.get("/oauth2/v2/userinfo")
+        assert resp.ok, resp.txt
+        email=resp.json()['email']
+        blueprint.storage = MongoStorage(email)
+        token=google.token
+        all=resp.json()   
+        try:
+            user=find_email(email)
+            if user is None:
+                raise ValueError("User not found")
+        except:
+            user=ct.insert(resp.json())
+            MongoStorage.set(MongoStorage(email),blueprint,token)
+            user=find_email(email)
+        print(f"before login_user: {current_user}")
+        login_user(User(email))
+        print(f"after login_user: {current_user}")
     form = MyPerson()
     e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
     r_results=[]
