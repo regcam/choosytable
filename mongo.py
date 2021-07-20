@@ -203,8 +203,8 @@ def home():
         user=ct.insert(resp.json())
         MongoStorage.set(MongoStorage(email),blueprint,token)
         user=find_email(email)
-
-    login_user(User(email))
+    if current_user.is_authenticated == False:
+        login_user(User(email))
     form = MyPerson()
 
     r_results=[]
