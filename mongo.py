@@ -114,7 +114,7 @@ def get_alignment():
 def show_single_page_or_not():
     return app.config.get("SHOW_SINGLE_PAGE", True)
 
-
+e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
 iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']
 igl = ['Female','Male','Transgender','Agender','Unspecified']
@@ -180,40 +180,33 @@ def get_pagination(**kwargs):
         **kwargs
     )
 
-@app.before_first_request
-def init_app():
-    logout_user()
-
 
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
 @app.route("/welcome")
 def home():
-    if current_user.is_authenticated:
-        print(f"before google.authorized: {google.authorized}")
-        if not google.authorized:
-            return redirect(url_for("google.login"))
-        print(f"after google.authorized: {google.authorized}")
-        resp = google.get("/oauth2/v2/userinfo")
-        assert resp.ok, resp.txt
-        email=resp.json()['email']
-        blueprint.storage = MongoStorage(email)
-        token=google.token
-        all=resp.json()   
-        try:
-            user=find_email(email)
-            if user is None:
-                raise ValueError("User not found")
-        except:
-            user=ct.insert(resp.json())
-            MongoStorage.set(MongoStorage(email),blueprint,token)
-            user=find_email(email)
-        print(f"before login_user: {current_user}")
-        login_user(User(email))
-        print(f"after login_user: {current_user}")
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+
+    resp = google.get("/oauth2/v2/userinfo")
+    assert resp.ok, resp.txt
+    email=resp.json()['email']
+    blueprint.storage = MongoStorage(email)
+    token=google.token
+   
+    try:
+        user=MongoStorage.get(MongoStorage(email),blueprint)
+        if user is None:
+            raise ValueError("User not found")
+    except:
+        user=ct.insert(resp.json())
+        MongoStorage.set(MongoStorage(email),blueprint,token)
+        user=find_email(email)
+
+    login_user(User(email))
     form = MyPerson()
-    e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
+
     r_results=[]
     x = user
 
