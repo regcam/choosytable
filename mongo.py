@@ -1,3 +1,4 @@
+from json import dumps
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from datetime import datetime
@@ -154,10 +155,10 @@ class MyInterview(FlaskForm):
 
 
 def find_creatorreviews(y):
-    key=str(y['_id'])+"_reviews"
+    key=str(y[0])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        querykey=ct.find({'reviews.user': str(y[0])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
         client.set(key, querykey)
     return querykey
 
@@ -197,12 +198,14 @@ def google_logged_in(blueprint, token):
     # Find this OAuth token in the database, or create it
     try:
         oauth = find_email(info['email'])
+        print(f"oauth is: {type(oauth)}")
+        print(f"oauth['email'] is: {oauth['email']}")
     except:
         #oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
         flash("User not found")
 
-    if oauth.email:
-        login_user(oauth.email)
+    if oauth['email']:
+        login_user(User(oauth['email']))
         flash("Successfully signed in.")
     else:
         # Create a new local user account for this user
@@ -230,7 +233,8 @@ def home():
     form = MyPerson()
 
     r_results=[]
-    x = google.email
+    x = find_email(blueprint.session.get("/oauth2/v1/userinfo").json()['email'])
+    x=x.decode("utf-8")
 
     if x is not None:
         page, per_page, offset = get_page_args(
