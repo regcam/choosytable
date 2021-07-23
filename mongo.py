@@ -2,6 +2,8 @@ from json import dumps
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from datetime import datetime
+import json
+import ast
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
@@ -59,7 +61,7 @@ app.register_blueprint(blueprint, url_prefix="/login")
 # setup login manager
 login_manager = LoginManager()
 login_manager.login_view = "google.login"
-login_manager.init_app(app)
+
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
@@ -85,12 +87,12 @@ class User(UserMixin):
     def get_id(self):
         return str(self.email)
 
-    @login_manager.user_loader
-    def load_user(email):
-        u = ct.find_one({'email': email})
-        if not u:
-            return False
-        return User(u['email'])
+@login_manager.user_loader
+def load_user(email):
+    u = ct.find_one({'email': email})
+    if not u:
+        return False
+    return User(u['email'])
 
 
 nav.Bar('top', [
@@ -168,7 +170,12 @@ def find_email(z):
     if querykey == None:
         querykey=ct.find_one({'email': z})
         client.set(z,querykey)
-    return querykey
+        return querykey
+    else:
+        print(f"querykey decoded is: {type(querykey.decode('utf-8'))} {querykey.decode('utf-8')}")
+        dict_str=ast.literal_eval(json.dumps(querykey.decode('utf-8')))
+        print(f"querykey is: {type(dict_str)} {dict_str}")
+        return dict_str
 
 
 def get_pagination(**kwargs):
@@ -221,6 +228,8 @@ def google_logged_in(blueprint, token):
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
 
+login_manager.init_app(app)
+
 @app.route("/")
 @app.route("/home")
 @app.route("/index")
@@ -233,8 +242,11 @@ def home():
     form = MyPerson()
 
     r_results=[]
-    x = find_email(blueprint.session.get("/oauth2/v1/userinfo").json()['email'])
-    x=x.decode("utf-8")
+    y=blueprint.session.get("/oauth2/v1/userinfo").json()['email']
+    print(f"y is: {y} and {type(y)}")
+    x = find_email(y)
+    #x=list(x.decode("utf-8"))
+    print(f"x is type: {type(x)}")
 
     if x is not None:
         page, per_page, offset = get_page_args(
