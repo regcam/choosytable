@@ -2,8 +2,6 @@ from json import dumps
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from datetime import datetime
-import json
-import ast
 import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
@@ -15,6 +13,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import PooledClient
+from pymemcache import serde
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
@@ -38,7 +37,7 @@ class MongoStorage(BaseStorage):
             {'$pull': {'email': self.email}}
         )
 
-client = PooledClient('localhost')
+client = PooledClient('localhost', serde=serde.pickle_serde)
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -157,10 +156,10 @@ class MyInterview(FlaskForm):
 
 
 def find_creatorreviews(y):
-    key=str(y[0])+"_reviews"
+    key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=ct.find({'reviews.user': str(y[0])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
         client.set(key, querykey)
     return querykey
 
@@ -170,12 +169,8 @@ def find_email(z):
     if querykey == None:
         querykey=ct.find_one({'email': z})
         client.set(z,querykey)
-        return querykey
-    else:
-        print(f"querykey decoded is: {type(querykey.decode('utf-8'))} {querykey.decode('utf-8')}")
-        dict_str=ast.literal_eval(json.dumps(querykey.decode('utf-8')))
-        print(f"querykey is: {type(dict_str)} {dict_str}")
-        return dict_str
+    return querykey
+
 
 
 def get_pagination(**kwargs):
