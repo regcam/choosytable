@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, session, render_template, request, j
 from flask_pymongo import PyMongo, ObjectId
 from datetime import datetime
 import os
+import json
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
@@ -37,7 +38,20 @@ class MongoStorage(BaseStorage):
             {'$pull': {'email': self.email}}
         )
 
-client = PooledClient('localhost', serde=serde.pickle_serde)
+class JsonSerde(object):
+    def serialize(self, key, value):
+        if isinstance(value, str):
+            return value, 1
+        return json.dumps(value), 2
+
+    def deserialize(self, key, value, flags):
+       if flags == 1:
+           return value
+       if flags == 2:
+           return json.loads(value)
+       raise Exception("Unknown serialization format")
+
+client = PooledClient('localhost', serde=JsonSerde())
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -206,8 +220,8 @@ def google_logged_in(blueprint, token):
         #oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
         flash("User not found")
 
-    if oauth['email']:
-        login_user(User(oauth['email']))
+    if info['email']:
+        login_user(User(info['email']))
         flash("Successfully signed in.")
     else:
         # Create a new local user account for this user
