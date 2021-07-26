@@ -1,6 +1,7 @@
 from json import dumps
 from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
+from bson import json_util
 from datetime import datetime
 import os
 import json
@@ -42,13 +43,13 @@ class JsonSerde(object):
     def serialize(self, key, value):
         if isinstance(value, str):
             return value, 1
-        return json.dumps(value), 2
+        return json_util.dumps(value), 2
 
     def deserialize(self, key, value, flags):
        if flags == 1:
            return value
        if flags == 2:
-           return json.loads(value)
+           return json_util.loads(value)
        raise Exception("Unknown serialization format")
 
 client = PooledClient('localhost', serde=JsonSerde())
@@ -326,14 +327,16 @@ def company():
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
     if per_page:
-        companies.limit(per_page).skip(offset)
+        #companies.limit(per_page).skip(offset)
+        print(f"companies is: {type(companies)} and is size: {len(companies)}")
+        companies[offset:per_page+offset]
 
     pagination = get_pagination(
             p=page, 
             pp=per_page, 
             format_total=True, 
             format_number= True, 
-            total=companies.count(),
+            total=len(companies),
             page_parameter="p",
             per_page_parameter="pp",
             record_name='companies')
