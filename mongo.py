@@ -1,21 +1,19 @@
-from json import dumps
-from flask import Flask, redirect, url_for, session, render_template, request, jsonify, flash
+from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
 import os
-import json
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
+from pymongo.cursor import CursorType
 from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import PooledClient
-from pymemcache import serde
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 
 class MongoStorage(BaseStorage):
@@ -174,7 +172,7 @@ def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
     querykey=client.get(key)
     if querykey == None:
-        querykey=ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1)
+        querykey=list(ct.find({'reviews.user': str(y['_id'])},{'reviews':1,'_id':1,'company':1}).sort('last_modified',-1))
         client.set(key, querykey)
     return querykey
 
@@ -185,7 +183,6 @@ def find_email(z):
         querykey=ct.find_one({'email': z})
         client.set(z,querykey)
     return querykey
-
 
 
 def get_pagination(**kwargs):
@@ -215,14 +212,12 @@ def google_logged_in(blueprint, token):
     # Find this OAuth token in the database, or create it
     try:
         oauth = find_email(info['email'])
-        print(f"oauth is: {type(oauth)}")
-        print(f"oauth['email'] is: {oauth['email']}")
     except:
         #oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
         flash("User not found")
 
-    if info['email']:
-        login_user(User(info['email']))
+    if oauth['email']:
+        login_user(User(oauth['email']))
         flash("Successfully signed in.")
     else:
         # Create a new local user account for this user
@@ -253,10 +248,7 @@ def home():
 
     r_results=[]
     y=blueprint.session.get("/oauth2/v1/userinfo").json()['email']
-    print(f"y is: {y} and {type(y)}")
     x = find_email(y)
-    #x=list(x.decode("utf-8"))
-    print(f"x is type: {type(x)}")
 
     if x is not None:
         page, per_page, offset = get_page_args(
@@ -314,7 +306,7 @@ def find_reviews():
     z="find_reviews"
     querykey=client.get(z)
     if querykey == None:
-        querykey=ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1)
+        querykey=list(ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1))
         client.set(z, querykey)
     return querykey
 
@@ -327,8 +319,6 @@ def company():
         page_parameter="p", per_page_parameter="pp", pp=10)
     companies = find_reviews()
     if per_page:
-        #companies.limit(per_page).skip(offset)
-        print(f"companies is: {type(companies)} and is size: {len(companies)}")
         companies[offset:per_page+offset]
 
     pagination = get_pagination(
