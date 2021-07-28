@@ -236,8 +236,11 @@ def google_logged_in(blueprint, token):
 login_manager.init_app(app)
 
 @app.route("/")
-@app.route("/home")
 @app.route("/index")
+def not_logged_in():
+    return render_template('index.html')
+
+@app.route("/home")
 @app.route("/welcome")
 def home():
     if not google.authorized:
