@@ -218,7 +218,6 @@ def google_logged_in(blueprint, token):
 
     if oauth['email']:
         login_user(User(oauth['email']))
-        flash("Successfully signed in.")
     else:
         # Create a new local user account for this user
         user = User(email=info["email"])
@@ -228,7 +227,6 @@ def google_logged_in(blueprint, token):
         ct.insert(oauth)
         # Log in the new local user account
         login_user(oauth.email)
-        flash("Successfully signed in.")
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
@@ -238,7 +236,10 @@ login_manager.init_app(app)
 @app.route("/")
 @app.route("/index")
 def not_logged_in():
-    return render_template('index.html')
+    if google.authorized:
+        return redirect(url_for("home"))
+    else:
+        return render_template('index.html')
 
 @app.route("/home")
 @app.route("/welcome")
