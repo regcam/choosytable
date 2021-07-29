@@ -575,7 +575,7 @@ def person_post():
 @login_required
 def forgetme(user):
     resp = google.get("/oauth2/v1/userinfo")
-    if find_email(resp.json()['email'],):
+    if find_email(resp.json()['email']):
         ct.update(
             {'reviews.user': user}, 
             {'$pull': {'reviews': {'user': user}}}
@@ -588,7 +588,7 @@ def forgetme(user):
             {'_id': ObjectId(user)} 
         )
         resp = google.get("/oauth2/v1/userinfo")
-        client.delete_multi([str(user['_id'])+"_reviews"],resp.json()['email'],)
+        client.delete_multi([str(user)+"_reviews"],resp.json()['email'])
     return redirect(url_for('home'))
 
 
