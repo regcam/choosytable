@@ -587,7 +587,6 @@ def forgetme(user):
         ct.remove(
             {'_id': ObjectId(user)} 
         )
-        resp = google.get("/oauth2/v1/userinfo")
         client.delete_multi([str(user)+"_reviews"],resp.json()['email'])
     return redirect(url_for('home'))
 
