@@ -214,9 +214,10 @@ def google_logged_in(blueprint, token):
         oauth = find_email(info['email'])
     except:
         #oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
+        oauth = info
         flash("User not found")
 
-    if oauth['email']:
+    if oauth is not None:
         login_user(User(oauth['email']))
     else:
         # Create a new local user account for this user
