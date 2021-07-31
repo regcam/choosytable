@@ -213,21 +213,12 @@ def google_logged_in(blueprint, token):
     try:
         oauth = find_email(info['email'])
     except:
-        #oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
-        oauth = info
-        flash("User not found")
-
-    if oauth is not None:
-        login_user(User(oauth['email']))
+        print("User not found")
     else:
-        # Create a new local user account for this user
-        user = User(email=info["email"])
-        # Associate the new local user account with the OAuth token
-        oauth.user = user
-        # Save and commit our database models
+        oauth = info | token
         ct.insert(oauth)
-        # Log in the new local user account
-        login_user(oauth.email)
+
+    login_user(User(oauth['email']))
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
