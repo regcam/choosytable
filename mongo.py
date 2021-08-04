@@ -8,7 +8,6 @@ from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
-from pymongo.cursor import CursorType
 from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
