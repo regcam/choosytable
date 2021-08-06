@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
 from flask_pymongo import PyMongo, ObjectId
+from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 import os
 
 app = Flask(__name__)
@@ -11,3 +12,7 @@ app.secret_key = os.urandom(24).hex()
 app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
 app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
     "GOOGLE_CLIENT_SECRET")
+
+# setup login manager
+login_manager = LoginManager()
+login_manager.login_view = "google.login"
