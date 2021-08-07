@@ -16,3 +16,4 @@ app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
 # setup login manager
 login_manager = LoginManager()
 login_manager.login_view = "google.login"
+
