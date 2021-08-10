@@ -28,5 +28,8 @@ blueprint = make_google_blueprint(
     )
 app.register_blueprint(blueprint, url_prefix="/login")
 
+mongo = PyMongo(app)
+ct = mongo.db.choosytable
+
 from app.main import bp as main_blueprint
 app.register_blueprint(main_blueprint)
