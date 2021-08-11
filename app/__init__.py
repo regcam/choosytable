@@ -33,3 +33,18 @@ ct = mongo.db.choosytable
 
 from app.main import bp as main_blueprint
 app.register_blueprint(main_blueprint)
+
+def get_css_framework():
+    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
+
+
+def get_link_size():
+    return app.config.get("LINK_SIZE", "sm")
+
+
+def get_alignment():
+    return app.config.get("LINK_ALIGNMENT", "")
+
+
+def show_single_page_or_not():
+    return app.config.get("SHOW_SINGLE_PAGE", True)
