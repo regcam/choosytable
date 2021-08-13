@@ -5,6 +5,9 @@ import os
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from pymemcache.client.base import PooledClient
+from bson import json_util
+from flask_paginate import Pagination, get_page_args
+from flask_navigation import Navigation
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
@@ -31,6 +34,14 @@ app.register_blueprint(blueprint, url_prefix="/login")
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable
+nav = Navigation(app)
+
+nav.Bar('top', [
+    nav.Item('Home', 'person'),
+    nav.Item('Companies', 'company'),
+    nav.Item('People', 'person'),
+    nav.Item('Logout', 'logout')
+])
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -44,7 +55,7 @@ class JsonSerde(object):
        if flags == 2:
            return json_util.loads(value)
        raise Exception("Unknown serialization format")
-       
+
 client = PooledClient('localhost', serde=JsonSerde())
 
 from app.main import bp as main_blueprint

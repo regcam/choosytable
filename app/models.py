@@ -26,18 +26,7 @@ class MongoStorage(BaseStorage):
             {'$pull': {'email': self.email}}
         )
 
-class JsonSerde(object):
-    def serialize(self, key, value):
-        if isinstance(value, str):
-            return value, 1
-        return json_util.dumps(value), 2
 
-    def deserialize(self, key, value, flags):
-       if flags == 1:
-           return value
-       if flags == 2:
-           return json_util.loads(value)
-       raise Exception("Unknown serialization format")
 
 class User(UserMixin):
     def __init__(self, email):
