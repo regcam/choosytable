@@ -102,3 +102,68 @@ def get_pagination(**kwargs):
         show_single_page=show_single_page_or_not(),
         **kwargs
     )
+
+
+def google_logged_in(blueprint, token):
+    if not token:
+        flash("Failed to log in.", category="error")
+        return False
+
+    resp = blueprint.session.get("/oauth2/v1/userinfo")
+    if not resp.ok:
+        msg = "Failed to fetch user info."
+        flash(msg, category="error")
+        return False
+
+    info = resp.json()
+
+    # Find this OAuth token in the database, or create it
+    try:
+        oauth = find_email(info['email'])
+    except:
+        print("User not found")
+    else:
+        oauth = info | token
+        ct.insert(oauth)
+
+    login_user(User(oauth['email']))
+
+    # Disable Flask-Dance's default behavior for saving the OAuth token
+    return False
+
+
+def find_reviews():
+    z="find_reviews"
+    querykey=client.get(z)
+    if querykey == None:
+        querykey=list(ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1))
+        client.set(z, querykey)
+    return querykey
+
+
+def findone_company(c):
+    querykey=client.get(c)
+    if querykey == None:
+        querykey=ct.find_one({'_id': ObjectId(c)})
+        client.set(c,querykey)
+    return querykey
+
+def pd_interviews(p,singlecompany):
+    querykey=client.get(str(singlecompany['_id'])+"_pd_interviews")
+    if querykey == None:
+        winDict=[]
+        wintype={}
+        for j in p:
+            if j[0] in singlecompany:
+                df=pd.DataFrame(singlecompany[j[0]])
+                grouped=df.groupby('user_ethnicity')
+
+                for key,value in grouped:
+                    for i in ['y','n','o']:
+                        wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
+
+                    winDict.append([j[1],key,wintype.copy()])
+                    wintype.clear()
+        querykey=winDict
+        client.set(str(singlecompany['_id'])+"_pd_interviews",querykey)
+    return querykey
