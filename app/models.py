@@ -9,6 +9,8 @@ from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectF
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 
+from app import ct, nav, login_manager
+
 e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
 iel = ['White','Asian','Latino','Black','Afro-Latino',
 'African','Indigenous People','Pacific Islander', 'Unspecified']

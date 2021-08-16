@@ -1,3 +1,11 @@
+from app import ct, blueprint
+from app.main import app
+from app.models import User, MongoStorage, MyPerson, MyCompany, MyInterview
+from flask import flash, redirect, url_for, render_template
+from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
+from flask_dance.contrib.google import make_google_blueprint, google
+from flask_dance.consumer.storage import BaseStorage
+
 @app.route("/")
 @app.route("/index")
 def not_logged_in():

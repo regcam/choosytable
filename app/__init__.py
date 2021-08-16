@@ -167,3 +167,5 @@ def pd_interviews(p,singlecompany):
         querykey=winDict
         client.set(str(singlecompany['_id'])+"_pd_interviews",querykey)
     return querykey
+
+from app import models
