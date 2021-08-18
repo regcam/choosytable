@@ -61,30 +61,4 @@ client = PooledClient('localhost', serde=JsonSerde())
 from app.main import bp as main_blueprint
 app.register_blueprint(main_blueprint)
 
-def get_css_framework():
-    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
-
-
-def get_link_size():
-    return app.config.get("LINK_SIZE", "sm")
-
-
-def get_alignment():
-    return app.config.get("LINK_ALIGNMENT", "")
-
-
-def show_single_page_or_not():
-    return app.config.get("SHOW_SINGLE_PAGE", True)
-
-    
-def get_pagination(**kwargs):
-    kwargs.setdefault("record_name", "records")
-    return Pagination(
-        css_framework=get_css_framework(),
-        link_size=get_link_size(),
-        alignment=get_alignment(),
-        show_single_page=show_single_page_or_not(),
-        **kwargs
-    )
-
 from app import models
