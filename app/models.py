@@ -1,6 +1,6 @@
 from flask_dance.consumer.storage import BaseStorage
 from flask_login import UserMixin
-from app import ct, nav, login_manager, e, iel, igl, p, age, location
+from app.__init__ import ct, nav, login_manager, e, iel, igl, p, age, location
 from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime

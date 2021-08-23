@@ -58,7 +58,7 @@ class JsonSerde(object):
 
 client = PooledClient('localhost', serde=JsonSerde())
 
-from app.main import bp as main_blueprint
+from app.main import app as main_blueprint
 app.register_blueprint(main_blueprint)
 
 from app import models
