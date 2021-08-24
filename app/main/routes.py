@@ -1,5 +1,7 @@
-from app.main import app
-from app.__init__ import ct, blueprint, client, Pagination, get_page_args, pd, ObjectId, e, request, datetime, jsonify
+#from app.main import bp
+from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, e, request, jsonify
+import pandas as pd
+from datetime import datetime
 from app.models import User, MongoStorage, MyPerson, MyCompany, MyInterview
 from flask import flash, redirect, url_for, render_template
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin

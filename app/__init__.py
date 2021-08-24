@@ -9,6 +9,22 @@ from bson import json_util
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 
+e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
+iel = ['White','Asian','Latino','Black','Afro-Latino',
+'African','Indigenous People','Pacific Islander', 'Unspecified']
+igl = ['Female','Male','Transgender','Agender','Unspecified']
+p = [('software_engineer','Software Engineer'),('staff_engineer','Staff Engineer'),('lead_engineering','Lead Engineer'),
+('architect','Architect'),('software_engineer_mngr','Software Engineer Manager'),('technical_mngr','Technical Manager'),('technical_drtr','Technical Director'),
+('vp','VP'),('cto','CTO'),('network_engineer','Network Engineer'),('principal_architect','Principal Architect'),('qa_engineer','QA Engineer'),('sre','SRE'),('sdet','SDET'),
+('project_mngr','Project Manager'),('program_mngr','Program Manager'),('devops_engineer','DevOps Engineer'),('systems_admin','Systems Admin'),
+('dba','DBA'),('operations_engineer','Operations Engineer')]
+age = ['18-24','25-34','35-44','45-54','55-64','65-74','75+']
+location = ['AK','AL','AR','AS','AZ','CA''CO','CT','DC','DE',
+'FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA',
+'MD','ME','MI','MN','MO','MP','MS','MT','NC','ND','NE','NH','NJ',
+'NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD','TN',
+'TX','UT','VA','VI','VT','WA','WI','WV','WY']
+
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
@@ -58,7 +74,7 @@ class JsonSerde(object):
 
 client = PooledClient('localhost', serde=JsonSerde())
 
-from app.main import app as main_blueprint
+from app.main import bp as main_blueprint
 app.register_blueprint(main_blueprint)
 
 from app import models
