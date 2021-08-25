@@ -114,19 +114,19 @@ nav.Bar('top', [
 ])
 
 def get_css_framework():
-    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
+    return bp.config.get("CSS_FRAMEWORK", "bootstrap4")
 
 
 def get_link_size():
-    return app.config.get("LINK_SIZE", "sm")
+    return bp.config.get("LINK_SIZE", "sm")
 
 
 def get_alignment():
-    return app.config.get("LINK_ALIGNMENT", "")
+    return bp.config.get("LINK_ALIGNMENT", "")
 
 
 def show_single_page_or_not():
-    return app.config.get("SHOW_SINGLE_PAGE", True)
+    return bp.config.get("SHOW_SINGLE_PAGE", True)
 
 e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
 iel = ['White','Asian','Latino','Black','Afro-Latino',
@@ -223,16 +223,16 @@ def google_logged_in(blueprint, token):
 
 login_manager.init_app(app)
 
-@app.route("/")
-@app.route("/index")
+@app.config("/")
+@app.config("/index")
 def not_logged_in():
     if google.authorized:
         return redirect(url_for("home"))
     else:
         return render_template('index.html')
 
-@app.route("/home")
-@app.route("/welcome")
+@app.config("/home")
+@app.config("/welcome")
 def home():
     if not google.authorized:
         return redirect(url_for("google.login"))
@@ -305,7 +305,7 @@ def find_reviews():
     return querykey
 
 
-@app.route('/company', methods=['GET'])
+@app.config('/company', methods=['GET'])
 @login_required
 def company():
     form = MyCompany()
@@ -327,7 +327,7 @@ def company():
     return render_template('company.html', companies=companies, pagination=pagination,form=form)
 
 
-@app.route('/company', methods=['POST', 'PUT'])
+@app.config('/company', methods=['POST', 'PUT'])
 @login_required
 def company_post():
     form = MyCompany()
@@ -387,7 +387,7 @@ def pd_interviews(p,singlecompany):
     return querykey
 
 
-@app.route('/company/<company_id>', methods=['GET'])
+@app.config('/company/<company_id>', methods=['GET'])
 @login_required
 def single_company(company_id):
     form = MyCompany()
@@ -420,7 +420,7 @@ def single_company(company_id):
     winDict=winDict,sc_results=sc_results,rating_avg=rating_avg)
 
 
-@app.route('/company/<company_id>', methods=['POST', 'PUT'])
+@app.config('/company/<company_id>', methods=['POST', 'PUT'])
 @login_required
 def single_companypost(company_id):
     form = MyCompany()
@@ -480,7 +480,7 @@ def single_companypost(company_id):
     return redirect(request.url)
 
 
-@app.route('/person/<person_id>', methods=['GET'])
+@app.config('/person/<person_id>', methods=['GET'])
 @login_required
 def single_person(person_id):
     form = MyPerson()
@@ -491,7 +491,7 @@ def single_person(person_id):
             return jsonify({'error': 'person not found'})
 
 
-@app.route('/person/<person_id>', methods=['PUT', 'POST'])
+@app.config('/person/<person_id>', methods=['PUT', 'POST'])
 @login_required
 def singleupdate_person(person_id):
     form = MyPerson()
@@ -535,13 +535,13 @@ def singleupdate_person(person_id):
         return jsonify({'error': "The form was not valid"})
 
 
-@app.route('/person', methods=['GET'])
+@app.config('/person', methods=['GET'])
 @login_required
 def person():
     return redirect(url_for('home'))
 
 
-@app.route('/person', methods=['POST', 'PUT'])
+@app.config('/person', methods=['POST', 'PUT'])
 @login_required
 def person_post():
     form = MyPerson()
@@ -561,7 +561,7 @@ def person_post():
         return jsonify({'error': "Form wasn't valid"})
 
 
-@app.route('/forgetme/<user>')
+@app.config('/forgetme/<user>')
 @login_required
 def forgetme(user):
     resp = google.get("/oauth2/v1/userinfo").json()
@@ -581,7 +581,7 @@ def forgetme(user):
     return redirect(url_for('home'))
 
 
-@app.route('/deletereview/<id>')
+@app.config('/deletereview/<id>')
 @login_required
 def deletereview(id):
     resp = google.get("/oauth2/v1/userinfo").json()
@@ -595,7 +595,7 @@ def deletereview(id):
     return redirect(url_for('home'))
 
 
-@app.route("/logout")
+@app.config("/logout")
 @login_required
 def logout():
     logout_user()
