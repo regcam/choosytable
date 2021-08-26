@@ -114,19 +114,19 @@ nav.Bar('top', [
 ])
 
 def get_css_framework():
-    return bp.config.get("CSS_FRAMEWORK", "bootstrap4")
+    return app.config.get("CSS_FRAMEWORK", "bootstrap4")
 
 
 def get_link_size():
-    return bp.config.get("LINK_SIZE", "sm")
+    return app.config.get("LINK_SIZE", "sm")
 
 
 def get_alignment():
-    return bp.config.get("LINK_ALIGNMENT", "")
+    return app.config.get("LINK_ALIGNMENT", "")
 
 
 def show_single_page_or_not():
-    return bp.config.get("SHOW_SINGLE_PAGE", True)
+    return app.config.get("SHOW_SINGLE_PAGE", True)
 
 e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
 iel = ['White','Asian','Latino','Black','Afro-Latino',

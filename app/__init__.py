@@ -53,10 +53,10 @@ ct = mongo.db.choosytable
 nav = Navigation(app)
 
 nav.Bar('top', [
-    nav.Item('Home', 'person'),
-    nav.Item('Companies', 'company'),
-    nav.Item('People', 'person'),
-    nav.Item('Logout', 'logout')
+    nav.Item('Home', 'main.person'),
+    nav.Item('Companies', 'main.company'),
+    nav.Item('People', 'main.person'),
+    nav.Item('Logout', 'main.logout')
 ])
 
 class JsonSerde(object):
@@ -77,4 +77,4 @@ client = PooledClient('localhost', serde=JsonSerde())
 from app.main import bp as main_blueprint
 app.register_blueprint(main_blueprint)
 
-from app import models
+from . import models
