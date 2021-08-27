@@ -119,7 +119,7 @@ def get_pagination(**kwargs):
 @bp.route("/index")
 def not_logged_in():
     if google.authorized:
-        return redirect(url_for("home"))
+        return redirect(url_for("main.home"))
     else:
         return render_template('index.html')
 
@@ -378,7 +378,7 @@ def single_person(person_id):
     form = MyPerson()
     if request.method == 'GET':
         try:
-            return redirect(url_for('home'))
+            return redirect(url_for('main.home'))
         except:
             return jsonify({'error': 'person not found'})
 
@@ -422,7 +422,7 @@ def singleupdate_person(person_id):
         )
         x=ct.find_one({'_id': ObjectId(person_id)})
         client.delete(x['email'])
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     else:
         return jsonify({'error': "The form was not valid"})
 
@@ -448,7 +448,7 @@ def person_post():
             'gender': request.form.get('gender'),
             'location': request.form.get('location'),
             'age': request.form.get('age')})
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     else:
         return jsonify({'error': "Form wasn't valid"})
 
@@ -470,7 +470,7 @@ def forgetme(user):
             {'_id': ObjectId(user)} 
         )
         client.delete_multi([str(user)+"_reviews"],resp['email'])
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
 @bp.route('/deletereview/<id>')
@@ -484,7 +484,7 @@ def deletereview(id):
             {'$pull': {'reviews': {'_id': id}}}
         )
         client.delete_multi([str(user['_id'])+"_reviews", resp['email']])
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
 @bp.route("/logout")
