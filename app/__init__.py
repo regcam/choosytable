@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
+from flask import Flask, redirect, url_for, render_template, request, jsonify, flash, current_app
 from flask_pymongo import PyMongo, ObjectId
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 import os
@@ -25,6 +25,7 @@ location = ['AK','AL','AR','AS','AZ','CA''CO','CT','DC','DE',
 'NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD','TN',
 'TX','UT','VA','VI','VT','WA','WI','WV','WY']
 
+
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 'choosytable'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
@@ -35,10 +36,6 @@ app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
 app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
     "GOOGLE_CLIENT_SECRET")
 
-# setup login manager
-login_manager = LoginManager()
-login_manager.login_view = "google.login"
-
 blueprint = make_google_blueprint(
     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
     client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
@@ -47,6 +44,10 @@ blueprint = make_google_blueprint(
     reprompt_consent=True
     )
 app.register_blueprint(blueprint, url_prefix="/login")
+
+# setup login manager
+login_manager = LoginManager(app)
+login_manager.login_view = "google.login"
 
 mongo = PyMongo(app)
 ct = mongo.db.choosytable

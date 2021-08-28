@@ -50,12 +50,7 @@ class User(UserMixin):
     def get_id(self):
         return str(self.email)
 
-@login_manager.user_loader
-def load_user(email):
-    u = ct.find_one({'email': email})
-    if not u:
-        return False
-    return User(u['email'])
+
 
 class MyPerson(FlaskForm):
     name = StringField('Your Name', validators=[DataRequired()])

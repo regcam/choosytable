@@ -1,10 +1,11 @@
+from flask.globals import current_app
 from app.main import bp
-from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, e, request, jsonify
+from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, \
+    e, request, jsonify, current_user, login_user, logout_user, login_required, login_manager
 import pandas as pd
 from datetime import datetime
 from app.models import User, MongoStorage, MyPerson, MyCompany, MyInterview
 from flask import flash, redirect, url_for, render_template
-from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 
@@ -24,6 +25,12 @@ def find_email(z):
         client.set(z,querykey)
     return querykey
 
+@login_manager.user_loader
+def load_user(email):
+    u = ct.find_one({'email': email})
+    if not u:
+        return False
+    return User(u['email'])
 
 def google_logged_in(blueprint, token):
     if not token:
@@ -46,7 +53,7 @@ def google_logged_in(blueprint, token):
     else:
         oauth = info | token
         ct.insert(oauth)
-
+    print(login_user(User(oauth['email'])))
     login_user(User(oauth['email']))
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
@@ -90,19 +97,19 @@ def pd_interviews(p,singlecompany):
     return querykey
 
 def get_css_framework():
-    return bp.config.get("CSS_FRAMEWORK", "bootstrap4")
+    return current_app.config.get("CSS_FRAMEWORK", "bootstrap4")
 
 
 def get_link_size():
-    return bp.config.get("LINK_SIZE", "sm")
+    return current_app.config.get("LINK_SIZE", "sm")
 
 
 def get_alignment():
-    return bp.config.get("LINK_ALIGNMENT", "")
+    return current_app.config.get("LINK_ALIGNMENT", "")
 
 
 def show_single_page_or_not():
-    return bp.config.get("SHOW_SINGLE_PAGE", True)
+    return current_app.config.get("SHOW_SINGLE_PAGE", True)
 
     
 def get_pagination(**kwargs):
