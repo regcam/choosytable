@@ -1,14 +1,16 @@
 # Choosy Table
 
 ## Purpose:
-Choosy Table is a place for People of Color to share and analyze their corporate experiences with each other before and after the interview phase.  The purpose is to give PoC concrete statistical analysis of landing an offer and having a fruitful career at a given company.  Before we lend our talents to any company we should know how they treat us.  
+Choosy Table is where People of Color share and analyze their corporate & interviews experiences.  This app provides the statistical chances a PoC receives an offer for a particular role.  Before we lend our talents to any company, we should know how they treat us.  
 
 ## Tech Stack:
-Backend/Frontend - Python3
+Backend/Frontend - Flask (Python3)
 
 Persistent Storage - MongoDB 
 
 WSGI Server - Gunicorn
+
+Caching - Memcached
 
 ## Requirements:
 * [Homebrew](https://docs.brew.sh/Installation)
@@ -43,7 +45,7 @@ WSGI Server - Gunicorn
     * OAUTHLIB_RELAX_TOKEN_SCOPE - Accounts for Google changing the requested OAuth scopes on you
 
 2. Then start the app locally:
-`gunicorn --bind 127.0.0.1:5000 mongo:app`
+`gunicorn -w 1 --bind 127.0.0.1:8080 app:app`
 
 ## TODO
 *Data Structure*
