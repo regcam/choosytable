@@ -1,6 +1,6 @@
 from flask.globals import current_app
 from app.main import bp
-from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, \
+from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, iel, p, igl, \
     e, request, jsonify, current_user, login_user, logout_user, login_required, login_manager
 import pandas as pd
 from datetime import datetime
@@ -53,7 +53,7 @@ def google_logged_in(blueprint, token):
     else:
         oauth = info | token
         ct.insert(oauth)
-    print(login_user(User(oauth['email'])))
+
     login_user(User(oauth['email']))
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
@@ -437,7 +437,7 @@ def singleupdate_person(person_id):
 @bp.route('/person', methods=['GET'])
 @login_required
 def person():
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
 @bp.route('/person', methods=['POST', 'PUT'])
