@@ -251,7 +251,7 @@ def company_post():
             client.delete("find_reviews")
             return redirect(request.url)
         except Exception as e:
-            return jsonify({'error': str(e)})
+            return render_template('error.html', error=str(e))
     else:
         flash('All fields are required.')
         return redirect(request.url)
@@ -375,7 +375,7 @@ def single_companypost(company_id):
         )
         client.delete_multi([company_id, company_id+"_pd_interviews"])
     else:
-        return jsonify({'error': "Something went wrong.  Make sure you complete your profile!"})
+        return render_template('error.html', error="Something went wrong.  Make sure you complete your profile!")
     return redirect(request.url)
 
 
@@ -387,7 +387,7 @@ def single_person(person_id):
         try:
             return redirect(url_for('main.home'))
         except:
-            return jsonify({'error': 'person not found'})
+            return render_template('error.html', error="person not found")
 
 
 @bp.route('/person/<person_id>', methods=['PUT', 'POST'])
@@ -431,7 +431,7 @@ def singleupdate_person(person_id):
         client.delete(x['email'])
         return redirect(url_for('main.home'))
     else:
-        return jsonify({'error': "The form was not valid"})
+        return render_template('error.html', error="The form was not valid")
 
 
 @bp.route('/person', methods=['GET'])
@@ -457,7 +457,7 @@ def person_post():
             'age': request.form.get('age')})
         return redirect(url_for('main.home'))
     else:
-        return jsonify({'error': "Form wasn't valid"})
+        return render_template('error.html', error="Form wasn't valid")
 
 
 @bp.route('/forgetme/<user>')
