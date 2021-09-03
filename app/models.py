@@ -51,7 +51,6 @@ class User(UserMixin):
         return str(self.email)
 
 
-
 class MyPerson(FlaskForm):
     name = StringField('Your Name', validators=[DataRequired()])
     email = EmailField('Your Email', validators=[DataRequired()])

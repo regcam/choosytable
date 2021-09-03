@@ -40,10 +40,4 @@ def google_logged_in(blueprint, token):
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
 
-# notify on OAuth provider error
-@oauth_error.connect_via(blueprint)
-def google_error(blueprint, message, response):
-    msg = ("OAuth error from {name}! " "message={message} response={response}").format(
-        name=blueprint.name, message=message, response=response
-    )
-    flash(msg, category="error")
+#

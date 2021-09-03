@@ -8,6 +8,7 @@ from app.models import User, MongoStorage, MyPerson, MyCompany, MyInterview
 from flask import flash, redirect, url_for, render_template
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
+from flask_dance.consumer import oauth_authorized, oauth_error
 
 def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
@@ -59,6 +60,13 @@ def google_logged_in(blueprint, token):
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
 
+#notify on OAuth provider error
+@oauth_error.connect_via(blueprint)
+def google_error(blueprint, message, response):
+    msg = ("OAuth error from {name}! " "message={message} response={response}").format(
+        name=blueprint.name, message=message, response=response
+    )
+    flash(msg, category="error")
 
 def find_reviews():
     z="find_reviews"
