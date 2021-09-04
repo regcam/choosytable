@@ -49,11 +49,13 @@ def google_logged_in(blueprint, token):
     # Find this OAuth token in the database, or create it
     try:
         oauth = find_email(info['email'])
+        print("this worked!")
     except:
-        print("User not found")
-    else:
+        print("this is the else statement")
         oauth = info | token
         ct.insert(oauth)
+
+
 
     login_user(User(oauth['email']))
 
