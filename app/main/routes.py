@@ -54,10 +54,7 @@ def google_logged_in(blueprint, token):
         print("this is the else statement")
         oauth = info | token
         ct.insert(oauth)
-
-
-
-    login_user(User(oauth['email']))
+        login_user(User(oauth['email']))
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
