@@ -139,11 +139,12 @@ def not_logged_in():
 
 @bp.route("/home")
 @bp.route("/welcome")
+@login_required
 def home():
-    if not google.authorized:
-        return redirect(url_for("google.login"))
+    #if not google.authorized:
+    #    return redirect(url_for("google.login"))
 
-    google_logged_in(blueprint, google.token)
+    #google_logged_in(blueprint, google.token)
     form = MyPerson()
 
     r_results=[]
