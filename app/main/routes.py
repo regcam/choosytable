@@ -47,14 +47,13 @@ def google_logged_in(blueprint, token):
     info = resp.json()
 
     # Find this OAuth token in the database, or create it
-    try:
-        oauth = find_email(info['email'])
-        print("this worked!")
-    except:
-        print("this is the else statement")
+    oauth = find_email(info['email'])
+
+    if oauth is None:
         oauth = info | token
         ct.insert(oauth)
-        login_user(User(oauth['email']))
+
+    login_user(User(oauth['email']))
 
     # Disable Flask-Dance's default behavior for saving the OAuth token
     return False
@@ -133,6 +132,7 @@ def get_pagination(**kwargs):
 @bp.route("/index")
 def not_logged_in():
     if google.authorized:
+        google_logged_in(blueprint, google.token)
         return redirect(url_for("main.home"))
     else:
         return render_template('index.html')
@@ -144,7 +144,7 @@ def home():
     #if not google.authorized:
     #    return redirect(url_for("google.login"))
 
-    #google_logged_in(blueprint, google.token)
+
     form = MyPerson()
 
     r_results=[]
