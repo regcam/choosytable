@@ -143,8 +143,6 @@ def not_logged_in():
 def home():
     #if not google.authorized:
     #    return redirect(url_for("google.login"))
-
-
     form = MyPerson()
 
     r_results=[]
@@ -256,7 +254,8 @@ def company_post():
                     ]
                 }
             )
-            client.delete("find_reviews")
+            querykey=list(ct.find({'reviews': {"$exists": True}}).sort('last_modified',-1))
+            client.replace("find_reviews",querykey)
             return redirect(request.url)
         except Exception as e:
             return render_template('error.html', error=str(e))
