@@ -355,10 +355,14 @@ def single_companypost(company_id):
             upsert=True
         )
 
-        ct.update_one({'_id': ObjectId(company_id)},{'$set': 
+        updatedcompany=ct.find_one_and_update({'_id': ObjectId(company_id)},{'$set': 
         {'last_modified': datetime.now()}})
+        
+        userreviews=str(user['_id'])+"_reviews"
+        r = find_creatorreviews(userreviews)
 
-        client.delete_multi([str(user['_id'])+"_reviews",company_id])
+        client.replace(userreviews,r)
+        client.replace(company_id,updatedcompany)
     elif form1.validate_on_submit() and user:
         ct.update_one(
             {'_id': ObjectId(company_id)},
