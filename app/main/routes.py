@@ -359,7 +359,7 @@ def single_companypost(company_id):
         {'last_modified': datetime.now()}})
         
         userreviews=str(user['_id'])+"_reviews"
-        r = find_creatorreviews(userreviews)
+        r = find_creatorreviews(user)
 
         client.replace(userreviews,r)
         client.replace(company_id,updatedcompany)
