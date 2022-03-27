@@ -273,27 +273,6 @@ def findone_company(c):
     return querykey
 
 
-def pd_interviews(p,singlecompany):
-    querykey=client.get(str(singlecompany['_id'])+"_pd_interviews")
-    if querykey == None:
-        winDict=[]
-        wintype={}
-        for j in p:
-            if j[0] in singlecompany:
-                df=pd.DataFrame(singlecompany[j[0]])
-                grouped=df.groupby('user_ethnicity')
-
-                for key,value in grouped:
-                    for i in ['y','n','o']:
-                        wintype[i]=int(((value['win']==i).sum()/len(grouped.apply(lambda x: x[x['user_ethnicity']==key]).index))*100)
-
-                    winDict.append([j[1],key,wintype.copy()])
-                    wintype.clear()
-        querykey=winDict
-        client.set(str(singlecompany['_id'])+"_pd_interviews",querykey)
-    return querykey
-
-
 @bp.route('/company/<company_id>', methods=['GET'])
 @login_required
 def single_company(company_id):
@@ -365,7 +344,7 @@ def single_companypost(company_id):
         client.replace(userreviews,r)
         client.replace(company_id,updatedcompany)
     elif form1.validate_on_submit() and user:
-        ct.update_one(
+        updatedcompany=ct.find_one_and_update(
             {'_id': ObjectId(company_id)},
             {
                 '$push':
@@ -383,9 +362,13 @@ def single_companypost(company_id):
                 },
                 '$set': {'last_modified': datetime.now()}
             },
-            upsert=True
+            upsert=True,return_document=ReturnDocument.AFTER
         )
-        client.delete_multi([company_id, company_id+"_pd_interviews"])
+
+        winDict=pd_interviews(p,updatedcompany)
+
+        client.replace(company_id,updatedcompany)
+        client.replace(company_id+"_pd_interviews",winDict)
     else:
         return render_template('error.html', error="Something went wrong.  Make sure you complete your profile!")
     return redirect(request.url)
