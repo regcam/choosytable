@@ -390,7 +390,7 @@ def single_person(person_id):
 def singleupdate_person(person_id):
     form = MyPerson()
     if form.validate_on_submit():
-        ct.update_one(
+        updateduser=ct.find_one_and_update(
             {'_id': ObjectId(person_id)},
             {
                 '$set': {
@@ -400,7 +400,7 @@ def singleupdate_person(person_id):
                     'ethnicity': request.form.get('ethnicity') or 'Unknown',
                     'location': request.form.get('location') or 'GA',
                     "last_modified": datetime.now()}
-            }
+            }, return_document=ReturnDocument.AFTER
         )
         ct.update_one(
             {'interviews.user': person_id},
@@ -422,8 +422,8 @@ def singleupdate_person(person_id):
                 }
             }
         )
-        x=ct.find_one({'_id': ObjectId(person_id)})
-        client.delete(x['email'])
+
+        client.replace(updateduser['email'], updateduser)
         return redirect(url_for('main.home'))
     else:
         return render_template('error.html', error="The form was not valid")
