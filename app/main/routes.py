@@ -9,6 +9,7 @@ from flask import flash, redirect, url_for, render_template
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_dance.consumer import oauth_authorized, oauth_error
+from pymongo import ReturnDocument
 
 def find_creatorreviews(y):
     key=str(y['_id'])+"_reviews"
@@ -356,7 +357,7 @@ def single_companypost(company_id):
         )
 
         updatedcompany=ct.find_one_and_update({'_id': ObjectId(company_id)},{'$set': 
-        {'last_modified': datetime.now()}})
+        {'last_modified': datetime.now()}},return_document=ReturnDocument.AFTER)
         
         userreviews=str(user['_id'])+"_reviews"
         r = find_creatorreviews(user)
