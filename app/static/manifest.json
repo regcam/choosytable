@@ -1,0 +1,34 @@
+{
+  "css": {
+    "core": {
+      "files": [
+        "bootstrap/css/bootstrap.min.css",
+        "css/fontawesome.css",
+        "css/templatemo-space-dynamic.css",
+        "css/animated.css",
+        "css/owl.css",
+        "styles/main.css"
+      ],
+      "bundle": "core.9b07503e.css",
+      "hash": "9b07503e9c3e1754b96196a108ce7c77",
+      "size_kb": 335.42
+    }
+  },
+  "js": {
+    "core": {
+      "files": [
+        "jquery/jquery.min.js",
+        "bootstrap/js/bootstrap.bundle.min.js",
+        "js/animation.js",
+        "js/imagesloaded.js",
+        "js/isotope.js",
+        "js/owl-carousel.js",
+        "js/tabs.js",
+        "js/templatemo-custom.js"
+      ],
+      "bundle": "core.1677edff.js",
+      "hash": "1677edff7c827823ea13f9807e081817",
+      "size_kb": 785.77
+    }
+  }
+}
