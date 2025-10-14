@@ -2,6 +2,10 @@ from flask import Flask, redirect, url_for, render_template, request, jsonify, f
 from flask_pymongo import PyMongo, ObjectId
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from pymemcache.client.base import PooledClient
@@ -51,6 +55,19 @@ nav = None
 blueprint = None
 login_manager = None
 client = None
+
+class JsonSerde(object):
+    def serialize(self, key, value):
+        if isinstance(value, str):
+            return value, 1
+        return json_util.dumps(value), 2
+
+    def deserialize(self, key, value, flags):
+       if flags == 1:
+           return value
+       if flags == 2:
+           return json_util.loads(value)
+       raise Exception("Unknown serialization format")
 
 def init_app_components(app):
     """Initialize app components after app creation"""

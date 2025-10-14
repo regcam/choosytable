@@ -4,8 +4,7 @@ from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField
-from wtforms.fields.html5 import EmailField
+from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField, EmailField
 from wtforms.validators import DataRequired
 from .constants import (
     ETHNICITY_OPTIONS,

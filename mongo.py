@@ -3,13 +3,16 @@ from flask_pymongo import PyMongo, ObjectId
 from bson import json_util
 from datetime import datetime
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.consumer.storage import BaseStorage
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField
-from wtforms.fields.html5 import EmailField
+from wtforms import StringField, TextAreaField, RadioField, SubmitField, SelectField, EmailField
 from wtforms.validators import DataRequired
 import pandas as pd
 from pymemcache.client.base import PooledClient
