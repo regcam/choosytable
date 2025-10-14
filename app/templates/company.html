@@ -1,46 +1,529 @@
 {% extends 'base.html' %}
 
-{% block title %}All Companies{% endblock %}
+{% block title %}Company Reviews{% endblock %}
 
 {% block content %}
-    <br>
-    <br>
-    {{ pagination.info }}
-    {{ pagination.links }}
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Company</th>
-                <th>Reviews</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for company in companies %}
-            <tr>
-                <td>{{ loop.index + pagination.skip }}</td>
-                <td><a href="company/{{company._id}}">{{ company.company }}</a></td>
-                <td>{{ company.reviews }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {{ pagination.links }}
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="page-icon">🏢</span>
+        Company Reviews & Insights
+    </h1>
+    <p class="page-description">
+        Discover authentic workplace experiences from People of Color at various companies. 
+        Make informed career decisions based on real data and community insights.
+    </p>
+</div>
 
+<div class="companies-section">
+    <div class="section-header">
+        <h2 class="section-title">All Companies</h2>
+        <div class="section-meta">
+            <span class="companies-count">{{ companies|length }} companies reviewed</span>
+        </div>
+    </div>
+    
+    <!-- Pagination Info -->
+    <div class="pagination-nav">
+        <div class="pagination-page-info">
+            {{ pagination.info }}
+        </div>
+        {{ pagination.links }}
+    </div>
+    
+    <!-- Companies Table -->
+    <div class="table-container">
+        <table class="styled-table modern-table">
+            <thead>
+                <tr>
+                    <th class="col-index">#</th>
+                    <th class="col-company">Company</th>
+                    <th class="col-reviews">Total Reviews</th>
+                    <th class="col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr class="table-row" data-company-id="{{company._id}}">
+                    <td class="col-index">
+                        <span class="row-number">{{ loop.index + pagination.skip }}</span>
+                    </td>
+                    <td class="col-company">
+                        <div class="company-info">
+                            <a href="company/{{company._id}}" class="company-link">
+                                <span class="company-name">{{ company.company }}</span>
+                            </a>
+                        </div>
+                    </td>
+                    <td class="col-reviews">
+                        <span class="review-count">{{ company.reviews }}</span>
+                        <span class="review-label">reviews</span>
+                    </td>
+                    <td class="col-actions">
+                        <div class="table-actions">
+                            <a href="company/{{company._id}}" class="action-button view-btn">
+                                👁️ View Details
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Bottom Pagination -->
+    <div class="pagination-nav">
+        {{ pagination.links }}
+    </div>
+</div>
 
-    <p>Submit a new company review</p>
-    {% if companyid %}
-    <form action="/company/{{companyid}}" id="updatecompany" method="POST">
+<div class="review-form-section">
+    <div class="form-header">
+        <h2 class="form-title">
+            <span class="form-icon">✍️</span>
+            Submit a New Company Review
+        </h2>
+        <p class="form-description">
+            Share your interview or workplace experience to help others in our community 
+            make informed career decisions.
+        </p>
+    </div>
+    
+    <div class="form-container">
+        {% if companyid %}
+        <form action="/company/{{companyid}}" id="updatecompany" method="POST" class="modern-form">
         {% else %}
-        <form action="/company" id="updatecompany" method="POST">
-            {% endif %}
+        <form action="/company" id="updatecompany" method="POST" class="modern-form">
+        {% endif %}
             {{ form.csrf_token }}
-            <p>{{ form.company.label }}<br>{{ form.company(size=20) }}</p>
-            <p>{{ form.reviews.label }}<br>{{ form.reviews(size=20) }}</p>
-            <p>Rating:</p>
-            {% for subfield in form.rating %}
-            <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-            {% endfor %}
-            <p>{{ form.submit }}</p>
+            
+            <div class="form-group">
+                <label for="{{ form.company.id }}" class="form-label">
+                    {{ form.company.label }}
+                    <span class="required">*</span>
+                </label>
+                {{ form.company(class="form-input", placeholder="Enter the company name") }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.reviews.id }}" class="form-label">
+                    {{ form.reviews.label }}
+                    <span class="required">*</span>
+                </label>
+                {{ form.reviews(class="form-textarea", placeholder="Share your detailed experience with this company...", rows="5") }}
+                <div class="form-hint">
+                    Please be specific about your interview process, workplace culture, 
+                    and overall experience as a Person of Color.
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Rating</label>
+                <div class="radio-group rating-group">
+                    {% for subfield in form.rating %}
+                    <div class="radio-item rating-item">
+                        {{ subfield(class="radio-input") }}
+                        <label for="{{ subfield.id }}" class="radio-label">
+                            <span class="rating-stars">
+                                {% set rating = subfield.data | int if subfield.data else loop.index %}
+                                {% for i in range(1, 6) %}
+                                    <span class="star {{ 'filled' if i <= rating else '' }}">★</span>
+                                {% endfor %}
+                            </span>
+                            <span class="rating-text">{{ subfield.label }}</span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                {{ form.submit(class="btn-primary form-submit") }}
+                <button type="reset" class="btn-secondary">
+                    Clear Form
+                </button>
+            </div>
         </form>
+    </div>
+</div>
+
+<style>
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+    padding: var(--spacing-xl) 0;
+    background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+    border-radius: var(--radius-lg);
+}
+
+.page-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.page-icon {
+    font-size: 3rem;
+}
+
+.page-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Section Headers */
+.companies-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+    font-family: var(--font-family-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.section-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.companies-count {
+    background: var(--primary-color);
+    color: var(--text-inverse);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Enhanced Table */
+.table-container {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.modern-table {
+    margin: 0;
+}
+
+.modern-table th {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-inverse);
+    font-weight: 600;
+    padding: var(--spacing-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.875rem;
+}
+
+.modern-table td {
+    padding: var(--spacing-lg);
+    vertical-align: middle;
+}
+
+.col-index {
+    width: 80px;
+    text-align: center;
+}
+
+.col-company {
+    width: 40%;
+}
+
+.col-reviews {
+    width: 150px;
+    text-align: center;
+}
+
+.col-actions {
+    width: 150px;
+    text-align: center;
+}
+
+.row-number {
+    background: var(--gray-100);
+    color: var(--text-secondary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.company-link {
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.company-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.company-link:hover .company-name {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.review-count {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--success-color);
+}
+
+.review-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+}
+
+.view-btn {
+    background: var(--primary-color);
+    color: var(--text-inverse);
+    border-color: var(--primary-color);
+}
+
+.view-btn:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+/* Review Form Section */
+.review-form-section {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    margin-top: var(--spacing-2xl);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.form-title {
+    font-family: var(--font-family-display);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.form-icon {
+    font-size: 2rem;
+}
+
+.form-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.modern-form {
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.required {
+    color: var(--error-color);
+    font-size: 0.9rem;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+    background: var(--surface);
+    font-family: var(--font-family-primary);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-hint {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: var(--spacing-sm);
+    font-style: italic;
+}
+
+/* Rating Group */
+.rating-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+}
+
+.rating-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.rating-item:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-50);
+}
+
+.rating-item:has(.radio-input:checked) {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--text-inverse);
+}
+
+.radio-input {
+    margin: 0;
+    accent-color: var(--primary-color);
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    margin: 0;
+    font-weight: 500;
+    flex: 1;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-text {
+    font-size: 1rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    padding-top: var(--spacing-xl);
+    border-top: 2px solid var(--gray-100);
+    margin-top: var(--spacing-xl);
+}
+
+.form-submit {
+    padding: var(--spacing-md) var(--spacing-2xl);
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        text-align: center;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: var(--spacing-sm);
+    }
+    
+    .col-index,
+    .col-actions {
+        display: none;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+        flex-direction: column;
+    }
+}
+</style>
 {% endblock %}

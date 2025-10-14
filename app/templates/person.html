@@ -1,62 +1,585 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
-    {% if r_results|count > 0 %}
-        <br>
-        <br>
-        {{ pagination.info }}
+<div class="profile-header">
+    <h1 class="profile-title">
+        <span class="profile-icon">👤</span>
+        {{ "Welcome back, "+x['name']+"!" if x['name'] else "Welcome to ChosyTable!" }}
+    </h1>
+    <p class="profile-subtitle">
+        {{ "Manage your profile and view your contributions" if x['name'] else "Let's get your profile set up to start sharing experiences" }}
+    </p>
+</div>
+
+<!-- User Reviews Section -->
+{% if r_results|count > 0 %}
+<div class="reviews-section">
+    <div class="section-header">
+        <h2 class="section-title">
+            <span class="section-icon">📝</span>
+            Your Reviews
+        </h2>
+        <div class="section-meta">
+            <span class="reviews-count">{{ r_results|count }} review{{ 's' if r_results|count != 1 else '' }}</span>
+        </div>
+    </div>
+    
+    <!-- Pagination Info -->
+    <div class="pagination-nav">
+        <div class="pagination-page-info">
+            {{ pagination.info }}
+        </div>
         {{ pagination.links }}
-        <table class="styled-table">
+    </div>
+    
+    <!-- Reviews Table -->
+    <div class="table-container">
+        <table class="styled-table reviews-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Company</th>
-                    <th>Reviews</th>
-                    <th>Delete</th>
+                    <th class="col-index">#</th>
+                    <th class="col-company">Company</th>
+                    <th class="col-review">Your Review</th>
+                    <th class="col-actions">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in r_results %}
-                <tr>
-                    <td>{{ loop.index + pagination.skip }}</td>
-                    <td><a href="company/{{ s[-2] }}">{{ s[-1] }}</a></td>
-                    <td>{% for j in s[0] %}
-                        <p>{{ j['review'] }}</p>
-                    {% endfor %}</td>
-                    <td>{% for j in s[0] %}
-                        <p><a href="/deletereview/{{ j['_id'] }}">Delete</a></p>
-                        {% endfor %}</td>
+                <tr class="review-row">
+                    <td class="col-index">
+                        <span class="row-number">{{ loop.index + pagination.skip }}</span>
+                    </td>
+                    <td class="col-company">
+                        <div class="company-info">
+                            <a href="company/{{ s[-2] }}" class="company-link">
+                                <span class="company-name">{{ s[-1] }}</span>
+                            </a>
+                        </div>
+                    </td>
+                    <td class="col-review">
+                        <div class="review-content">
+                            {% for j in s[0] %}
+                                <div class="review-item">
+                                    <p class="review-text">{{ j['review'] }}</p>
+                                    <div class="review-meta">
+                                        <span class="review-date">📅 Posted recently</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="col-actions">
+                        <div class="table-actions">
+                            {% for j in s[0] %}
+                                <a href="/deletereview/{{ j['_id'] }}" class="action-button delete-btn" 
+                                   onclick="return confirm('Are you sure you want to delete this review?')">
+                                    🔴 Delete
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    
+    <!-- Bottom Pagination -->
+    <div class="pagination-nav">
         {{ pagination.links }}
-    {% endif %}
-    <br><br>
-    <p>{{ "Hey "+x['name']+", is your info correct?" if x['name'] else "Welcome! Complete your profile!" }}</p>
-    {% if x['_id'] %}
-        <form action="/person/{{x['_id']}}" method="post">
-        <p>{{ form.email(value=x['email'],hidden=True) }}</p>
-        <p>{{ form.name.label }}<br>{{ form.name(value=x['name']) }}</p>
-    {% else %}
-        <form action="/person" method="post">
-        <p>{{ form.email(value=x,hidden=True) }}</p>
-        <p>{{ form.name.label }}<br>{{ form.name }}</p>
-    {% endif %}
-        {{ form.csrf_token }}
-        <p>Gender:</p>
-        {% for subfield in form.gender %}
-        <tr><td>{{ subfield }}</td><td>{{ subfield.label }}</td></tr>
-        {% endfor %}
-        <p>{{ form.age.label }}<br>{{ form.age }}</p>
-        <p>{{ form.ethnicity.label }}<br>{{ form.ethnicity }}</p>
-        <p>{{ form.location.label }}<br>{{ form.location }}</p>
-        <br>
-        <p>{{ form.submit }}</p>
-    </form>
+    </div>
+</div>
+{% endif %}
 
-    <p><a href='forgetme/{{x['_id']}}'>Delete My Data</a></p>
-    <p><a href={{url_for('main.company')}}>Post a Company review?</a></p>
+<!-- Profile Management Section -->
+<div class="profile-section">
+    <div class="profile-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <span class="card-icon">⚙️</span>
+                Profile Information
+            </h2>
+            <p class="card-description">
+                {{ "Update your information below to keep your profile current" if x['name'] else "Please complete your profile to help us provide better insights" }}
+            </p>
+        </div>
+        
+        <div class="form-container">
+            {% if x['_id'] %}
+            <form action="/person/{{x['_id']}}" method="post" class="profile-form">
+                {{ form.email(value=x['email'], type="hidden") }}
+            {% else %}
+            <form action="/person" method="post" class="profile-form">
+                {{ form.email(value=x, type="hidden") }}
+            {% endif %}
+                {{ form.csrf_token }}
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.name.id }}" class="form-label">
+                            {{ form.name.label }}
+                            <span class="required">*</span>
+                        </label>
+                        {% if x['_id'] %}
+                            {{ form.name(value=x['name'], class="form-input", placeholder="Enter your full name") }}
+                        {% else %}
+                            {{ form.name(class="form-input", placeholder="Enter your full name") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Gender
+                            <span class="required">*</span>
+                        </label>
+                        <div class="radio-group gender-group">
+                            {% for subfield in form.gender %}
+                            <div class="radio-item">
+                                {{ subfield(class="radio-input") }}
+                                <label for="{{ subfield.id }}" class="radio-label">
+                                    {{ subfield.label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.age.id }}" class="form-label">
+                            {{ form.age.label }}
+                            <span class="required">*</span>
+                        </label>
+                        {{ form.age(class="form-select") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.ethnicity.id }}" class="form-label">
+                            {{ form.ethnicity.label }}
+                            <span class="required">*</span>
+                        </label>
+                        {{ form.ethnicity(class="form-select") }}
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="{{ form.location.id }}" class="form-label">
+                            {{ form.location.label }}
+                            <span class="required">*</span>
+                        </label>
+                        {{ form.location(class="form-select") }}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    {{ form.submit(class="btn-primary form-submit") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="actions-section">
+    <div class="actions-grid">
+        <div class="action-card">
+            <div class="action-icon">🏢</div>
+            <h3 class="action-title">Share Your Experience</h3>
+            <p class="action-description">
+                Help others by reviewing a company you've interviewed with or worked at.
+            </p>
+            <a href="{{ url_for('main.company') }}" class="btn-primary action-button">
+                Post a Review
+            </a>
+        </div>
+        
+        <div class="action-card">
+            <div class="action-icon">📊</div>
+            <h3 class="action-title">Explore Companies</h3>
+            <p class="action-description">
+                Browse company reviews and insights from other People of Color.
+            </p>
+            <a href="{{ url_for('main.company') }}" class="btn-secondary action-button">
+                View All Companies
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Data Management Section -->
+{% if x['_id'] %}
+<div class="data-management">
+    <div class="warning-card">
+        <div class="warning-header">
+            <span class="warning-icon">⚠️</span>
+            <h3 class="warning-title">Data Management</h3>
+        </div>
+        <p class="warning-text">
+            You have complete control over your data. If you wish to permanently delete 
+            your account and all associated data, you can do so below.
+        </p>
+        <div class="warning-actions">
+            <a href="forgetme/{{x['_id']}}" class="btn-danger" 
+               onclick="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.')">
+                🔍 Delete My Account & Data
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* Profile Header */
+.profile-header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+    padding: var(--spacing-2xl) 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--text-inverse);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+
+.profile-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    position: relative;
+    z-index: 2;
+}
+
+.profile-icon {
+    font-size: 3rem;
+}
+
+.profile-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+/* Reviews Section */
+.reviews-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.reviews-table .col-review {
+    width: 50%;
+}
+
+.review-content {
+    max-width: 500px;
+}
+
+.review-item {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+.review-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.delete-btn {
+    background: var(--error-color);
+    color: var(--text-inverse);
+    border-color: var(--error-color);
+}
+
+.delete-btn:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+/* Profile Section */
+.profile-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.profile-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.card-title {
+    font-family: var(--font-family-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.card-icon {
+    font-size: 1.75rem;
+}
+
+.card-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Profile Form */
+.profile-form {
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    margin: 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-select {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    background: var(--surface);
+    transition: all var(--transition-fast);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.gender-group {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.gender-group .radio-item {
+    background: transparent;
+    border: 2px solid var(--gray-300);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    flex: 1;
+    min-width: 120px;
+}
+
+.gender-group .radio-item:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-50);
+}
+
+.gender-group .radio-item:has(.radio-input:checked) {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--text-inverse);
+}
+
+/* Actions Section */
+.actions-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+}
+
+.action-card {
+    background: var(--surface);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    transition: all var(--transition-normal);
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.action-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+    display: block;
+}
+
+.action-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.action-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+}
+
+.action-button {
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+/* Data Management */
+.data-management {
+    margin-top: var(--spacing-3xl);
+}
+
+.warning-card {
+    background: var(--surface);
+    border: 2px solid var(--warning-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.warning-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.warning-icon {
+    font-size: 2rem;
+}
+
+.warning-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--warning-color);
+    margin: 0;
+}
+
+.warning-text {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.btn-danger {
+    background: var(--error-color);
+    color: var(--text-inverse);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    display: inline-block;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gender-group {
+        flex-direction: column;
+    }
+    
+    .gender-group .radio-item {
+        min-width: auto;
+    }
+    
+    .col-review {
+        font-size: 0.85rem;
+    }
+    
+    .review-item {
+        padding: var(--spacing-sm);
+    }
+}
+</style>
 {% endblock %}

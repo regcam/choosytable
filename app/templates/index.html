@@ -1,9 +1,483 @@
 {% extends 'base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Empowering Career Decisions{% endblock %}
 
 {% block content %}
-    <p><h1>Welcome to Choosy Table</h1></p>
-    <br>
-    <p><h2>Please <a href="{{ url_for('google.login') }}">login</a></h2></p>
+<section class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">
+                <span class="hero-highlight">Empowering</span> People of Color with 
+                <span class="hero-highlight">Corporate Transparency</span>
+            </h1>
+            <p class="hero-description">
+                Before we lend our talents to any company, we should know how they treat us. 
+                ChosyTable provides statistical insights about the likelihood of PoC receiving 
+                job offers and authentic workplace experiences.
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">📊</span>
+                    <span class="stat-label">Interview Analytics</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">🏢</span>
+                    <span class="stat-label">Company Reviews</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">📈</span>
+                    <span class="stat-label">Success Metrics</span>
+                </div>
+            </div>
+            
+            <div class="hero-actions">
+                <a href="{{ url_for('google.login') }}" class="btn-primary hero-cta">
+                    <span class="cta-icon">🚀</span>
+                    Get Started - Sign in with Google
+                </a>
+                <p class="login-note">
+                    <span class="security-icon">🔐</span>
+                    Secure authentication • Your data is protected
+                </p>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="visual-card">
+                <div class="card-header">
+                    <span class="card-icon">💼</span>
+                    <span class="card-title">Company Insights</span>
+                </div>
+                <div class="card-content">
+                    <div class="insight-item">
+                        <span class="insight-label">Success Rate</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%;"></div>
+                        </div>
+                        <span class="insight-value">78%</span>
+                    </div>
+                    <div class="insight-item">
+                        <span class="insight-label">Interview Experience</span>
+                        <div class="rating-stars">
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star filled">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span class="insight-value">4.2/5</span>
+                    </div>
+                    <div class="insight-item">
+                        <span class="insight-label">Reviews</span>
+                        <span class="insight-value">156 reviews</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="section-header">
+        <h2 class="section-title">Why ChosyTable?</h2>
+        <p class="section-description">
+            Data-driven insights to help you make informed career decisions
+        </p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Interview Analytics</h3>
+            <p class="feature-description">
+                Statistical analysis of interview outcomes by ethnicity, position, and company. 
+                Make informed decisions based on real data.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🏢</div>
+            <h3 class="feature-title">Honest Company Reviews</h3>
+            <p class="feature-description">
+                Authentic reviews and ratings from PoC employees about their actual 
+                workplace experiences and company culture.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3 class="feature-title">Secure & Private</h3>
+            <p class="feature-description">
+                Your data is protected with Google OAuth. Share experiences anonymously 
+                while contributing to community insights.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Performance Optimized</h3>
+            <p class="feature-description">
+                Recently enhanced with 60-80% faster queries and improved caching 
+                for the best user experience.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="mission-section">
+    <div class="mission-content">
+        <h2 class="mission-title">Our Mission</h2>
+        <blockquote class="mission-quote">
+            "Before we lend our talents to any company, we should know how they treat us."
+        </blockquote>
+        <p class="mission-text">
+            ChosyTable empowers People of Color with the transparency and insights needed 
+            to make informed career decisions. We believe in creating a more equitable 
+            job market through shared experiences and data-driven insights.
+        </p>
+        
+        <div class="mission-cta">
+            <a href="{{ url_for('google.login') }}" class="btn-secondary">
+                Join Our Community
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Hero Section Styles */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: var(--text-inverse);
+    padding: var(--spacing-3xl) 0;
+    margin: calc(-1 * var(--spacing-xl)) 0 var(--spacing-2xl) 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/></svg>') no-repeat center;
+    background-size: cover;
+    opacity: 0.1;
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-3xl);
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-family: var(--font-family-display);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--spacing-lg);
+}
+
+.hero-highlight {
+    background: linear-gradient(135deg, var(--accent-color), #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-xl);
+    opacity: 0.9;
+}
+
+.hero-stats {
+    display: flex;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.stat-number {
+    font-size: 2rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: var(--accent-color);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-xl);
+}
+
+.hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.2);
+}
+
+.cta-icon {
+    font-size: 1.3rem;
+}
+
+.login-note {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.security-icon {
+    font-size: 1.1rem;
+}
+
+/* Hero Visual */
+.visual-card {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.card-icon {
+    font-size: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.insight-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.insight-item:last-child {
+    border-bottom: none;
+}
+
+.insight-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.insight-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.progress-bar {
+    width: 100px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.star {
+    color: var(--gray-300);
+    font-size: 1rem;
+}
+
+.star.filled {
+    color: var(--accent-color);
+}
+
+/* Features Section */
+.features-section {
+    padding: var(--spacing-3xl) 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: var(--spacing-3xl);
+}
+
+.section-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.section-description {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+.feature-card {
+    background: var(--surface);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--gray-200);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-lg);
+    display: block;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.feature-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Mission Section */
+.mission-section {
+    background: var(--gray-50);
+    padding: var(--spacing-3xl) 0;
+    text-align: center;
+}
+
+.mission-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.mission-title {
+    font-family: var(--font-family-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xl);
+}
+
+.mission-quote {
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--primary-color);
+    margin: 0 0 var(--spacing-xl) 0;
+    padding: var(--spacing-xl);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--accent-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.mission-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.mission-cta {
+    margin-top: var(--spacing-xl);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .mission-title {
+        font-size: 2rem;
+    }
+}
+</style>
 {% endblock %}
