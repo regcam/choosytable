@@ -8,57 +8,92 @@ from pymemcache.client.base import PooledClient
 from bson import json_util
 from flask_paginate import Pagination, get_page_args
 from flask_navigation import Navigation
+from .constants import (
+    ETHNICITY_OPTIONS as iel,
+    GENDER_OPTIONS as igl, 
+    POSITION_OPTIONS as p,
+    AGE_OPTIONS as age,
+    LOCATION_OPTIONS as location,
+    HIGHLIGHTED_ETHNICITIES as e
+)
 
-e = ['Black', 'Afro-Latino', 'Bahamian', 'Jamaican', 'African']
-iel = ['White','Asian','Latino','Black','Afro-Latino',
-'African','Indigenous People','Pacific Islander', 'Unspecified']
-igl = ['Female','Male','Transgender','Agender','Unspecified']
-p = [('software_engineer','Software Engineer'),('staff_engineer','Staff Engineer'),('lead_engineering','Lead Engineer'),
-('architect','Architect'),('software_engineer_mngr','Software Engineer Manager'),('technical_mngr','Technical Manager'),('technical_drtr','Technical Director'),
-('vp','VP'),('cto','CTO'),('network_engineer','Network Engineer'),('principal_architect','Principal Architect'),('qa_engineer','QA Engineer'),('sre','SRE'),('sdet','SDET'),
-('project_mngr','Project Manager'),('program_mngr','Program Manager'),('devops_engineer','DevOps Engineer'),('systems_admin','Systems Admin'),
-('dba','DBA'),('operations_engineer','Operations Engineer')]
-age = ['18-24','25-34','35-44','45-54','55-64','65-74','75+']
-location = ['AK','AL','AR','AS','AZ','CA''CO','CT','DC','DE',
-'FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA',
-'MD','ME','MI','MN','MO','MP','MS','MT','NC','ND','NE','NH','NJ',
-'NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD','TN',
-'TX','UT','VA','VI','VT','WA','WI','WV','WY']
+def create_app():
+    app = Flask(__name__)
+    
+    # Configuration
+    app.config['MONGO_DBNAME'] = os.environ.get('MONGO_DBNAME', 'choosytable')
+    app.config['MONGO_URI'] = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/choosytable')
+    
+    # Security: Use environment variable for secret key to maintain sessions across restarts
+    secret_key = os.environ.get('SECRET_KEY')
+    if not secret_key:
+        raise ValueError(
+            "SECRET_KEY environment variable must be set. "
+            "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))'"
+        )
+    app.secret_key = secret_key
+    
+    # OAuth configuration
+    app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
+    app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get("GOOGLE_CLIENT_SECRET")
+    
+    # Development OAuth settings - only set if explicitly enabled
+    if os.environ.get('FLASK_ENV') == 'development':
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+        os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+    
+    return app
 
+# Initialize global objects
+mongo = None
+ct = None 
+nav = None
+blueprint = None
+login_manager = None
+client = None
 
-app = Flask(__name__)
-app.config['MONGO_DBNAME'] = 'choosytable'
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-app.secret_key = os.urandom(24).hex()
-app.config['GOOGLE_OAUTH_CLIENT_ID'] = os.environ.get("GOOGLE_CLIENT_ID")
-app.config['GOOGLE_OAUTH_CLIENT_SECRET'] = os.environ.get(
-    "GOOGLE_CLIENT_SECRET")
-
-blueprint = make_google_blueprint(
-    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
-    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
-    scope=["profile", "email"],
-    offline=True,
-    reprompt_consent=True
+def init_app_components(app):
+    """Initialize app components after app creation"""
+    global mongo, ct, nav, blueprint, login_manager, client
+    
+    # MongoDB setup
+    mongo = PyMongo(app)
+    ct = mongo.db.choosytable
+    
+    # Navigation setup  
+    nav = Navigation(app)
+    nav.Bar('top', [
+        nav.Item('Home', 'main.home'),
+        nav.Item('Companies', 'main.company'),
+        nav.Item('People', 'main.person'),
+        nav.Item('Logout', 'main.logout')
+    ])
+    
+    # OAuth blueprint
+    blueprint = make_google_blueprint(
+        client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+        client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+        scope=["profile", "email"],
+        offline=True,
+        reprompt_consent=True
     )
-app.register_blueprint(blueprint, url_prefix="/login")
+    app.register_blueprint(blueprint, url_prefix="/login")
+    
+    # Login manager setup
+    login_manager = LoginManager(app)
+    login_manager.login_view = "google.login"
+    
+    # Cache client setup
+    cache_host = os.environ.get('MEMCACHED_HOST', 'localhost')
+    client = PooledClient(cache_host, serde=JsonSerde())
+    
+    # Register blueprints
+    from app.main import bp as main_blueprint
+    app.register_blueprint(main_blueprint)
+    
+    return app
 
-# setup login manager
-login_manager = LoginManager(app)
-login_manager.login_view = "google.login"
-
-mongo = PyMongo(app)
-ct = mongo.db.choosytable
-nav = Navigation(app)
-
-nav.Bar('top', [
-    nav.Item('Home', 'main.person'),
-    nav.Item('Companies', 'main.company'),
-    nav.Item('People', 'main.person'),
-    nav.Item('Logout', 'main.logout')
-])
+app = init_app_components(create_app())
 
 class JsonSerde(object):
     def serialize(self, key, value):
@@ -73,9 +108,5 @@ class JsonSerde(object):
            return json_util.loads(value)
        raise Exception("Unknown serialization format")
 
-client = PooledClient('localhost', serde=JsonSerde())
-
-from app.main import bp as main_blueprint
-app.register_blueprint(main_blueprint)
-
+# Import models after everything is set up
 from . import models
