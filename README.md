@@ -171,7 +171,6 @@ chosytable/
 ├── create_indexes.py        # Database optimization script
 ├── setup_optimizations.py  # Automated setup wizard
 ├── run.py                  # Application entry point
-├── mongo.py                # Legacy entry point
 ├── requirements.txt        # Python dependencies
 ├── .env.template          # Environment configuration template
 ├── OPTIMIZATION_GUIDE.md  # Detailed optimization documentation
