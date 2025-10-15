@@ -44,7 +44,7 @@ This guide documents comprehensive performance optimizations implemented for the
 ### 1. Run the Automated Setup
 ```bash
 cd choosytable/
-python setup_optimizations.py
+python3 setup_optimizations.py
 ```
 
 ### 2. Manual Setup (if needed)
@@ -55,7 +55,7 @@ python setup_optimizations.py
 cp .env.template .env
 
 # Generate secure secret key
-python -c 'import secrets; print("SECRET_KEY=" + secrets.token_hex(32))' >> .env
+python3 -c 'import secrets; print("SECRET_KEY=" + secrets.token_hex(32))' >> .env
 
 # Add your OAuth credentials to .env
 ```
@@ -63,7 +63,7 @@ python -c 'import secrets; print("SECRET_KEY=" + secrets.token_hex(32))' >> .env
 #### Database Indexes
 ```bash
 # Create performance indexes
-python create_indexes.py
+python3 create_indexes.py
 ```
 
 #### Update Dependencies  
@@ -269,7 +269,7 @@ When making further optimizations:
 - [MongoDB Indexing Best Practices](https://docs.mongodb.com/manual/applications/indexes/)
 - [Flask Performance Tips](https://flask.palletsprojects.com/en/2.3.x/deploying/)  
 - [Memcached Documentation](https://memcached.org/)
-- [Python Performance Profiling](https://docs.python.org/3/library/profile.html)
+- [Python3 Performance Profiling](https://docs.python.org/3/library/profile.html)
 
 ---
 

@@ -33,7 +33,7 @@ def create_app():
     if not secret_key:
         raise ValueError(
             "SECRET_KEY environment variable must be set. "
-            "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))'"
+            "Generate one with: python3 -c 'import secrets; print(secrets.token_hex(32))'"
         )
     app.secret_key = secret_key
     
