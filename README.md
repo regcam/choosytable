@@ -137,7 +137,7 @@ python3 create_indexes.py
 ### Development
 ```bash
 # Simple development server
-python3 mongo.py
+python3 run.py
 
 # Or with environment variables loaded
 python3 -m flask run --debug
@@ -170,7 +170,8 @@ chosytable/
 │   └── templates/          # Jinja2 templates
 ├── create_indexes.py        # Database optimization script
 ├── setup_optimizations.py  # Automated setup wizard
-├── mongo.py                # Application entry point
+├── run.py                  # Application entry point
+├── mongo.py                # Legacy entry point
 ├── requirements.txt        # Python dependencies
 ├── .env.template          # Environment configuration template
 ├── OPTIMIZATION_GUIDE.md  # Detailed optimization documentation
