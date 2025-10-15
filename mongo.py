@@ -54,7 +54,7 @@ class JsonSerde(object):
 
 client = PooledClient('localhost', serde=JsonSerde())
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.config['MONGO_DBNAME'] = 'choosytable'
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/choosytable'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -226,16 +226,16 @@ def google_logged_in(blueprint, token):
 
 login_manager.init_app(app)
 
-@app.config("/")
-@app.config("/index")
+@app.route("/")
+@app.route("/index")
 def not_logged_in():
     if google.authorized:
         return redirect(url_for("home"))
     else:
         return render_template('index.html')
 
-@app.config("/home")
-@app.config("/welcome")
+@app.route("/home")
+@app.route("/welcome")
 def home():
     if not google.authorized:
         return redirect(url_for("google.login"))
@@ -308,7 +308,7 @@ def find_reviews():
     return querykey
 
 
-@app.config('/company', methods=['GET'])
+@app.route('/company', methods=['GET'])
 @login_required
 def company():
     form = MyCompany()
@@ -330,7 +330,7 @@ def company():
     return render_template('company.html', companies=companies, pagination=pagination,form=form)
 
 
-@app.config('/company', methods=['POST', 'PUT'])
+@app.route('/company', methods=['POST', 'PUT'])
 @login_required
 def company_post():
     form = MyCompany()
@@ -390,7 +390,7 @@ def pd_interviews(p,singlecompany):
     return querykey
 
 
-@app.config('/company/<company_id>', methods=['GET'])
+@app.route('/company/<company_id>', methods=['GET'])
 @login_required
 def single_company(company_id):
     form = MyCompany()
@@ -423,7 +423,7 @@ def single_company(company_id):
     winDict=winDict,sc_results=sc_results,rating_avg=rating_avg)
 
 
-@app.config('/company/<company_id>', methods=['POST', 'PUT'])
+@app.route('/company/<company_id>', methods=['POST', 'PUT'])
 @login_required
 def single_companypost(company_id):
     form = MyCompany()
@@ -483,7 +483,7 @@ def single_companypost(company_id):
     return redirect(request.url)
 
 
-@app.config('/person/<person_id>', methods=['GET'])
+@app.route('/person/<person_id>', methods=['GET'])
 @login_required
 def single_person(person_id):
     form = MyPerson()
@@ -494,7 +494,7 @@ def single_person(person_id):
             return jsonify({'error': 'person not found'})
 
 
-@app.config('/person/<person_id>', methods=['PUT', 'POST'])
+@app.route('/person/<person_id>', methods=['PUT', 'POST'])
 @login_required
 def singleupdate_person(person_id):
     form = MyPerson()
@@ -538,13 +538,13 @@ def singleupdate_person(person_id):
         return jsonify({'error': "The form was not valid"})
 
 
-@app.config('/person', methods=['GET'])
+@app.route('/person', methods=['GET'])
 @login_required
 def person():
     return redirect(url_for('home'))
 
 
-@app.config('/person', methods=['POST', 'PUT'])
+@app.route('/person', methods=['POST', 'PUT'])
 @login_required
 def person_post():
     form = MyPerson()
@@ -564,7 +564,7 @@ def person_post():
         return jsonify({'error': "Form wasn't valid"})
 
 
-@app.config('/forgetme/<user>')
+@app.route('/forgetme/<user>')
 @login_required
 def forgetme(user):
     resp = google.get("/oauth2/v1/userinfo").json()
@@ -584,7 +584,7 @@ def forgetme(user):
     return redirect(url_for('home'))
 
 
-@app.config('/deletereview/<id>')
+@app.route('/deletereview/<id>')
 @login_required
 def deletereview(id):
     resp = google.get("/oauth2/v1/userinfo").json()
@@ -598,7 +598,7 @@ def deletereview(id):
     return redirect(url_for('home'))
 
 
-@app.config("/logout")
+@app.route("/logout")
 @login_required
 def logout():
     logout_user()
