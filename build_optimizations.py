@@ -8,7 +8,7 @@ This script applies all performance optimizations:
 3. Sets up performance monitoring
 4. Creates deployment-ready optimized app
 
-Usage: python build_optimizations.py
+Usage: python3 build_optimizations.py
 """
 
 import os
@@ -281,7 +281,7 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 ### Running with Optimizations
 ```bash
 # Start the optimized application
-python -c "from app import app; app.run(debug=False, port=5000)"
+python3 -c "from app import app; app.run(debug=False, port=5000)"
 
 # Monitor performance
 # Visit: http://localhost:5000/admin/performance
@@ -354,7 +354,7 @@ def main():
         print("🎉 All optimizations applied successfully!")
         print()
         print("🚀 Ready to launch optimized ChosyTable:")
-        print("   python -c \"from app import app; app.run(port=5000)\"")
+        print("   python3 -c \"from app import app; app.run(port=5000)\"")
         print()
         print("📊 Performance monitoring:")
         print("   http://localhost:5000/admin/performance")

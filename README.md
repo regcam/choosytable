@@ -53,7 +53,7 @@ git clone https://github.com/regcam/choosytable.git
 cd choosytable
 
 # Run the automated setup
-python setup_optimizations.py
+python3 setup_optimizations.py
 ```
 
 This script will:
@@ -74,7 +74,7 @@ If you prefer manual setup or need to troubleshoot:
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install dependencies
-brew install python mongodb-community memcached
+brew install python3 mongodb-community memcached
 
 # Start services
 brew services start mongodb/brew/mongodb-community
@@ -101,7 +101,7 @@ sudo systemctl start memcached
 
 2. **Generate a secure secret key:**
    ```bash
-   python -c 'import secrets; print("SECRET_KEY=" + secrets.token_hex(32))' >> .env
+   python3 -c 'import secrets; print("SECRET_KEY=" + secrets.token_hex(32))' >> .env
    ```
 
 3. **Configure Google OAuth:**
@@ -129,7 +129,7 @@ sudo systemctl start memcached
 pip install -r requirements.txt
 
 # Create database indexes for optimal performance
-python create_indexes.py
+python3 create_indexes.py
 ```
 
 ## 🚀 Running the Application
@@ -137,10 +137,10 @@ python create_indexes.py
 ### Development
 ```bash
 # Simple development server
-python mongo.py
+python3 mongo.py
 
 # Or with environment variables loaded
-python -m flask run --debug
+python3 -m flask run --debug
 ```
 
 ### Production

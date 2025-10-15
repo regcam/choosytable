@@ -9,7 +9,7 @@ It will guide you through:
 3. Security setup
 4. Dependency verification
 
-Usage: python setup_optimizations.py
+Usage: python3 setup_optimizations.py
 """
 
 import os
@@ -186,7 +186,7 @@ def show_next_steps():
     print("   - Linux: sudo apt install memcached && sudo systemctl start memcached")
     print()
     print("4. 🚀 Start your application:")
-    print("   - python mongo.py  (or your main app file)")
+    print("   - python3 mongo.py  (or your main app file)")
     print()
     print("📊 Expected Performance Improvements:")
     print("   - 60-80% faster database queries")

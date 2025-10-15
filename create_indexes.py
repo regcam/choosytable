@@ -5,7 +5,7 @@ MongoDB Index Creation Script for ChosyTable
 This script creates the necessary indexes to optimize database performance.
 Run this script after setting up your MongoDB database.
 
-Usage: python create_indexes.py
+Usage: python3 create_indexes.py
 """
 
 import os
