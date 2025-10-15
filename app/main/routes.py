@@ -4,10 +4,9 @@ from app import ct, blueprint, client, Pagination, get_page_args, ObjectId, iel,
     e, request, jsonify, current_user, login_user, logout_user, login_required, login_manager
 import pandas as pd
 from datetime import datetime
-from app.models import User, MongoStorage, MyPerson, MyCompany, MyInterview
+from app.models import User, MyPerson, MyCompany, MyInterview
 from flask import flash, redirect, url_for, render_template
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_dance.consumer.storage import BaseStorage
+from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_authorized, oauth_error
 from pymongo import ReturnDocument
 

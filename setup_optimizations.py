@@ -186,7 +186,7 @@ def show_next_steps():
     print("   - Linux: sudo apt install memcached && sudo systemctl start memcached")
     print()
     print("4. 🚀 Start your application:")
-    print("   - python3 mongo.py  (or your main app file)")
+    print("   - python3 run.py")
     print()
     print("📊 Expected Performance Improvements:")
     print("   - 60-80% faster database queries")
