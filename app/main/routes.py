@@ -44,6 +44,7 @@ from collections import defaultdict, Counter
 from flask import flash, redirect, url_for, render_template, current_app
 from flask_dance.contrib.google import google
 from flask_dance.consumer import oauth_error
+import os
 from pymongo import ReturnDocument
 
 from app.main import bp
@@ -66,6 +67,23 @@ CACHE_TTL = {
 # =============================================================================
 # HELPER FUNCTIONS - Optimized with better caching and error handling
 # =============================================================================
+
+def get_current_user_info():
+    """
+    Get current user info, works with both real OAuth and mock auth.
+    
+    Returns:
+        dict: User info dictionary with email, name, etc.
+    """
+    use_mock_auth = os.environ.get('USE_MOCK_AUTH', '').lower() == 'true'
+    
+    if use_mock_auth:
+        from app.mock_auth import get_mock_user_info
+        return get_mock_user_info()
+    else:
+        if google.authorized:
+            return google.get("/oauth2/v1/userinfo").json()
+        return {}
 
 def get_user_reviews(user_id):
     """
@@ -484,10 +502,17 @@ def index():
     Landing page route with optimized OAuth handling.
     """
     try:
-        if google.authorized:
-            google_logged_in(blueprint, google.token)
-            return redirect(url_for("main.home"))
-        return render_template('index.html')
+        use_mock_auth = os.environ.get('USE_MOCK_AUTH', '').lower() == 'true'
+        
+        if use_mock_auth:
+            # In mock mode, show login link
+            return render_template('index.html', mock_auth=True)
+        else:
+            # Real OAuth mode
+            if google.authorized:
+                google_logged_in(blueprint, google.token)
+                return redirect(url_for("main.home"))
+            return render_template('index.html', mock_auth=False)
     except Exception as e:
         logger.error(f"Error in index route: {e}")
         return render_template('index.html')
@@ -502,8 +527,8 @@ def home():
     try:
         form = MyPerson()
         
-        # Get user info from Google OAuth
-        resp = blueprint.session.get("/oauth2/v1/userinfo").json()
+        # Get user info (works with both OAuth and mock)
+        resp = get_current_user_info()
         email = resp.get('email')
         
         if not email:
