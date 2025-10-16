@@ -148,12 +148,13 @@
 <style>
 /* Hero Section Styles */
 .hero-section {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: var(--text-inverse);
+    background: var(--gradient-subtle);
+    color: var(--text-primary);
     padding: var(--spacing-3xl) 0;
     margin: calc(-1 * var(--spacing-xl)) 0 var(--spacing-2xl) 0;
     position: relative;
     overflow: hidden;
+    border: 1px solid var(--gray-200);
 }
 
 .hero-section::before {
@@ -186,7 +187,7 @@
 }
 
 .hero-highlight {
-    background: linear-gradient(135deg, var(--accent-color), #fbbf24);
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -235,16 +236,18 @@
     padding: var(--spacing-lg) var(--spacing-2xl);
     font-size: 1.1rem;
     font-weight: 600;
-    background: var(--accent-color);
+    background: var(--primary-color);
+    color: var(--text-inverse);
     border-radius: var(--radius-lg);
     text-decoration: none;
     transition: all var(--transition-normal);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-card);
 }
 
 .hero-cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 25px 35px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-float);
+    background: var(--primary-dark);
 }
 
 .cta-icon {
@@ -266,12 +269,13 @@
 
 /* Hero Visual */
 .visual-card {
-    background: var(--surface);
+    background: var(--white);
     color: var(--text-primary);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-card);
     backdrop-filter: blur(10px);
+    border: 1px solid var(--gray-200);
 }
 
 .card-header {
@@ -311,7 +315,7 @@
 
 .insight-value {
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--accent-color);
 }
 
 .progress-bar {
@@ -324,7 +328,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    background: var(--gradient-accent);
     border-radius: 3px;
     transition: width 0.5s ease;
 }
@@ -340,7 +344,7 @@
 }
 
 .star.filled {
-    color: var(--accent-color);
+    color: var(--accent-warm);
 }
 
 /* Features Section */
@@ -386,8 +390,8 @@
 
 .feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary-color);
+    box-shadow: var(--shadow-float);
+    border-color: var(--accent-color);
 }
 
 .feature-icon {
@@ -410,9 +414,11 @@
 
 /* Mission Section */
 .mission-section {
-    background: var(--gray-50);
+    background: var(--gradient-neutral);
     padding: var(--spacing-3xl) 0;
     text-align: center;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
 }
 
 .mission-content {
