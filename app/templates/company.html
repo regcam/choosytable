@@ -153,8 +153,24 @@
     text-align: center;
     margin-bottom: var(--spacing-3xl);
     padding: var(--spacing-xl) 0;
-    background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-card);
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-glass);
+    z-index: -1;
 }
 
 .page-title {
