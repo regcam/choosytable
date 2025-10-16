@@ -77,28 +77,52 @@ def init_app_components(app):
     mongo = PyMongo(app)
     ct = mongo.db.choosytable
     
-    # Navigation setup  
-    nav = Navigation(app)
-    nav.Bar('top', [
-        nav.Item('Home', 'main.home'),
-        nav.Item('Companies', 'main.company'),
-        nav.Item('People', 'main.person'),
-        nav.Item('Logout', 'main.logout')
-    ])
+    # Check if we're in development mode with mock auth
+    use_mock_auth = os.environ.get('USE_MOCK_AUTH', '').lower() == 'true'
     
-    # OAuth blueprint
-    blueprint = make_google_blueprint(
-        client_id=os.environ.get("GOOGLE_CLIENT_ID"),
-        client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
-        scope=["profile", "email"],
-        offline=True,
-        reprompt_consent=True
-    )
-    app.register_blueprint(blueprint, url_prefix="/login")
+    # Navigation setup  
+    if use_mock_auth:
+        nav = Navigation(app)
+        nav.Bar('top', [
+            nav.Item('Home', 'main.home'),
+            nav.Item('Companies', 'main.company'),
+            nav.Item('People', 'main.person'),
+            nav.Item('Mock Login', 'mock_auth.mock_login'),
+            nav.Item('Logout', 'main.logout')
+        ])
+    else:
+        nav = Navigation(app)
+        nav.Bar('top', [
+            nav.Item('Home', 'main.home'),
+            nav.Item('Companies', 'main.company'),
+            nav.Item('People', 'main.person'),
+            nav.Item('Logout', 'main.logout')
+        ])
+    
+    # OAuth blueprint or mock auth
+    if use_mock_auth:
+        from app.mock_auth import mock_auth_bp
+        app.register_blueprint(mock_auth_bp)
+        blueprint = None  # No real OAuth blueprint needed
+        print("\n🔧 DEVELOPMENT MODE: Using mock authentication")
+        print("   Visit /mock/login to log in as test@example.com\n")
+    else:
+        # OAuth blueprint
+        blueprint = make_google_blueprint(
+            client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+            client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+            scope=["profile", "email"],
+            offline=True,
+            reprompt_consent=True
+        )
+        app.register_blueprint(blueprint, url_prefix="/login")
     
     # Login manager setup
     login_manager = LoginManager(app)
-    login_manager.login_view = "google.login"
+    if use_mock_auth:
+        login_manager.login_view = "mock_auth.mock_login"
+    else:
+        login_manager.login_view = "google.login"
     
     # Cache client setup
     cache_host = os.environ.get('MEMCACHED_HOST', 'localhost')

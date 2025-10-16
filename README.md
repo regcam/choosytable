@@ -134,13 +134,57 @@ python3 create_indexes.py
 
 ## 🚀 Running the Application
 
-### Development
+### Development (Local Testing)
+
+For local testing, you have two options:
+
+#### Option 1: Mock Authentication (No Google OAuth Required) ✨
+
+This is the easiest way to test locally without setting up Google OAuth:
+
 ```bash
+# Copy the development environment file
+cp .env.dev .env
+
+# Start required services
+brew services start mongodb-community  # macOS
+brew services start memcached          # macOS
+
+# Run the application
+python3 run.py
+```
+
+Then:
+1. Visit `http://localhost:5000`
+2. Click "Mock Login" or go to `/mock/login`
+3. You'll be logged in as `test@example.com`
+4. Test all features without OAuth setup!
+
+#### Option 2: Full Google OAuth Setup
+
+For production-like testing with real Google authentication:
+
+```bash
+# Copy environment template
+cp .env.template .env
+
+# Add your Google OAuth credentials to .env
+# (See "Configure Google OAuth" section above)
+
 # Simple development server
 python3 run.py
 
 # Or with environment variables loaded
 python3 -m flask run --debug
+```
+
+**Environment Variables for Mock Auth:**
+```bash
+# In your .env file, set:
+USE_MOCK_AUTH=true    # Enables mock authentication
+FLASK_ENV=development
+SECRET_KEY=dev_secret_key_for_testing_only
+MONGO_DBNAME=choosytable_dev
 ```
 
 ### Production
@@ -184,12 +228,15 @@ chosytable/
 | Variable | Required | Description | Example |
 |----------|----------|-------------|----------|
 | `SECRET_KEY` | ✅ | Flask session secret | `your_64_char_secret_here` |
-| `GOOGLE_CLIENT_ID` | ✅ | Google OAuth client ID | `123456789.apps.googleusercontent.com` |
-| `GOOGLE_CLIENT_SECRET` | ✅ | Google OAuth secret | `your_secret_here` |
+| `GOOGLE_CLIENT_ID` | ✅* | Google OAuth client ID | `123456789.apps.googleusercontent.com` |
+| `GOOGLE_CLIENT_SECRET` | ✅* | Google OAuth secret | `your_secret_here` |
+| `USE_MOCK_AUTH` | ❌ | Enable mock auth for testing | `true` or `false` |
 | `MONGO_URI` | ❌ | MongoDB connection string | `mongodb://localhost:27017/choosytable` |
 | `MONGO_DBNAME` | ❌ | Database name | `choosytable` |
 | `MEMCACHED_HOST` | ❌ | Memcached server | `localhost` |
 | `FLASK_ENV` | ❌ | Environment mode | `development` or `production` |
+
+*Required only when `USE_MOCK_AUTH` is not set to `true`
 
 ### Security Notes
 
@@ -257,9 +304,16 @@ pip install -r requirements.txt --force-reinstall
 ```
 
 **Authentication Problems:**
+
+*For Google OAuth:*
 - Verify Google OAuth credentials are correct
 - Check that redirect URIs are properly configured
 - Ensure `SECRET_KEY` is set and persistent
+
+*For Mock Authentication (Development):*
+- Set `USE_MOCK_AUTH=true` in your `.env` file
+- Visit `/mock/login` to log in as test user
+- No Google OAuth setup required for testing
 
 ## 📈 Performance Benchmarks
 
