@@ -32,6 +32,16 @@
             </div>
             
             <div class="hero-actions">
+                {% if mock_auth %}
+                <a href="{{ url_for('mock_auth.mock_login') }}" class="btn-primary hero-cta">
+                    <span class="cta-icon">🔧</span>
+                    Get Started - Mock Login (Development)
+                </a>
+                <p class="login-note">
+                    <span class="security-icon">⚙️</span>
+                    Development mode • Mock authentication enabled
+                </p>
+                {% else %}
                 <a href="{{ url_for('google.login') }}" class="btn-primary hero-cta">
                     <span class="cta-icon">🚀</span>
                     Get Started - Sign in with Google
@@ -40,6 +50,7 @@
                     <span class="security-icon">🔐</span>
                     Secure authentication • Your data is protected
                 </p>
+                {% endif %}
             </div>
         </div>
         
@@ -138,9 +149,15 @@
         </p>
         
         <div class="mission-cta">
+            {% if mock_auth %}
+            <a href="{{ url_for('mock_auth.mock_login') }}" class="btn-secondary">
+                Join Our Community (Mock Login)
+            </a>
+            {% else %}
             <a href="{{ url_for('google.login') }}" class="btn-secondary">
                 Join Our Community
             </a>
+            {% endif %}
         </div>
     </div>
 </section>
