@@ -37,8 +37,8 @@
                 </div>
                 
                 <ul class="nav-menu">
-                    {% for item in nav.top %}
-                    <li class="nav-item {{ 'active' if item.is_active else '' }}">
+                    {% for item in nav_items %}
+                    <li class="nav-item {{ 'active' if item.active else '' }}">
                         <a href="{{ item.url }}" class="nav-link">{{ item.label }}</a>
                     </li>
                     {% endfor %}
