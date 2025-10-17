@@ -1,5 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, jsonify, flash, current_app
-from flask_pymongo import PyMongo, ObjectId
+from flask_pymongo import PyMongo
+from bson import ObjectId
+from bson.objectid import ObjectId
 from flask_login import current_user, login_user, logout_user, login_required, LoginManager, UserMixin
 import os
 from dotenv import load_dotenv
@@ -11,7 +13,7 @@ from flask_dance.consumer.storage import BaseStorage
 from pymemcache.client.base import PooledClient
 from bson import json_util
 from flask_paginate import Pagination, get_page_args
-from flask_navigation import Navigation
+# No additional navigation library needed - using Bootstrap CSS in templates
 from .constants import (
     ETHNICITY_OPTIONS as iel,
     GENDER_OPTIONS as igl, 
@@ -51,7 +53,6 @@ def create_app():
 # Initialize global objects
 mongo = None
 ct = None 
-nav = None
 blueprint = None
 login_manager = None
 client = None
@@ -71,7 +72,7 @@ class JsonSerde(object):
 
 def init_app_components(app):
     """Initialize app components after app creation"""
-    global mongo, ct, nav, blueprint, login_manager, client
+    global mongo, ct, blueprint, login_manager, client
     
     # MongoDB setup
     mongo = PyMongo(app)
@@ -80,24 +81,42 @@ def init_app_components(app):
     # Check if we're in development mode with mock auth
     use_mock_auth = os.environ.get('USE_MOCK_AUTH', '').lower() == 'true'
     
-    # Navigation setup  
-    if use_mock_auth:
-        nav = Navigation(app)
-        nav.Bar('top', [
-            nav.Item('Home', 'main.home'),
-            nav.Item('Companies', 'main.company'),
-            nav.Item('People', 'main.person'),
-            nav.Item('Mock Login', 'mock_auth.mock_login'),
-            nav.Item('Logout', 'main.logout')
-        ])
-    else:
-        nav = Navigation(app)
-        nav.Bar('top', [
-            nav.Item('Home', 'main.home'),
-            nav.Item('Companies', 'main.company'),
-            nav.Item('People', 'main.person'),
-            nav.Item('Logout', 'main.logout')
-        ])
+    # Simple navigation context for templates
+    def get_nav_items():
+        """Get navigation items based on current mode."""
+        items = [
+            {'label': 'Home', 'endpoint': 'main.home'},
+            {'label': 'Companies', 'endpoint': 'main.company'},
+            {'label': 'People', 'endpoint': 'main.person'},
+        ]
+        
+        if use_mock_auth:
+            items.append({'label': 'Mock Login', 'endpoint': 'mock_auth.mock_login'})
+        
+        items.append({'label': 'Logout', 'endpoint': 'main.logout'})
+        return items
+    
+    # Make navigation available to templates
+    @app.context_processor
+    def inject_navigation():
+        from flask import url_for, request
+        
+        # Create navigation with active state detection
+        nav_items = []
+        for item in get_nav_items():
+            try:
+                url = url_for(item['endpoint'])
+                is_active = request.endpoint == item['endpoint'] if request else False
+                nav_items.append({
+                    'label': item['label'],
+                    'url': url,
+                    'active': is_active
+                })
+            except:
+                # Skip items that can't generate URLs
+                continue
+        
+        return {'nav_items': nav_items}
     
     # OAuth blueprint or mock auth
     if use_mock_auth:

@@ -3,20 +3,21 @@
 ## Technology Stack
 
 ### Backend Framework
-- **Flask 2.3.3**: Modern Python web framework
+- **Flask 3.0.3**: Latest Python web framework (updated for security & performance)
 - **Python 3.8+**: Core programming language
-- **Flask-Dance**: Google OAuth integration
-- **Flask-Login**: User session management
-- **Flask-WTF**: Form handling and CSRF protection
+- **Flask-Dance 7.1.0**: Google OAuth integration
+- **Flask-Login 0.6.3**: User session management
+- **Flask-WTF 1.2.2**: Form handling and CSRF protection
 
 ### Database & Storage
 - **MongoDB 4.0+**: Document-based data storage
-- **PyMongo**: Python MongoDB driver
+- **PyMongo 4.15.3**: Latest Python MongoDB driver (updated)
+- **Flask-PyMongo 3.0.1**: Flask 3.x compatible MongoDB integration
 - **ObjectId**: MongoDB document identification
 
 ### Caching & Performance
 - **Memcached**: High-performance caching layer
-- **PyMemcache 4.0+**: Python memcached client
+- **PyMemcache 4.0.0**: Python memcached client
 - **Custom Cache Manager**: Intelligent invalidation strategies
 
 ### Authentication & Security
