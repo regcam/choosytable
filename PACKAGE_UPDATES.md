@@ -32,6 +32,11 @@ Updated all packages to their latest compatible versions as of October 2024. Thi
 - **Flask-DebugToolbar**: 0.13.1 → 0.16.0
 - **flask-paginate**: 2022.1.8 → 2024.4.12
 
+### Navigation System
+- **Removed**: Flask-Navigation 0.2.0 (not Flask 3.x compatible)
+- **Replaced**: Template-based navigation with Bootstrap CSS classes
+- **Benefits**: Simpler, more maintainable, Flask 3.x compatible
+
 ## New Dependencies Added
 
 ### Flask 3.x Compatibility
@@ -80,11 +85,14 @@ pip install --upgrade -r requirements.txt
 ## Potential Issues & Solutions
 
 ### Flask 3.x Migration Issues
-**Issue**: `ImportError: cannot import name 'escape' from 'flask'`
-**Solution**: Use `from markupsafe import escape` instead
+**Issue**: `ImportError: cannot import name 'Markup' from 'flask'` (Flask-Navigation)
+**Solution**: Replaced Flask-Navigation with template-based navigation using Bootstrap CSS
+
+**Issue**: `ImportError: cannot import name 'ObjectId' from 'flask_pymongo'`
+**Solution**: Import ObjectId directly from bson: `from bson import ObjectId`
 
 **Issue**: Template rendering changes
-**Solution**: Most templates should work unchanged, but test thoroughly
+**Solution**: Templates work unchanged, navigation now handled in templates
 
 ### NumPy 2.x Compatibility
 **Why constrained**: NumPy 2.x has breaking changes that may affect pandas

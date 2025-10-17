@@ -2,7 +2,7 @@
 Flask==3.0.3
 Flask-Login==0.6.3
 Flask-PyMongo==3.0.1
-Flask-Navigation==0.2.0
+# Navigation handled in templates with Bootstrap CSS
 Flask-WTF==1.2.2
 Flask-Dance==7.1.0
 flask-paginate==2024.4.12

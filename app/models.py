@@ -1,6 +1,7 @@
 from flask_dance.consumer.storage import BaseStorage
 from flask_login import UserMixin
-from flask_pymongo import PyMongo, ObjectId
+from flask_pymongo import PyMongo
+from bson import ObjectId
 from bson import json_util
 from datetime import datetime
 from flask_wtf import FlaskForm
