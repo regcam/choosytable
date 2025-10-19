@@ -110,19 +110,26 @@
     --transition-slow: 0.5s ease-out;
 }
 
-/* Base Styles with Professional Enhancement */
+/* Base Styles with Appealing Professional Background */
 body {
     font-family: var(--font-family-primary);
     color: var(--text-primary);
-    background: linear-gradient(135deg, var(--white) 0%, var(--gray-50) 30%, var(--cream) 100%);
+    background: linear-gradient(135deg, 
+        #f8fafc 0%,           /* Light blue-gray */
+        #e2e8f0 25%,          /* Soft blue-gray */
+        #f1f5f9 50%,          /* Very light blue */
+        #fafbfc 75%,          /* Almost white with blue hint */
+        #ffffff 100%          /* Pure white */
+    );
     background-attachment: fixed;
+    min-height: 100vh;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
 }
 
-/* Professional Animated Background Elements */
+/* Enhanced Animated Background Elements */
 body::before {
     content: '';
     position: fixed;
@@ -131,17 +138,32 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 80%, rgba(30, 64, 175, 0.04) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 60%),
-        radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.02) 0%, transparent 60%);
+        radial-gradient(circle at 15% 85%, rgba(30, 64, 175, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 85% 15%, rgba(16, 185, 129, 0.05) 0%, transparent 55%),
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 30%, rgba(30, 64, 175, 0.02) 0%, transparent 70%);
     z-index: -1;
     pointer-events: none;
-    animation: backgroundFloat 30s ease-in-out infinite;
+    animation: backgroundFloat 40s ease-in-out infinite;
 }
 
 @keyframes backgroundFloat {
-    0%, 100% { opacity: 0.3; transform: translateY(0px) rotate(0deg); }
-    50% { opacity: 0.8; transform: translateY(-20px) rotate(1deg); }
+    0%, 100% { 
+        opacity: 0.4; 
+        transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+    }
+    25% {
+        opacity: 0.7;
+        transform: translateY(-15px) translateX(10px) rotate(0.5deg) scale(1.05);
+    }
+    50% { 
+        opacity: 1; 
+        transform: translateY(-30px) translateX(-5px) rotate(1deg) scale(1.1); 
+    }
+    75% {
+        opacity: 0.8;
+        transform: translateY(-10px) translateX(15px) rotate(-0.5deg) scale(1.02);
+    }
 }
 
 /* =======================

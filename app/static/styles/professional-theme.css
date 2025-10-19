@@ -1,6 +1,31 @@
 /* Professional Theme Enhancements for ChoosyTable */
 /* Modern, appealing color schemes with professional polish */
 
+/* Enhanced Background Pattern */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        /* Subtle dot pattern */
+        radial-gradient(circle at 1px 1px, rgba(30, 64, 175, 0.08) 1px, transparent 0);
+    background-size: 20px 20px;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 0.3;
+    animation: patternShift 60s ease-in-out infinite;
+}
+
+@keyframes patternShift {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(5px) translateY(-3px); }
+    50% { transform: translateX(-3px) translateY(5px); }
+    75% { transform: translateX(2px) translateY(-2px); }
+}
+
 /* Enhanced Button Styles */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
@@ -33,10 +58,12 @@
 /* Professional Card Styles */
 .hero-section {
     background: linear-gradient(135deg, 
-        rgba(30, 64, 175, 0.02) 0%, 
-        rgba(16, 185, 129, 0.02) 50%, 
-        rgba(139, 92, 246, 0.02) 100%);
-    border: 1px solid rgba(30, 64, 175, 0.08);
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(248, 250, 252, 0.95) 50%, 
+        rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(30, 64, 175, 0.1);
+    box-shadow: 0 8px 32px rgba(30, 64, 175, 0.12);
     position: relative;
 }
 
@@ -52,10 +79,10 @@
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(30, 64, 175, 0.1);
-    box-shadow: 0 4px 20px rgba(30, 64, 175, 0.08);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(30, 64, 175, 0.12);
+    box-shadow: 0 6px 24px rgba(30, 64, 175, 0.1);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -235,6 +262,30 @@
 .stat-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 30px rgba(30, 64, 175, 0.12);
+}
+
+/* Content container for better readability */
+.main-content {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.06);
+}
+
+/* Improve text contrast on all content areas */
+.container, .container-fluid {
+    position: relative;
+}
+
+.container > .row, .container-fluid > .row {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(30, 64, 175, 0.04);
 }
 
 .stat-number {
