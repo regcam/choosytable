@@ -56,10 +56,10 @@ body::before {
 
 /* Force RGB color space for better compatibility */
 :root {
-    --primary-color: rgb(31, 41, 55) !important;
-    --secondary-color: rgb(75, 85, 99) !important;
-    --accent-color: rgb(5, 150, 105) !important;
-    --accent-light: rgb(16, 185, 129) !important;
+    --primary-color: rgb(30, 64, 175) !important;
+    --secondary-color: rgb(15, 23, 42) !important;
+    --accent-color: rgb(16, 185, 129) !important;
+    --accent-light: rgb(52, 211, 153) !important;
 }
 
 /* Disable CSS animations that might cause issues */
@@ -73,12 +73,17 @@ body::before {
 }
 
 /* Fix button and link color rendering */
-.btn-primary,
+.btn-primary {
+    background-color: rgb(30, 64, 175) !important;
+    color: rgb(255, 255, 255) !important;
+    border-color: rgb(30, 64, 175) !important;
+}
+
 .btn-secondary,
 .nav-link {
-    color: rgb(31, 41, 55) !important;
+    color: rgb(30, 64, 175) !important;
     background-color: rgb(255, 255, 255) !important;
-    border-color: rgb(229, 231, 235) !important;
+    border-color: rgb(226, 232, 240) !important;
 }
 
 /* Fix card and surface colors */
@@ -93,18 +98,18 @@ body::before {
 .hero-title,
 .section-title,
 .feature-title {
-    color: rgb(31, 41, 55) !important;
+    color: rgb(15, 23, 42) !important;
 }
 
 .hero-description,
 .section-description,
 .feature-description {
-    color: rgb(75, 85, 99) !important;
+    color: rgb(71, 85, 105) !important;
 }
 
 /* Fix any remaining gradient issues */
 .progress-fill {
-    background: rgb(5, 150, 105) !important;
+    background: rgb(16, 185, 129) !important;
 }
 
 /* Force proper rendering mode */
