@@ -19,6 +19,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/fontawesome.css') }}">
     
+    <!-- Intel Graphics Compatibility Fix -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/intel-graphics-fix.css') }}">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
@@ -83,6 +86,7 @@
     </footer>
 
     <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/graphics-compatibility.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

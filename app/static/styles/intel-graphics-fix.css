@@ -1,0 +1,132 @@
+/* Intel Graphics Compatibility Fixes for ChosyTable */
+/* Addresses color distortion issues on Intel Iris Plus Graphics on macOS */
+
+/* Force hardware acceleration and fix color space issues */
+* {
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Fix backdrop-filter issues on Intel graphics */
+@supports (backdrop-filter: blur(20px)) {
+    .main-header {
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+    }
+}
+
+/* Fallback for systems with backdrop-filter issues */
+@supports not (backdrop-filter: blur(20px)) {
+    .main-header {
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
+
+/* Fix gradient rendering on Intel graphics */
+body {
+    background: #ffffff !important;
+    background-attachment: scroll !important;
+}
+
+/* Remove problematic animated background on Intel graphics */
+body::before {
+    display: none !important;
+}
+
+/* Simplify header gradients for Intel graphics */
+.main-header::before {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Fix text gradients that may appear distorted */
+.brand-title,
+.hero-highlight {
+    background: var(--primary-color) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* Force RGB color space for better compatibility */
+:root {
+    --primary-color: rgb(31, 41, 55) !important;
+    --secondary-color: rgb(75, 85, 99) !important;
+    --accent-color: rgb(5, 150, 105) !important;
+    --accent-light: rgb(16, 185, 129) !important;
+}
+
+/* Disable CSS animations that might cause issues */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Fix button and link color rendering */
+.btn-primary,
+.btn-secondary,
+.nav-link {
+    color: rgb(31, 41, 55) !important;
+    background-color: rgb(255, 255, 255) !important;
+    border-color: rgb(229, 231, 235) !important;
+}
+
+/* Fix card and surface colors */
+.hero-section,
+.feature-card,
+.visual-card {
+    background: rgb(255, 255, 255) !important;
+    border: 1px solid rgb(229, 231, 235) !important;
+}
+
+/* Ensure proper text contrast */
+.hero-title,
+.section-title,
+.feature-title {
+    color: rgb(31, 41, 55) !important;
+}
+
+.hero-description,
+.section-description,
+.feature-description {
+    color: rgb(75, 85, 99) !important;
+}
+
+/* Fix any remaining gradient issues */
+.progress-fill {
+    background: rgb(5, 150, 105) !important;
+}
+
+/* Force proper rendering mode */
+html {
+    -webkit-font-smoothing: subpixel-antialiased !important;
+    -moz-osx-font-smoothing: auto !important;
+}
+
+/* Intel graphics specific fixes */
+@media (-webkit-min-device-pixel-ratio: 1) {
+    /* Fix scaling issues on Intel graphics */
+    .hero-section,
+    .features-section,
+    .mission-section {
+        will-change: transform;
+        transform: translateZ(0);
+    }
+    
+    /* Disable problematic filters */
+    .main-header {
+        filter: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
