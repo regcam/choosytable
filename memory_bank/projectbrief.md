@@ -1,7 +1,7 @@
-# ChosyTable Project Brief
+# ChoosyTable Project Brief
 
 ## Mission Statement
-ChosyTable empowers People of Color (PoC) with corporate interview insights and company transparency data. Our core principle: **"Before we lend our talents to any company, we should know how they treat us."**
+ChoosyTable empowers People of Color (PoC) with corporate interview insights and company transparency data. Our core principle: **"Before we lend our talents to any company, we should know how they treat us."**
 
 ## Core Objectives
 1. **Statistical Analysis**: Provide data-driven insights on interview outcomes by ethnicity and position

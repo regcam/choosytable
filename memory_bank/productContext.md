@@ -3,7 +3,7 @@
 ## Problem Statement
 People of Color face systemic challenges in corporate hiring and workplace experiences, but lack transparent data about company practices and success rates. Traditional job platforms don't provide demographic-specific insights that could inform career decisions.
 
-## Why ChosyTable Exists
+## Why ChoosyTable Exists
 - **Information Gap**: PoC need data about their likelihood of success at specific companies
 - **Hidden Bias**: Corporate hiring practices often have hidden biases affecting PoC
 - **Community Need**: Shared experiences can empower better career decisions
@@ -38,7 +38,7 @@ People of Color face systemic challenges in corporate hiring and workplace exper
 - **Mobile-First**: Works perfectly on all devices
 
 ## Success Definition
-A successful ChosyTable empowers PoC to make informed career decisions by providing:
+A successful ChoosyTable empowers PoC to make informed career decisions by providing:
 - Accurate, up-to-date hiring statistics
 - Authentic workplace experiences
 - Clear data visualization

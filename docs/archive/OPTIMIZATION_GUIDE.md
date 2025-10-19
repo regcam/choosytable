@@ -1,7 +1,7 @@
-# 🚀 ChosyTable Performance Optimization Guide
+# 🚀 ChoosyTable Performance Optimization Guide
 
 ## Overview
-This guide documents comprehensive performance optimizations implemented for the ChosyTable application, addressing database performance, caching, security, and code organization issues.
+This guide documents comprehensive performance optimizations implemented for the ChoosyTable application, addressing database performance, caching, security, and code organization issues.
 
 ## 🎯 Performance Improvements Achieved
 
@@ -275,4 +275,4 @@ When making further optimizations:
 
 ## Summary
 
-These optimizations transform ChosyTable from a basic Flask application to a performance-optimized, secure, and maintainable web application. The improvements address critical bottlenecks while maintaining functionality and providing a foundation for future enhancements.
+These optimizations transform ChoosyTable from a basic Flask application to a performance-optimized, secure, and maintainable web application. The improvements address critical bottlenecks while maintaining functionality and providing a foundation for future enhancements.

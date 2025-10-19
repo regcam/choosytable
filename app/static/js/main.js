@@ -1,5 +1,5 @@
 /**
- * ChosyTable Frontend JavaScript
+ * ChoosyTable Frontend JavaScript
  * Handles mobile navigation and interactive features
  */
 

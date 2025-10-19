@@ -1,4 +1,4 @@
-# 🍽️ ChosyTable
+# 🍽️ ChoosyTable
 
 > **Empowering People of Color with corporate interview insights and company transparency data**
 
@@ -9,7 +9,7 @@
 
 ## 🎯 Purpose
 
-ChosyTable is a platform where People of Color (PoC) share and analyze their corporate and interview experiences. Our mission is to provide statistical insights about the likelihood of PoC receiving job offers for specific roles at different companies. **Before we lend our talents to any company, we should know how they treat us.**
+ChoosyTable is a platform where People of Color (PoC) share and analyze their corporate and interview experiences. Our mission is to provide statistical insights about the likelihood of PoC receiving job offers for specific roles at different companies. **Before we lend our talents to any company, we should know how they treat us.**
 
 ### ✨ Key Features
 

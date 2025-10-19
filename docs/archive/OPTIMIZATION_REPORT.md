@@ -1,5 +1,5 @@
 
-# ChosyTable Optimization Report
+# ChoosyTable Optimization Report
 Generated: 2025-10-14 13:05:48
 
 ## Applied Optimizations

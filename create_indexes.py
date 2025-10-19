@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MongoDB Index Creation Script for ChosyTable
+MongoDB Index Creation Script for ChoosyTable
 
 This script creates the necessary indexes to optimize database performance.
 Run this script after setting up your MongoDB database.

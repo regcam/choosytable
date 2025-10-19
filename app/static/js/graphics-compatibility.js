@@ -1,5 +1,5 @@
 /**
- * Graphics Compatibility Script for ChosyTable
+ * Graphics Compatibility Script for ChoosyTable
  * Detects Intel graphics and applies necessary fixes for color rendering issues
  */
 
@@ -127,7 +127,7 @@
     init();
     
     // Expose debug functions
-    window.ChosyTableGraphics = {
+    window.ChoosyTableGraphics = {
         detectIntelGraphics,
         applyFixes: applyIntelGraphicsFixes,
         isMacOS

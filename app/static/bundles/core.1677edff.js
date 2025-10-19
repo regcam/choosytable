@@ -1,4 +1,4 @@
-/* ChosyTable JS Bundle: core */
+/* ChoosyTable JS Bundle: core */
 /* Generated: 2025-10-14T12:59:04.090983 */
 
 /* === jquery/jquery.min.js === */

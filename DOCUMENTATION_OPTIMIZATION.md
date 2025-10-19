@@ -147,4 +147,4 @@ git commit -m "Optimize documentation with memory bank structure
 - Add clear navigation and quick reference"
 ```
 
-This optimization transforms ChosyTable's documentation from a collection of overlapping files into a coherent, navigable knowledge base that scales with the project's growth.
+This optimization transforms ChoosyTable's documentation from a collection of overlapping files into a coherent, navigable knowledge base that scales with the project's growth.

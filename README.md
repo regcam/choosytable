@@ -1,4 +1,4 @@
-# 🍽️ ChosyTable
+# 🍽️ ChoosyTable
 
 > **Empowering People of Color with corporate interview insights and company transparency data**
 
@@ -47,7 +47,7 @@ Our documentation is organized using a **memory bank structure** for maximum cla
 
 ### Core Documentation
 - **[Project Brief](memory_bank/projectbrief.md)** - Mission, objectives, and technical vision
-- **[Product Context](memory_bank/productContext.md)** - Why ChosyTable exists and how it works
+- **[Product Context](memory_bank/productContext.md)** - Why ChoosyTable exists and how it works
 - **[Technical Context](memory_bank/techContext.md)** - Technologies, setup, and constraints
 - **[System Patterns](memory_bank/systemPatterns.md)** - Architecture and design patterns
 - **[Active Context](memory_bank/activeContext.md)** - Current work focus and recent changes

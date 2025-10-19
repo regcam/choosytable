@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ChosyTable Optimization Setup Script
+ChoosyTable Optimization Setup Script
 
-This script helps you set up the optimizations for your ChosyTable application.
+This script helps you set up the optimizations for your ChoosyTable application.
 It will guide you through:
 1. Environment configuration
 2. Database index creation
@@ -170,7 +170,7 @@ def show_next_steps():
     """Show next steps after setup"""
     print_header("NEXT STEPS")
     
-    print("🎯 Your ChosyTable optimization setup is complete!")
+    print("🎯 Your ChoosyTable optimization setup is complete!")
     print("\nTo finish the setup:")
     print()
     print("1. 🔑 Configure OAuth:")
@@ -201,8 +201,8 @@ def show_next_steps():
 
 def main():
     """Main setup function"""
-    print("🏁 ChosyTable Optimization Setup")
-    print("This script will optimize your ChosyTable application")
+    print("🏁 ChoosyTable Optimization Setup")
+    print("This script will optimize your ChoosyTable application")
     print()
     
     # Change to the script's directory

@@ -1,5 +1,5 @@
 """
-Optimized routes for ChosyTable application.
+Optimized routes for ChoosyTable application.
 
 MAJOR OPTIMIZATIONS APPLIED:
 

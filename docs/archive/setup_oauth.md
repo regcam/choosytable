@@ -1,7 +1,7 @@
 # 🔐 Google OAuth Setup Guide
 
 ## Current Issue
-Your ChosyTable app is running but login fails because Google OAuth credentials are not configured.
+Your ChoosyTable app is running but login fails because Google OAuth credentials are not configured.
 
 ## Error Details
 - **URL being generated**: `https://accounts.google.com/o/oauth2/auth?client_id=your_google_oauth_client_id_here`
@@ -12,7 +12,7 @@ Your ChosyTable app is running but login fails because Google OAuth credentials 
 ### 1. Create Google Cloud Project
 1. Go to: https://console.cloud.google.com/
 2. Create a new project or select existing
-3. Name it something like "ChosyTable Dev"
+3. Name it something like "ChoosyTable Dev"
 
 ### 2. Enable Required APIs
 1. Go to "APIs & Services" → "Library"
@@ -25,7 +25,7 @@ Your ChosyTable app is running but login fails because Google OAuth credentials 
 2. Click "Create Credentials" → "OAuth client ID"
 3. Configure:
    - **Application type**: Web application
-   - **Name**: ChosyTable Local Dev
+   - **Name**: ChoosyTable Local Dev
    - **Authorized redirect URIs**: 
      ```
      http://localhost:5000/login/google/authorized
@@ -60,7 +60,7 @@ python3 -c "from app import app; app.run(debug=True, port=5000)"
 1. Visit: http://localhost:5000
 2. Click login - should redirect to Google
 3. Authenticate with your Google account
-4. Should redirect back to ChosyTable successfully
+4. Should redirect back to ChoosyTable successfully
 
 ## Troubleshooting
 - **"redirect_uri_mismatch"**: Check authorized URIs match exactly

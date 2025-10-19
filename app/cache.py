@@ -1,5 +1,5 @@
 """
-Improved caching module for ChosyTable
+Improved caching module for ChoosyTable
 Provides better cache key management, race condition handling, and invalidation strategies
 """
 
