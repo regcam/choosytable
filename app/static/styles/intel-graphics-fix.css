@@ -31,7 +31,7 @@
 
 /* Fix gradient rendering on Intel graphics */
 body {
-    background: #ffffff !important;
+    background: #e6f7ff !important;
     background-attachment: scroll !important;
 }
 
